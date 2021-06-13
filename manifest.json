@@ -1,0 +1,38 @@
+{
+  "name" : "Autobot Sabong",
+  "description" : "Bet online on higher odds",
+  "version" : "1.0",
+  "permissions" : [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "content_scripts" : [
+    {
+      "matches" : [
+        "*://wpc2022.live/*"
+      ],
+      "js" : [
+        "js/content.js"
+      ]
+    }
+  ],
+  "background" : {
+    "scripts" : [
+      "js/background.js"
+    ],
+    "persistent" : true
+  },
+  "browser_action" : {
+    "default_title" : "Autobot Sabong",
+    "default_popup" : "main.html"
+  },
+  "manifest_version" : 2,
+  "icons" : [
+    {
+      "16" : "Icons/icon16.png",
+      "48" : "Icons/icon48.png",
+      "128" : "Icons/icon128.png"
+    }
+  ]
+}
