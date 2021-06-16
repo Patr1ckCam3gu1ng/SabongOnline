@@ -1,6 +1,6 @@
 {
   "name": "Autobot Sabong",
-  "description": "Bet online on higher odds",
+  "description": "Automated sabong betting on a click of a button",
   "version": "1.0",
   "permissions": [
     "activeTab",
