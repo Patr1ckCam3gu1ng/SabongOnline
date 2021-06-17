@@ -3,13 +3,12 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
-    125,
+    132,
     281,
     914,
     1775,
     3837,
-    8790,
-    14278
+    7686
 ];
 
 let presentLevel = 0;
@@ -21,6 +20,7 @@ let betSide = '';
 let isBetOnHigherRoi = false;
 let lossStreakCount = 0;
 let winStreakCount = 0;
+let matchCompletedCount = 0;
 
 const diffTriggeredSubmit = 9;
 
@@ -93,6 +93,8 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe();
+                reverseBetIfAboveMatchCompletedThreshold();
+
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
@@ -116,6 +118,9 @@ const websocketConnect = (crfToken) => {
                         }
                     }
                 }
+
+                reverseBetIfAboveMatchCompletedThreshold();
+
                 if (betSide === '' || isBetSubmitted === false) {
                     console.log(`No bets detected! ${winner} wins`);
                     isBetSubmitted = false;
@@ -125,21 +130,19 @@ const websocketConnect = (crfToken) => {
                     if (isWinner) {
                         presentLevel = 0;
                         winStreakCount = winStreakCount + 1;
-                        lossStreakCount = 0;
+
+                        reverseBetIfLosingStreak();
                     } else {
                         presentLevel = presentLevel + 1;
-                        lossStreakCount = lossStreakCount + 1;
+                        increaseLossStreak();
                     }
                 }
 
                 isBetSubmitted = false;
-                console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
+                printRemainingLives();
 
                 // reverse betting
-                if (winStreakCount > 3 && winner === betSide) {
-                    reverseBet();
-                }
-                if (lossStreakCount > 3) {
+                if (winStreakCount > (isBetOnHigherRoi ? 2 : 3) && isWinner) {
                     reverseBet();
                 }
 
@@ -207,10 +210,31 @@ function reverseBet() {
 
     lossStreakCount = 0;
     winStreakCount = 0;
+    matchCompletedCount = 0;
 }
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
-    console.log(`${presentLevel + 1} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
+    printRemainingLives();
+}
+function printRemainingLives() {
+    console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
+}
+function increaseLossStreak() {
+    lossStreakCount = lossStreakCount + 1;
+}
+function reverseBetIfLosingStreak() {
+    if (lossStreakCount >= 3) {
+        reverseBet();
+    }
+
+    lossStreakCount = 0;
+}
+function reverseBetIfAboveMatchCompletedThreshold() {
+    matchCompletedCount = matchCompletedCount + 1;
+
+    if (matchCompletedCount >= 4 && (lossStreakCount > 1 || winStreakCount > 1)) {
+        reverseBet();
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
