@@ -1,14 +1,17 @@
-var websocket;
+let websocket;
 let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
-    132,
-    281,
-    914,
-    1775,
-    3837,
-    7686
+    100,
+    100,
+    239,
+    615,
+    // 1299,
+    // 2603,
+    // 5495,
+    // 11601,
+    // 24491
 ];
 
 let presentLevel = 0;
@@ -17,12 +20,10 @@ let previousDiff = 0;
 let diffTriggeredCount = 0;
 let isBetSubmitted = false;
 let betSide = '';
-let isBetOnHigherRoi = false;
+let hasPicked = false;
 let lossStreakCount = 0;
-let winStreakCount = 0;
-let matchCompletedCount = 0;
 
-const diffTriggeredSubmit = 9;
+const diffTriggeredSubmit = 2;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -91,9 +92,10 @@ const websocketConnect = (crfToken) => {
             const isOpenBet = fightData.open_bet === 'yes';
             const isNewFight = fightData.newFight === 'yes';
 
+            hasPicked = false;
+
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe();
-                reverseBetIfAboveMatchCompletedThreshold();
 
                 return;
             }
@@ -108,6 +110,7 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
+
                         isBetSubmitted = false;
                         return;
                     } else {
@@ -119,8 +122,6 @@ const websocketConnect = (crfToken) => {
                     }
                 }
 
-                reverseBetIfAboveMatchCompletedThreshold();
-
                 if (betSide === '' || isBetSubmitted === false) {
                     console.log(`No bets detected! ${winner} wins`);
                     isBetSubmitted = false;
@@ -129,22 +130,20 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isWinner) {
                         presentLevel = 0;
-                        winStreakCount = winStreakCount + 1;
 
-                        reverseBetIfLosingStreak();
+                        if (lossStreakCount >= 2) {
+
+                        }
                     } else {
                         presentLevel = presentLevel + 1;
-                        increaseLossStreak();
+                        lossStreakCount = lossStreakCount + 1;
+
+
                     }
                 }
 
                 isBetSubmitted = false;
                 printRemainingLives();
-
-                // reverse betting
-                if (winStreakCount > (isBetOnHigherRoi ? 2 : 3) && isWinner) {
-                    reverseBet();
-                }
 
                 return;
             }
@@ -161,16 +160,13 @@ const websocketConnect = (crfToken) => {
 
             const fightData = data[2];
 
-            betSide = (isBetOnHigherRoi
-                ? (fightData.meron_odds > fightData.wala_odds)
-                : (fightData.meron_odds < fightData.wala_odds))
-                ? 'meron' : 'wala';
+            betSide = randomPickBetSide();
 
             if (previousOdds > 0) {
                 const calc = (fightData.meron_odds / previousOdds) * 100;
                 const diff = calc > previousDiff ? calc - previousDiff : previousDiff - calc;
                 previousDiff = calc;
-                if (diff < 1.4) {
+                if (diff < 10) {
                     chrome.tabs.sendMessage(tab.id, {
                         text: "placeBet",
                         betSide: betSide
@@ -184,10 +180,12 @@ const websocketConnect = (crfToken) => {
 
             if (diffTriggeredCount >= diffTriggeredSubmit) {
                 console.log('--------------------');
-                console.log(`Betting for ${betSide}`);
+                console.log(`Betting for -%c${betSide}-`, 'font-weight: bold; color: pink');
+
                 chrome.tabs.sendMessage(tab.id, {
                     text: "submitBet"
                 });
+
                 isBetSubmitted = true;
             }
         }
@@ -204,14 +202,7 @@ const websocketConnect = (crfToken) => {
     }, 15000);
 }
 
-function reverseBet() {
-    isBetOnHigherRoi = !isBetOnHigherRoi;
-    console.log(`%c--==* Betting is now reversed! Now betting by ${isBetOnHigherRoi ? 'higher' : 'lower'} ROI *==--`, 'font-weight: bold; color: pink');
 
-    lossStreakCount = 0;
-    winStreakCount = 0;
-    matchCompletedCount = 0;
-}
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
     printRemainingLives();
@@ -219,23 +210,34 @@ function paymentSafe(isDraw) {
 function printRemainingLives() {
     console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
 }
-function increaseLossStreak() {
-    lossStreakCount = lossStreakCount + 1;
-}
-function reverseBetIfLosingStreak() {
-    if (lossStreakCount >= 3) {
-        reverseBet();
-    }
+ function randomPickBetSide() {
+     if (betSide === '') {
+         hasPicked = false;
+     }
+     if (hasPicked === true) {
+         return betSide;
+     }
 
-    lossStreakCount = 0;
-}
-function reverseBetIfAboveMatchCompletedThreshold() {
-    matchCompletedCount = matchCompletedCount + 1;
+     hasPicked = true;
 
-    if (matchCompletedCount >= 4 && (lossStreakCount > 1 || winStreakCount > 1)) {
-        reverseBet();
-    }
-}
+     const shuffleNames = (array) => {
+         let oldElement;
+         for (let i = array.length - 1; i > 0; i--) {
+             let rand = Math.floor(Math.random() * (i + 1));
+             oldElement = array[i];
+             array[i] = array[rand];
+             array[rand] = oldElement;
+         }
+
+         return array;
+     }
+
+     const meron = 'meron';
+     const wala = 'wala';
+
+     const shuffleIndex = shuffleNames([0, 1])[0];
+     return shuffleNames([meron, wala])[shuffleIndex];
+ }
 
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
     if (info.status === "complete") {
