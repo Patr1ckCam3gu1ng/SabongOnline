@@ -3,27 +3,15 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
-    100,
-    100,
-    239,
-    615,
-    // 1299,
-    // 2603,
-    // 5495,
-    // 11601,
-    // 24491
+    140
 ];
 
 let presentLevel = 0;
-let previousOdds = 0;
 let previousDiff = 0;
-let diffTriggeredCount = 0;
 let isBetSubmitted = false;
 let betSide = '';
 let hasPicked = false;
-let lossStreakCount = 0;
-
-const diffTriggeredSubmit = 2;
+let finalBetside = '';
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -60,7 +48,7 @@ const websocketConnect = (crfToken) => {
         websocket.send(`42${JSON.stringify(subscriptionBody)}`);
     };
 
-    websocket.onmessage = function (event) {
+    websocket.onmessage = async function (event) {
         if (event.data === '3') {
             return;
         }
@@ -100,11 +88,9 @@ const websocketConnect = (crfToken) => {
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
-                diffTriggeredCount = 0;
-                previousOdds = 0;
                 previousDiff = 0;
 
-                const isWinner = winner === betSide;
+                const isWinner = winner === finalBetside;
                 const isDraw = winner === 'draw';
 
                 if (isBetSubmitted === true) {
@@ -117,12 +103,12 @@ const websocketConnect = (crfToken) => {
                         if (isWinner) {
                             console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
                         } else {
-                            console.log('%cYou lose!', 'font-weight: bold; color: red', 'Your bet is', `${betSide} but ${winner} wins`);
+                            console.log('%cYou lose!', 'font-weight: bold; color: red', 'Your bet is', `${finalBetside} but ${winner} wins`);
                         }
                     }
                 }
 
-                if (betSide === '' || isBetSubmitted === false) {
+                if (finalBetside === '' || isBetSubmitted === false) {
                     console.log(`No bets detected! ${winner} wins`);
                     isBetSubmitted = false;
                     return;
@@ -130,15 +116,8 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isWinner) {
                         presentLevel = 0;
-
-                        if (lossStreakCount >= 2) {
-
-                        }
                     } else {
                         presentLevel = presentLevel + 1;
-                        lossStreakCount = lossStreakCount + 1;
-
-
                     }
                 }
 
@@ -148,46 +127,41 @@ const websocketConnect = (crfToken) => {
                 return;
             }
             if (fightStatus === 'on-going' && isOpenBet === false && isNewFight === false) {
-                previousOdds = 0;
-
                 return;
             }
         }
         if (fightEvent === 'App\\Events\\BettingPosted' && isBetting === true) {
+            await new Promise(resolve => setTimeout(resolve, 8000));
+
             if (isBetSubmitted === true) {
                 return;
             }
 
-            const fightData = data[2];
+            finalBetside = '';
+            finalBetside = betSide;
 
-            betSide = randomPickBetSide();
+            finalBetside = '';
+            finalBetside = betSide;
 
-            if (previousOdds > 0) {
-                const calc = (fightData.meron_odds / previousOdds) * 100;
-                const diff = calc > previousDiff ? calc - previousDiff : previousDiff - calc;
-                previousDiff = calc;
-                if (diff < 10) {
-                    chrome.tabs.sendMessage(tab.id, {
-                        text: "placeBet",
-                        betSide: betSide
-                    });
-                    diffTriggeredCount++;
-                }
-            }
-
-            previousOdds = fightData.meron_odds;
+            await new Promise(resolve => setTimeout(resolve, 500));
             chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
 
-            if (diffTriggeredCount >= diffTriggeredSubmit) {
-                console.log('--------------------');
-                console.log(`Betting for -%c${betSide}-`, 'font-weight: bold; color: pink');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            chrome.tabs.sendMessage(tab.id, {text: "placeBet", betSide: finalBetside});
 
-                chrome.tabs.sendMessage(tab.id, {
-                    text: "submitBet"
-                });
+            await new Promise(resolve => setTimeout(resolve, 3000));
 
-                isBetSubmitted = true;
+            if (isBetSubmitted === true) {
+                return;
             }
+
+            chrome.tabs.sendMessage(tab.id, {text: "submitBet"});
+
+            console.log('--------------------');
+            console.log(`Betting for -%c${finalBetside}-`, 'font-weight: bold; color: pink');
+
+            hasPicked = true;
+            isBetSubmitted = true;
         }
     }
     websocket.onclose = function () {
@@ -200,6 +174,25 @@ const websocketConnect = (crfToken) => {
         } catch (e) {
         }
     }, 15000);
+
+    setInterval(async function () {
+        const shuffleNames = (array) => {
+            let oldElement;
+            for (let i = array.length - 1; i > 0; i--) {
+                let rand = Math.floor(Math.random() * (i + 1));
+                oldElement = array[i];
+                array[i] = array[rand];
+                array[rand] = oldElement;
+            }
+
+            return array;
+        }
+
+        const meron = 'meron';
+        const wala = 'wala';
+
+        betSide = shuffleNames([meron, wala])[0];
+    }, 100);
 }
 
 
@@ -210,34 +203,6 @@ function paymentSafe(isDraw) {
 function printRemainingLives() {
     console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
 }
- function randomPickBetSide() {
-     if (betSide === '') {
-         hasPicked = false;
-     }
-     if (hasPicked === true) {
-         return betSide;
-     }
-
-     hasPicked = true;
-
-     const shuffleNames = (array) => {
-         let oldElement;
-         for (let i = array.length - 1; i > 0; i--) {
-             let rand = Math.floor(Math.random() * (i + 1));
-             oldElement = array[i];
-             array[i] = array[rand];
-             array[rand] = oldElement;
-         }
-
-         return array;
-     }
-
-     const meron = 'meron';
-     const wala = 'wala';
-
-     const shuffleIndex = shuffleNames([0, 1])[0];
-     return shuffleNames([meron, wala])[shuffleIndex];
- }
 
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
     if (info.status === "complete") {
