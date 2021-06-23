@@ -22,6 +22,8 @@ let finalBetside = meron;
 
 let winStreak = 0;
 let lossStreak = 0;
+let succeedingLossStreak = 0;
+
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -94,9 +96,9 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe();
+                setFinalBet();
 
                 isBetSubmitted = false;
-
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
@@ -108,6 +110,7 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
+                        setFinalBet();
 
                         isBetSubmitted = false;
                         return;
@@ -131,10 +134,12 @@ const websocketConnect = (crfToken) => {
 
                         winStreak = winStreak + 1;
                         lossStreak = 0;
+                        succeedingLossStreak = 0;
                     } else {
                         presentLevel = presentLevel + 1;
 
                         lossStreak = lossStreak + 1;
+                        succeedingLossStreak = succeedingLossStreak + 1;
                         winStreak = 0;
                     }
                 }
@@ -160,7 +165,7 @@ const websocketConnect = (crfToken) => {
             setFinalBet();
 
             // Do not reverse if streaking
-            if (winStreak > 1 || lossStreak > 1) {
+            if (winStreak > 1 || (lossStreak > 1 && succeedingLossStreak > 2)) {
                 setFinalBet();
                 restartStreaks();
             }
