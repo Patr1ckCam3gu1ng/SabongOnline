@@ -3,16 +3,16 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
-    300,
-    300,
-    633,
-    1337,
-    2822,
-    5958
+    281,
+    612,
+    1292,
+    2728
 ];
 
 const meron = 'meron';
 const wala = 'wala';
+
+const maxGame = 8;
 
 let presentLevel = 0;
 let previousDiff = 0;
@@ -23,7 +23,10 @@ let finalBetside = meron;
 let winStreak = 0;
 let lossStreak = 0;
 let succeedingLossStreak = 0;
-
+let gameProgressCount = 0;
+let gameSkippedCount = 0;
+let isPauseGameNextRound = false;
+let isGamePaused = false;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -99,10 +102,17 @@ const websocketConnect = (crfToken) => {
                 setFinalBet();
 
                 isBetSubmitted = false;
+                isPauseGameNextRound = false;
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
                 previousDiff = 0;
+
+                gameProgressCount = gameProgressCount + 1;
+
+                if(isGamePaused === true) {
+                    gameSkippedCount = gameSkippedCount + 1;
+                }
 
                 const isWinner = winner === finalBetside;
                 const isDraw = winner === 'draw';
@@ -113,18 +123,22 @@ const websocketConnect = (crfToken) => {
                         setFinalBet();
 
                         isBetSubmitted = false;
+                        isPauseGameNextRound = false;
                         return;
                     } else {
                         if (isWinner) {
                             console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
+                            isPauseGameNextRound = true;
                         } else {
                             console.log('%cYou lose!', 'font-weight: bold; color: red', 'Your bet is', `${finalBetside} but ${winner} wins`);
                         }
                     }
                 }
 
-                if (finalBetside === '' || isBetSubmitted === false) {
-                    console.log(`No bets detected! ${winner} wins`);
+                if ((finalBetside === '' || isBetSubmitted === false)) {
+                    if (isGamePaused === false) {
+                        console.log(`No bets detected! ${winner} wins`);
+                    }
                     isBetSubmitted = false;
                     return;
                 }
@@ -154,6 +168,25 @@ const websocketConnect = (crfToken) => {
             }
         }
         if (fightEvent === 'App\\Events\\BettingPosted' && isBetting === true) {
+            // Rest for 2 games
+            if(gameSkippedCount > 1 && isPauseGameNextRound === true && isGamePaused === true){
+                gameSkippedCount = 0;
+                gameProgressCount = 0;
+                isPauseGameNextRound = false;
+                isGamePaused = false;
+
+                restartStreaks()
+
+                console.log(`%c-= Game recommencing =-`, 'font-weight: bold; color: orange');
+            }
+            if(gameProgressCount >= maxGame && isPauseGameNextRound === true && winStreak > 1) {
+                console.log(`%c-= Game skipped: ${gameSkippedCount + 1} of 2 =-`, 'font-weight: bold; color: orange');
+                isGamePaused = true;
+                return;
+            }
+
+            isPauseGameNextRound = false;
+
             await new Promise(resolve => setTimeout(resolve, 10000));
 
             if (isBetSubmitted === true) {
@@ -165,6 +198,7 @@ const websocketConnect = (crfToken) => {
             setFinalBet();
 
             // Do not reverse if streaking
+            // Do not reverse if losing streak is more than 3 times
             if (winStreak > 1 || (lossStreak > 1 && succeedingLossStreak > 2)) {
                 setFinalBet();
                 restartStreaks();
@@ -201,6 +235,7 @@ const websocketConnect = (crfToken) => {
 function restartStreaks() {
     winStreak = 0;
     lossStreak = 0;
+    succeedingLossStreak = 0;
 }
 function setFinalBet() {
     if (finalBetside === meron) {
