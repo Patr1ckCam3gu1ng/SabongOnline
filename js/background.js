@@ -3,15 +3,25 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
-    140
+    300,
+    300,
+    633,
+    1337,
+    2822,
+    5958
 ];
+
+const meron = 'meron';
+const wala = 'wala';
 
 let presentLevel = 0;
 let previousDiff = 0;
 let isBetSubmitted = false;
-let betSide = '';
 let hasPicked = false;
-let finalBetside = '';
+let finalBetside = meron;
+
+let winStreak = 0;
+let lossStreak = 0;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -85,6 +95,8 @@ const websocketConnect = (crfToken) => {
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe();
 
+                isBetSubmitted = false;
+
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
@@ -116,8 +128,14 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isWinner) {
                         presentLevel = 0;
+
+                        winStreak = winStreak + 1;
+                        lossStreak = 0;
                     } else {
                         presentLevel = presentLevel + 1;
+
+                        lossStreak = lossStreak + 1;
+                        winStreak = 0;
                     }
                 }
 
@@ -131,25 +149,24 @@ const websocketConnect = (crfToken) => {
             }
         }
         if (fightEvent === 'App\\Events\\BettingPosted' && isBetting === true) {
-            await new Promise(resolve => setTimeout(resolve, 8000));
+            await new Promise(resolve => setTimeout(resolve, 10000));
 
             if (isBetSubmitted === true) {
                 return;
             }
 
-            finalBetside = '';
-            finalBetside = betSide;
-
-            finalBetside = '';
-            finalBetside = betSide;
-
-            await new Promise(resolve => setTimeout(resolve, 500));
             chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
+
+            setFinalBet();
+
+            // Do not reverse if streaking
+            if (winStreak > 1 || lossStreak > 1) {
+                setFinalBet();
+                restartStreaks();
+            }
 
             await new Promise(resolve => setTimeout(resolve, 500));
             chrome.tabs.sendMessage(tab.id, {text: "placeBet", betSide: finalBetside});
-
-            await new Promise(resolve => setTimeout(resolve, 3000));
 
             if (isBetSubmitted === true) {
                 return;
@@ -174,34 +191,25 @@ const websocketConnect = (crfToken) => {
         } catch (e) {
         }
     }, 15000);
-
-    setInterval(async function () {
-        const shuffleNames = (array) => {
-            let oldElement;
-            for (let i = array.length - 1; i > 0; i--) {
-                let rand = Math.floor(Math.random() * (i + 1));
-                oldElement = array[i];
-                array[i] = array[rand];
-                array[rand] = oldElement;
-            }
-
-            return array;
-        }
-
-        const meron = 'meron';
-        const wala = 'wala';
-
-        betSide = shuffleNames([meron, wala])[0];
-    }, 100);
 }
 
-
+function restartStreaks() {
+    winStreak = 0;
+    lossStreak = 0;
+}
+function setFinalBet() {
+    if (finalBetside === meron) {
+        finalBetside = wala;
+    } else if (finalBetside === wala) {
+        finalBetside = meron;
+    }
+}
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
     printRemainingLives();
 }
 function printRemainingLives() {
-    console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos. Good luck!`);
+    console.log(`${betLevel.length - presentLevel} of ${betLevel.length} lives remaining. Bets will be now at ${betLevel[presentLevel]} pesos.`);
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
