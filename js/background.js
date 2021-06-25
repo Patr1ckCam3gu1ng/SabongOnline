@@ -4,9 +4,9 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 const betLevel = [
     281,
+    281,
     612,
-    1292,
-    2728
+    1292
 ];
 
 const meron = 'meron';
@@ -18,7 +18,7 @@ let presentLevel = 0;
 let previousDiff = 0;
 let isBetSubmitted = false;
 let hasPicked = false;
-let finalBetside = meron;
+let finalBetside = wala;
 
 let winStreak = 0;
 let lossStreak = 0;
@@ -174,8 +174,9 @@ const websocketConnect = (crfToken) => {
                 gameProgressCount = 0;
                 isPauseGameNextRound = false;
                 isGamePaused = false;
+                isBetSubmitted = false;
 
-                restartStreaks()
+                // restartStreaks()
 
                 console.log(`%c-= Game recommencing =-`, 'font-weight: bold; color: orange');
             }
@@ -187,7 +188,7 @@ const websocketConnect = (crfToken) => {
 
             isPauseGameNextRound = false;
 
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            await new Promise(resolve => setTimeout(resolve, 22000));
 
             if (isBetSubmitted === true) {
                 return;
@@ -199,7 +200,7 @@ const websocketConnect = (crfToken) => {
 
             // Do not reverse if streaking
             // Do not reverse if losing streak is more than 3 times
-            if (winStreak > 1 || (lossStreak > 1 && succeedingLossStreak > 2)) {
+            if (winStreak > 1) {
                 setFinalBet();
                 restartStreaks();
             }
