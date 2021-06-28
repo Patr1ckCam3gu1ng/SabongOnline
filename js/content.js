@@ -12,21 +12,17 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         if ($cancel.length > 0) {
             $cancel[0].click()
         }
-        setTimeout(function () {
-            const betSide = msg.betSide === 'meron' ? 0 : 1;
-            const $postBet = document.getElementsByClassName("post-bet");
-            if ($postBet.length > 0) {
-                $postBet[betSide].click();
-            }
-        }, 100);
+        const betSide = msg.betSide === 'meron' ? 0 : 1;
+        const $postBet = document.getElementsByClassName("post-bet");
+        if ($postBet.length > 0) {
+            $postBet[betSide].click();
+        }
     }
     if (msg.text === "submitBet") {
-        setTimeout(function () {
-            const $confirm = document.getElementsByClassName("swal2-confirm");
-            if ($confirm.length > 0) {
-                $confirm[0].click();
-            }
-        }, 300);
+        const $confirm = document.getElementsByClassName("swal2-confirm");
+        if ($confirm.length > 0) {
+            $confirm[0].click();
+        }
     }
 
     function inputBet() {

@@ -2,31 +2,39 @@ let websocket;
 let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
-const betLevel = [
-    281,
-    281,
+let betLevel = [
+    // 100,
+    // 100,
+    // 311,
+    // 745,
+    // 1684,
+    // 3656
     612,
-    1292
+    612,
+    1292,
+    2728,
+    5759
 ];
 
 const meron = 'meron';
 const wala = 'wala';
 
-const maxGame = 8;
+let pinger;
+// let autoReverter;
 
 let presentLevel = 0;
 let previousDiff = 0;
 let isBetSubmitted = false;
 let hasPicked = false;
 let finalBetside = wala;
+let isBetOnHigherRoi = false;
 
 let winStreak = 0;
-let lossStreak = 0;
-let succeedingLossStreak = 0;
-let gameProgressCount = 0;
-let gameSkippedCount = 0;
-let isPauseGameNextRound = false;
-let isGamePaused = false;
+let alternateCount = 0;
+
+let timer;
+let timerIndex = 0;
+let maxWaitTimes = 85;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -85,6 +93,10 @@ const websocketConnect = (crfToken) => {
 
         if (presentLevel > betLevel.length - 1) {
             console.log('Insufficient funds!');
+            clearInterval(pinger);
+            // clearInterval(autoReverter);
+            websocket.close();
+
             return;
         }
 
@@ -97,22 +109,19 @@ const websocketConnect = (crfToken) => {
 
             hasPicked = false;
 
-            if (fightStatus === 'cancelled' && isOpenBet === false) {
-                paymentSafe();
-                setFinalBet();
+            // Fix issue whereas the betting is closed but bet is not yet submitted
+            if (timerIndex > 0) {
+                clearTimeout(timer);
+                timerIndex = 0;
+            }
 
+            if (fightStatus === 'cancelled' && isOpenBet === false) {
+                // paymentSafe();
                 isBetSubmitted = false;
-                isPauseGameNextRound = false;
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
                 previousDiff = 0;
-
-                gameProgressCount = gameProgressCount + 1;
-
-                if(isGamePaused === true) {
-                    gameSkippedCount = gameSkippedCount + 1;
-                }
 
                 const isWinner = winner === finalBetside;
                 const isDraw = winner === 'draw';
@@ -120,25 +129,20 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
-                        setFinalBet();
 
                         isBetSubmitted = false;
-                        isPauseGameNextRound = false;
                         return;
                     } else {
                         if (isWinner) {
                             console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
-                            isPauseGameNextRound = true;
                         } else {
                             console.log('%cYou lose!', 'font-weight: bold; color: red', 'Your bet is', `${finalBetside} but ${winner} wins`);
                         }
                     }
                 }
 
-                if ((finalBetside === '' || isBetSubmitted === false)) {
-                    if (isGamePaused === false) {
-                        console.log(`No bets detected! ${winner} wins`);
-                    }
+                if (finalBetside === '' || isBetSubmitted === false) {
+                    console.log(`No bets detected! ${winner} wins`);
                     isBetSubmitted = false;
                     return;
                 }
@@ -147,13 +151,8 @@ const websocketConnect = (crfToken) => {
                         presentLevel = 0;
 
                         winStreak = winStreak + 1;
-                        lossStreak = 0;
-                        succeedingLossStreak = 0;
                     } else {
                         presentLevel = presentLevel + 1;
-
-                        lossStreak = lossStreak + 1;
-                        succeedingLossStreak = succeedingLossStreak + 1;
                         winStreak = 0;
                     }
                 }
@@ -168,42 +167,23 @@ const websocketConnect = (crfToken) => {
             }
         }
         if (fightEvent === 'App\\Events\\BettingPosted' && isBetting === true) {
-            // Rest for 2 games
-            if(gameSkippedCount > 1 && isPauseGameNextRound === true && isGamePaused === true){
-                gameSkippedCount = 0;
-                gameProgressCount = 0;
-                isPauseGameNextRound = false;
-                isGamePaused = false;
-                isBetSubmitted = false;
-
-                // restartStreaks()
-
-                console.log(`%c-= Game recommencing =-`, 'font-weight: bold; color: orange');
-            }
-            if(gameProgressCount >= maxGame && isPauseGameNextRound === true && winStreak > 1) {
-                console.log(`%c-= Game skipped: ${gameSkippedCount + 1} of 2 =-`, 'font-weight: bold; color: orange');
-                isGamePaused = true;
-                return;
-            }
-
-            isPauseGameNextRound = false;
-
-            await new Promise(resolve => setTimeout(resolve, 22000));
-
             if (isBetSubmitted === true) {
                 return;
             }
 
-            chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
-
-            setFinalBet();
-
-            // Do not reverse if streaking
-            // Do not reverse if losing streak is more than 3 times
-            if (winStreak > 1) {
-                setFinalBet();
-                restartStreaks();
+            if (timerIndex === 0) {
+                startTimer();
             }
+
+            if (timerIndex <= maxWaitTimes) {
+                return;
+            }
+
+            stopTimer();
+
+            setFinalBet(data[2]);
+
+            chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
 
             await new Promise(resolve => setTimeout(resolve, 500));
             chrome.tabs.sendMessage(tab.id, {text: "placeBet", betSide: finalBetside});
@@ -212,10 +192,11 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
+            await new Promise(resolve => setTimeout(resolve, 500));
             chrome.tabs.sendMessage(tab.id, {text: "submitBet"});
 
             console.log('--------------------');
-            console.log(`Betting for -%c${finalBetside}-`, 'font-weight: bold; color: pink');
+            console.log(`Betting for %c${finalBetside} with ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
             hasPicked = true;
             isBetSubmitted = true;
@@ -225,25 +206,45 @@ const websocketConnect = (crfToken) => {
         websocket = undefined;
         console.log('Connection Closed!!!!');
     };
-    setInterval(function () {
+    pinger = setInterval(function () {
         try {
             websocket.send('2');
         } catch (e) {
         }
     }, 15000);
+    // autoReverter = setInterval(function () {
+    //     isBetOnHigherRoi = !isBetOnHigherRoi;
+    //     alternateCount = 1;
+    //     console.log('%c-----= Auto-revert initialized =-----', 'font-weight: bold; color: cyan; font-size: 12px');
+    // }, 1320000 /* 22 minutes */);
 }
 
+function startTimer() {
+    timer = setInterval(function () {
+        timerIndex = timerIndex + 1;
+    }, 1000);
+}
+function stopTimer() {
+    clearTimeout(timer);
+    timerIndex = 0;
+}
 function restartStreaks() {
     winStreak = 0;
-    lossStreak = 0;
-    succeedingLossStreak = 0;
 }
-function setFinalBet() {
-    if (finalBetside === meron) {
-        finalBetside = wala;
-    } else if (finalBetside === wala) {
-        finalBetside = meron;
-    }
+function setFinalBet(fightData) {
+    reverseBet();
+    finalBetside = (isBetOnHigherRoi
+        ? (fightData.meron_odds > fightData.wala_odds)
+        : (fightData.meron_odds < fightData.wala_odds))
+        ? meron : wala;
+
+    alternateCount = alternateCount + 1;
+}
+function reverseBet() {
+    // if (alternateCount >= 2) {
+        isBetOnHigherRoi = !isBetOnHigherRoi;
+        // alternateCount = 0;
+    // }
 }
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
