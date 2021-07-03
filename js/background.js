@@ -19,14 +19,9 @@ const wala = 'wala';
 let pinger;
 
 let presentLevel = 0;
-let previousDiff = 0;
 let isBetSubmitted = false;
-let hasPicked = false;
 let finalBetside = wala;
 let isBetOnHigherRoi = false;
-
-let winStreak = 0;
-let alternateCount = 0;
 
 let timer;
 let timerIndex = 0;
@@ -90,7 +85,6 @@ const websocketConnect = (crfToken) => {
         if (presentLevel > betLevel.length - 1) {
             console.log('Insufficient funds!');
             clearInterval(pinger);
-            // clearInterval(autoReverter);
             websocket.close();
 
             return;
@@ -103,8 +97,6 @@ const websocketConnect = (crfToken) => {
             const isOpenBet = fightData.open_bet === 'yes';
             const isNewFight = fightData.newFight === 'yes';
 
-            hasPicked = false;
-
             // Fix issue whereas the betting is closed but bet is not yet submitted
             if (timerIndex > 0) {
                 clearTimeout(timer);
@@ -112,12 +104,11 @@ const websocketConnect = (crfToken) => {
             }
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
-                // paymentSafe();
+                paymentSafe(false);
                 isBetSubmitted = false;
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
-                previousDiff = 0;
 
                 const isWinner = winner === finalBetside;
                 const isDraw = winner === 'draw';
@@ -125,7 +116,6 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
-
                         isBetSubmitted = false;
                         return;
                     } else {
@@ -145,11 +135,8 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isWinner) {
                         presentLevel = 0;
-
-                        winStreak = winStreak + 1;
                     } else {
                         presentLevel = presentLevel + 1;
-                        winStreak = 0;
                     }
                 }
 
@@ -194,12 +181,14 @@ const websocketConnect = (crfToken) => {
             console.log('--------------------');
             console.log(`Betting for %c${finalBetside} with ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
-            hasPicked = true;
             isBetSubmitted = true;
         }
     }
     websocket.onclose = function () {
         websocket = undefined;
+        clearInterval(pinger);
+        websocket.close();
+
         console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px');
     };
     pinger = setInterval(function () {
@@ -219,23 +208,15 @@ function stopTimer() {
     clearTimeout(timer);
     timerIndex = 0;
 }
-function restartStreaks() {
-    winStreak = 0;
-}
 function setFinalBet(fightData) {
     reverseBet();
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds)
         : (fightData.meron_odds < fightData.wala_odds))
         ? meron : wala;
-
-    alternateCount = alternateCount + 1;
 }
 function reverseBet() {
-    // if (alternateCount >= 2) {
-        isBetOnHigherRoi = !isBetOnHigherRoi;
-        // alternateCount = 0;
-    // }
+    isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
