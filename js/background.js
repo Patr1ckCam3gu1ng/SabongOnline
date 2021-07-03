@@ -3,24 +3,20 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 let betLevel = [
-    // 100,
-    // 100,
-    // 311,
-    // 745,
-    // 1684,
-    // 3656
-    612,
-    612,
-    1292,
-    2728,
-    5759
+    147,
+    147,
+    311,
+    745,
+    1684,
+    3656,
+    7818,
+    10492
 ];
 
 const meron = 'meron';
 const wala = 'wala';
 
 let pinger;
-// let autoReverter;
 
 let presentLevel = 0;
 let previousDiff = 0;
@@ -34,7 +30,7 @@ let alternateCount = 0;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 85;
+let maxWaitTimes = 72;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -204,7 +200,7 @@ const websocketConnect = (crfToken) => {
     }
     websocket.onclose = function () {
         websocket = undefined;
-        console.log('Connection Closed!!!!');
+        console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px');
     };
     pinger = setInterval(function () {
         try {
@@ -212,11 +208,6 @@ const websocketConnect = (crfToken) => {
         } catch (e) {
         }
     }, 15000);
-    // autoReverter = setInterval(function () {
-    //     isBetOnHigherRoi = !isBetOnHigherRoi;
-    //     alternateCount = 1;
-    //     console.log('%c-----= Auto-revert initialized =-----', 'font-weight: bold; color: cyan; font-size: 12px');
-    // }, 1320000 /* 22 minutes */);
 }
 
 function startTimer() {
