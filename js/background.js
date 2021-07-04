@@ -20,8 +20,8 @@ let pinger;
 
 let presentLevel = 0;
 let isBetSubmitted = false;
-let finalBetside = wala;
-let isBetOnHigherRoi = false;
+let finalBetside = meron;
+let isBetOnHigherRoi = true;
 
 let timer;
 let timerIndex = 0;
@@ -185,11 +185,11 @@ const websocketConnect = (crfToken) => {
         }
     }
     websocket.onclose = function () {
-        websocket = undefined;
         clearInterval(pinger);
         websocket.close();
+        websocket = undefined;
 
-        console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px');
+        console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px;');
     };
     pinger = setInterval(function () {
         try {
