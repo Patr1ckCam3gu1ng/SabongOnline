@@ -17,7 +17,7 @@ let betLevel = [
     1292, // 3
     2728, // 4
     5759, // 5
-    // 12158, /* 23,161 */ // 6
+    12158, /* 23,161 */ // 6
     // 25667, /* 48,216 */ // 7
     // 54185 /* 102,401 */
 ];
@@ -189,7 +189,7 @@ const websocketConnect = (crfToken) => {
 
             if (matchIndex >= multiplier) {
                 if (lossCount >= winCount) {
-                    console.log(`Reversing... Loss is ${lossCount} but win is only ${winCount}`);
+                    console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 23px;');
                     reverseBet();
                 }
 
@@ -219,7 +219,7 @@ const websocketConnect = (crfToken) => {
             }
 
             console.log('--------------------');
-            console.log(`Match index: ${matchIndex} of ${multiplier}`)
+            console.log(`Match index: ${matchIndex} of ${multiplier - 1}`)
             console.log(`Betting for %c${finalBetside} with ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
