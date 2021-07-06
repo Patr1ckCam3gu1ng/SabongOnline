@@ -17,7 +17,7 @@ let betLevel = [
     1292, // 3
     2728, // 4
     5759, // 5
-    12158, /* 23,161 */ // 6
+    // 12158, /* 23,161 */ // 6
     // 25667, /* 48,216 */ // 7
     // 54185 /* 102,401 */
 ];
@@ -40,6 +40,8 @@ let lossCount = 0;
 let timer;
 let timerIndex = 0;
 let maxWaitTimes = 62;
+
+let isDemoOnly = true;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -121,6 +123,7 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
+                // reverseBet();
                 isBetSubmitted = false;
                 return;
             }
@@ -182,7 +185,7 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            const multiplier = 10 * matchIndexMultiplier;
+            const multiplier = 7 * matchIndexMultiplier;
 
             if (matchIndex >= multiplier) {
                 if (lossCount >= winCount) {
@@ -201,15 +204,19 @@ const websocketConnect = (crfToken) => {
 
             chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            chrome.tabs.sendMessage(tab.id, {text: "placeBet", betSide: finalBetside});
+            if (isDemoOnly === false) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                chrome.tabs.sendMessage(tab.id, {text: "placeBet", betSide: finalBetside});
+            }
 
             if (isBetSubmitted === true) {
                 return;
             }
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            chrome.tabs.sendMessage(tab.id, {text: "submitBet"});
+            if (isDemoOnly === false) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                chrome.tabs.sendMessage(tab.id, {text: "submitBet"});
+            }
 
             console.log('--------------------');
             console.log(`Match index: ${matchIndex} of ${multiplier}`)
