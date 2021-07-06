@@ -3,14 +3,23 @@ let tab = { id : 0 };
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 let betLevel = [
-    147,
-    147,
-    311,
-    745,
-    1684,
-    3656,
-    7818,
-    10492
+    // 147,
+    // 147,
+    // 311,
+    // 745,
+    // 1684,
+    // 3656,
+    // 7818,
+    // 10492,
+
+    612, // 1
+    612, // 2
+    1292, // 3
+    2728, // 4
+    5759, // 5
+    12158, /* 23,161 */ // 6
+    // 25667, /* 48,216 */ // 7
+    // 54185 /* 102,401 */
 ];
 
 const meron = 'meron';
@@ -20,12 +29,17 @@ let pinger;
 
 let presentLevel = 0;
 let isBetSubmitted = false;
-let finalBetside = meron;
-let isBetOnHigherRoi = true;
+let finalBetside = wala;
+let isBetOnHigherRoi = false;
+
+let matchIndex = 1;
+let matchIndexMultiplier = 1;
+let winCount = 0;
+let lossCount = 0;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 72;
+let maxWaitTimes = 62;
 
 function createWebSocketConnection(crfToken) {
     if('WebSocket' in window){
@@ -83,7 +97,9 @@ const websocketConnect = (crfToken) => {
         const isBetting = data[1] === 'betting';
 
         if (presentLevel > betLevel.length - 1) {
-            console.log('Insufficient funds!');
+            console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
+            console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
+            console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
             clearInterval(pinger);
             websocket.close();
 
@@ -116,17 +132,21 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
+                        reverseBet();
                         isBetSubmitted = false;
                         return;
                     } else {
+                        matchIndex += 1;
+
                         if (isWinner) {
+                            winCount += 1;
                             console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
                         } else {
+                            lossCount += 1;
                             console.log('%cYou lose!', 'font-weight: bold; color: red', 'Your bet is', `${finalBetside} but ${winner} wins`);
                         }
                     }
                 }
-
                 if (finalBetside === '' || isBetSubmitted === false) {
                     console.log(`No bets detected! ${winner} wins`);
                     isBetSubmitted = false;
@@ -136,7 +156,7 @@ const websocketConnect = (crfToken) => {
                     if (isWinner) {
                         presentLevel = 0;
                     } else {
-                        presentLevel = presentLevel + 1;
+                        presentLevel += 1;
                     }
                 }
 
@@ -162,6 +182,19 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
+            const multiplier = 10 * matchIndexMultiplier;
+
+            if (matchIndex >= multiplier) {
+                if (lossCount >= winCount) {
+                    console.log(`Reversing... Loss is ${lossCount} but win is only ${winCount}`);
+                    reverseBet();
+                }
+
+                resetIndexCounter();
+
+                matchIndexMultiplier += 1;
+            }
+
             stopTimer();
 
             setFinalBet(data[2]);
@@ -179,6 +212,7 @@ const websocketConnect = (crfToken) => {
             chrome.tabs.sendMessage(tab.id, {text: "submitBet"});
 
             console.log('--------------------');
+            console.log(`Match index: ${matchIndex} of ${multiplier}`)
             console.log(`Betting for %c${finalBetside} with ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -201,8 +235,12 @@ const websocketConnect = (crfToken) => {
 
 function startTimer() {
     timer = setInterval(function () {
-        timerIndex = timerIndex + 1;
+        timerIndex += 1;
     }, 1000);
+}
+function resetIndexCounter() {
+    lossCount = 0;
+    winCount = 0;
 }
 function stopTimer() {
     clearTimeout(timer);
