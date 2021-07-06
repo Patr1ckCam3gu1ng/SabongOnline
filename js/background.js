@@ -36,6 +36,7 @@ let matchIndex = 1;
 let matchIndexMultiplier = 1;
 let winCount = 0;
 let lossCount = 0;
+let lossStreak = 0;
 
 let timer;
 let timerIndex = 0;
@@ -158,8 +159,10 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isWinner) {
                         presentLevel = 0;
+                        lossStreak = 0;
                     } else {
                         presentLevel += 1;
+                        lossStreak += 1;
                     }
                 }
 
@@ -196,6 +199,11 @@ const websocketConnect = (crfToken) => {
                 resetIndexCounter();
 
                 matchIndexMultiplier += 1;
+            }
+            else {
+                if (lossStreak >= 3) {
+                    reverseBet();
+                }
             }
 
             stopTimer();
