@@ -1,6 +1,10 @@
 let websocket;
 let tab = { id : 0 };
+let crfTokenValue = '';
 const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
+
+let reconnectRetries = 0;
+let retryPinger;
 
 let betLevel = [
     612, // 1
@@ -38,7 +42,10 @@ let isDemoOnly = false;
 
 
 function createWebSocketConnection(crfToken) {
-    if('WebSocket' in window){
+    if (crfTokenValue === '') {
+        crfTokenValue = crfToken;
+    }
+    if ('WebSocket' in window) {
         websocketConnect(crfToken);
     }
 }
@@ -77,7 +84,17 @@ const websocketConnect = (crfToken) => {
             return;
         }
         if (event.data === '40') {
-            console.log('Websocket connected successfully!')
+            clearInterval(pinger);
+
+            reconnectRetries = 0;
+            console.log('Websocket connected successfully!');
+
+            pinger = setInterval(function () {
+                try {
+                    websocket.send('2');
+                } catch (e) {
+                }
+            }, 15000);
             return;
         }
         if (event.data.substr(0, 2) === '0{') {
@@ -224,7 +241,7 @@ const websocketConnect = (crfToken) => {
             }
 
             const livesRemaining = betLevel.length - presentLevel;
-            
+
             console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betLevel[presentLevel]} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -232,18 +249,25 @@ const websocketConnect = (crfToken) => {
     }
     websocket.onclose = function () {
         clearInterval(pinger);
-        websocket.close();
-        websocket = undefined;
         isBetSubmitted = false;
+        console.log(`%c**** Interrupted ****`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
-        console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px;');
+        retryPinger = setInterval(function () {
+            if (reconnectRetries >= 3) {
+                console.log('%c**** Disconnected ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                websocket.close();
+                websocket = undefined;
+                clearInterval(retryPinger);
+                clearInterval(pinger);
+                return;
+            }
+            if (crfTokenValue !== '') {
+                console.log('%c**** Reconnecting ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                createWebSocketConnection(crfTokenValue);
+            }
+            reconnectRetries += 1;
+        }, 8000);
     };
-    pinger = setInterval(function () {
-        try {
-            websocket.send('2');
-        } catch (e) {
-        }
-    }, 15000);
 }
 
 function startTimer() {
