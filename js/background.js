@@ -28,11 +28,11 @@ let matchIndexMultiplier = 1;
 let winCount = 0;
 let lossCount = 0;
 let lossStreak = 0;
-let allHighRoiOverwrite = false;
+let betLowRoiOverwrite = false;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 62;
+let maxWaitTimes = 77;
 
 let isDemoOnly = false;
 
@@ -153,7 +153,7 @@ const websocketConnect = (crfToken) => {
                     if (isWinner) {
                         presentLevel = 0;
                         lossStreak = 0;
-                        allHighRoiOverwrite = false;
+                        betLowRoiOverwrite = false;
                     } else {
                         presentLevel += 1;
                         lossStreak += 1;
@@ -194,14 +194,13 @@ const websocketConnect = (crfToken) => {
                 resetIndexCounter();
 
                 matchIndexMultiplier += 1;
-            } else {
-                if (lossStreak >= 3) {
-                    console.log(`%cAll bets for High ROI! Succeeding loss streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                    reverseBet();
-                    resetIndexCounter();
+            }
+            if (lossStreak >= 3 && betLowRoiOverwrite === false) {
+                betLowRoiOverwrite = true;
 
-                    allHighRoiOverwrite = true;
-                }
+                console.log(`%cAll bets for Low ROI! Succeeding loss streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                reverseBet();
+                resetIndexCounter();
             }
 
             stopTimer();
@@ -235,6 +234,7 @@ const websocketConnect = (crfToken) => {
         clearInterval(pinger);
         websocket.close();
         websocket = undefined;
+        isBetSubmitted = false;
 
         console.log(`%c**** Connection Closed ****`, 'font-weight: bold; color: #00ff00; font-size: 23px;');
     };
@@ -268,8 +268,8 @@ function setFinalBet(fightData) {
         ? meron : wala;
 }
 function reverseBet() {
-    if (allHighRoiOverwrite === true) {
-        isBetOnHigherRoi = true;
+    if (betLowRoiOverwrite === true) {
+        isBetOnHigherRoi = false;
         return;
     }
 
