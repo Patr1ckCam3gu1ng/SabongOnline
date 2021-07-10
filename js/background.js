@@ -84,6 +84,7 @@ const websocketConnect = (crfToken) => {
             return;
         }
         if (event.data === '40') {
+            clearInterval(retryPinger);
             clearInterval(pinger);
 
             reconnectRetries = 0;
@@ -248,8 +249,11 @@ const websocketConnect = (crfToken) => {
         }
     }
     websocket.onclose = function () {
+        if (reconnectRetries > 0) {
+            return;
+        }
+
         clearInterval(pinger);
-        isBetSubmitted = false;
         console.log(`%c**** Interrupted ****`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
         retryPinger = setInterval(function () {
@@ -263,10 +267,11 @@ const websocketConnect = (crfToken) => {
             }
             if (crfTokenValue !== '') {
                 console.log('%c**** Reconnecting ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                websocket = new WebSocket(wssUrl);
                 createWebSocketConnection(crfTokenValue);
             }
             reconnectRetries += 1;
-        }, 8000);
+        }, 12000);
     };
 }
 
