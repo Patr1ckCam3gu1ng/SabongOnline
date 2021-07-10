@@ -200,21 +200,19 @@ const websocketConnect = (crfToken) => {
             }
 
             const multiplier = 7 * matchIndexMultiplier;
-            const maxLimit = 4;
 
             console.log('--------------------------');
 
             if (matchIndex >= multiplier && betLowRoiOverwrite === false) {
-                if (lossCount >= winCount && (lossCount >= maxLimit || winCount >= maxLimit)) {
+                if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
+                    resetIndexCounter();
+
+                    matchIndexMultiplier += 1;
                 }
-
-                resetIndexCounter();
-
-                matchIndexMultiplier += 1;
             }
-            if (lossStreak >= maxLimit && betLowRoiOverwrite === false) {
+            if (lossStreak >= 4 && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
