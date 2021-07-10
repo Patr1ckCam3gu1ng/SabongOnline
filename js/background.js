@@ -200,11 +200,12 @@ const websocketConnect = (crfToken) => {
             }
 
             const multiplier = 7 * matchIndexMultiplier;
+            const maxLimit = 4;
 
             console.log('--------------------------');
 
-            if (matchIndex >= multiplier) {
-                if (lossCount >= winCount && (lossCount >= 3 || winCount >= 3)) {
+            if (matchIndex >= multiplier && betLowRoiOverwrite === false) {
+                if (lossCount >= winCount && (lossCount >= maxLimit || winCount >= maxLimit)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
                 }
@@ -213,11 +214,10 @@ const websocketConnect = (crfToken) => {
 
                 matchIndexMultiplier += 1;
             }
-            if (lossStreak >= 3 && betLowRoiOverwrite === false) {
+            if (lossStreak >= maxLimit && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
 
-                console.log(`%cAll bets for Low ROI! Succeeding loss streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                reverseBet();
+                console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 resetIndexCounter();
             }
 
@@ -256,22 +256,24 @@ const websocketConnect = (crfToken) => {
         clearInterval(pinger);
         console.log(`%c**** Interrupted ****`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
-        retryPinger = setInterval(function () {
-            if (reconnectRetries >= 3) {
-                console.log('%c**** Disconnected ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                websocket.close();
-                websocket = undefined;
-                clearInterval(retryPinger);
-                clearInterval(pinger);
-                return;
-            }
-            if (crfTokenValue !== '') {
-                console.log('%c**** Reconnecting ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                websocket = new WebSocket(wssUrl);
-                createWebSocketConnection(crfTokenValue);
-            }
-            reconnectRetries += 1;
-        }, 12000);
+        if (!(presentLevel > betLevel.length - 1)) {
+            retryPinger = setInterval(function () {
+                if (reconnectRetries >= 3) {
+                    console.log('%c**** Disconnected ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    websocket.close();
+                    websocket = undefined;
+                    clearInterval(retryPinger);
+                    clearInterval(pinger);
+                    return;
+                }
+                if (crfTokenValue !== '') {
+                    console.log('%c**** Reconnecting ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    websocket = new WebSocket(wssUrl);
+                    createWebSocketConnection(crfTokenValue);
+                }
+                reconnectRetries += 1;
+            }, 12000);
+        }
     };
 }
 
@@ -283,7 +285,6 @@ function startTimer() {
 function resetIndexCounter() {
     lossCount = 0;
     winCount = 0;
-    lossStreak = 0;
 }
 function stopTimer() {
     clearTimeout(timer);
