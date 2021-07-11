@@ -6,16 +6,27 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
+// let betLevel = [
+//     612, // 1
+//     612, // 2
+//     1292, // 3
+//     2728, // 4
+//     5759, // 5
+//     12158, /* 23,161 */ // 6
+//     25667, /* 48,216 */ // 7
+//     54185, /* 102,401 */ // 8
+// ];
+
 let betLevel = [
-    612, // 1
-    612, // 2
-    1292, // 3
-    2728, // 4
-    5759, // 5
-    12158, /* 23,161 */ // 6
-    25667, /* 48,216 */ // 7
-    54185, /* 102,401 */ // 8
+    1000,
+    1000,
+    2111,
+    4457,
+    9409,
+    19863,
+    41933
 ];
+
 
 const meron = 'meron';
 const wala = 'wala';
@@ -25,7 +36,7 @@ let pinger;
 let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = wala;
-let isBetOnHigherRoi = false;
+let isBetOnHigherRoi = true;
 
 let matchIndex = 1;
 let matchIndexMultiplier = 1;
@@ -36,10 +47,11 @@ let betLowRoiOverwrite = false;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 77;
+let maxWaitTimes = 82;
 
 let isDemoOnly = false;
 
+let matchLogs = [];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -126,6 +138,9 @@ const websocketConnect = (crfToken) => {
             const winner = fightData.winner;
             const isOpenBet = fightData.open_bet === 'yes';
             const isNewFight = fightData.newFight === 'yes';
+            const meronOdds = fightData.meron_equalpoint;
+            const walaOdds = fightData.wala_equalpoint;
+            const fightNumber = fightData.fight_number;
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
             if (timerIndex > 0) {
@@ -168,13 +183,21 @@ const websocketConnect = (crfToken) => {
                     return;
                 }
                 if (isBetSubmitted === true) {
+                    const odds = (finalBetside === wala ? walaOdds : meronOdds);
+
                     if (isWinner) {
-                        presentLevel = 0;
                         lossStreak = 0;
                         betLowRoiOverwrite = false;
+
+                        setMatchLogs(fightNumber, isWinner, betLevel[presentLevel] * odds);
+
+                        presentLevel = 0;
                     } else {
-                        presentLevel += 1;
                         lossStreak += 1;
+
+                        setMatchLogs(fightNumber, isWinner, parseInt(-(betLevel[presentLevel])));
+
+                        presentLevel += 1;
                     }
                 }
 
@@ -257,7 +280,7 @@ const websocketConnect = (crfToken) => {
         if (!(presentLevel > betLevel.length - 1)) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
-                    console.log('%c- Disconnected -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    console.log('%c- Terminated -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     websocket.close();
                     websocket = undefined;
                     clearInterval(retryPinger);
@@ -275,6 +298,9 @@ const websocketConnect = (crfToken) => {
     };
 }
 
+function setMatchLogs(fightNumber, isWin, sum) {
+    matchLogs.push({fightNumber, isWin, sum});
+}
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
