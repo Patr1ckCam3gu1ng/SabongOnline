@@ -60,7 +60,7 @@ const tabsOnUpdated = {
 }
 const websocketConnect = (crfToken) => {
     if (websocket === undefined) {
-        console.log('Websocket initialized!')
+        console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
         websocket = new WebSocket(wssUrl);
     }
     websocket.onopen = function () {
@@ -88,7 +88,7 @@ const websocketConnect = (crfToken) => {
             clearInterval(pinger);
 
             reconnectRetries = 0;
-            console.log('Websocket connected successfully!');
+            console.log(`%c- Connected -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
             pinger = setInterval(function () {
                 try {
@@ -252,12 +252,12 @@ const websocketConnect = (crfToken) => {
         }
 
         clearInterval(pinger);
-        console.log(`%c**** Interrupted ****`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+        console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
         if (!(presentLevel > betLevel.length - 1)) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
-                    console.log('%c**** Disconnected ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    console.log('%c- Disconnected -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     websocket.close();
                     websocket = undefined;
                     clearInterval(retryPinger);
@@ -265,7 +265,7 @@ const websocketConnect = (crfToken) => {
                     return;
                 }
                 if (crfTokenValue !== '') {
-                    console.log('%c**** Reconnecting ****', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    console.log('%c- Reconnecting -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     websocket = new WebSocket(wssUrl);
                     createWebSocketConnection(crfTokenValue);
                 }
