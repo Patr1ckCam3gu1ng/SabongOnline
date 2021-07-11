@@ -27,6 +27,15 @@ let betLevel = [
     41933
 ];
 
+// let betLevel = [
+//     2000,
+//     2000,
+//     4222,
+//     8913,
+//     18817,
+//     39724,
+//     83862
+// ];
 
 const meron = 'meron';
 const wala = 'wala';
@@ -223,6 +232,11 @@ const websocketConnect = (crfToken) => {
             }
 
             const multiplier = 7 * matchIndexMultiplier;
+            const matchModulus = (matchIndex / 10) % 2;
+
+            if (matchModulus === 0 || matchModulus === 1) {
+                printProfit();
+            }
 
             console.log('--------------------------');
 
@@ -331,6 +345,14 @@ function reverseBet() {
 }
 function paymentSafe(isDraw) {
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
+}
+function printProfit() {
+    const winMatches = matchLogs.filter(c => c.isWin === true);
+    const lossMatches = matchLogs.filter(c => c.isWin === false);
+
+    console.log('--------------------------');
+    console.log(`%cWin: ${winMatches.length} | Loss: ${lossMatches.length} | Total: ${matchLogs.length}`, 'font-weight: bold; color: yellow');
+    console.log(`%cTotal Profit: Php ${parseInt(matchLogs.map(({sum}) => sum).reduce((a, b) => a + b, 0)).toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
