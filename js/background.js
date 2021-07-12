@@ -17,15 +17,15 @@ let retryPinger;
 //     54185, /* 102,401 */ // 8
 // ];
 
-let betLevel = [
-    1000,
-    1000,
-    2111,
-    4457,
-    9409,
-    19863,
-    41933
-];
+// let betLevel = [
+//     1000,
+//     1000,
+//     2111,
+//     4457,
+//     9409,
+//     19863,
+//     41933
+// ];
 
 // let betLevel = [
 //     2000,
@@ -36,6 +36,16 @@ let betLevel = [
 //     39724,
 //     83862
 // ];
+
+let betLevel = [
+    3000,
+    3000,
+    6333,
+    8913,
+    18817,
+    39724,
+    83862
+];
 
 const meron = 'meron';
 const wala = 'wala';
@@ -52,11 +62,14 @@ let matchIndexMultiplier = 1;
 let winCount = 0;
 let lossCount = 0;
 let lossStreak = 0;
+let winStreak = 0;
 let betLowRoiOverwrite = false;
+let highestLossStreak = 0;
+let highestWinStreak = 0;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 82;
+let maxWaitTimes = 78;
 
 let isDemoOnly = false;
 
@@ -195,18 +208,28 @@ const websocketConnect = (crfToken) => {
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
 
                     if (isWinner) {
+                        winStreak += 1;
                         lossStreak = 0;
                         betLowRoiOverwrite = false;
 
                         setMatchLogs(fightNumber, isWinner, betLevel[presentLevel] * odds);
 
                         presentLevel = 0;
+
+                        if (winStreak > highestWinStreak) {
+                            highestWinStreak = winStreak;
+                        }
                     } else {
                         lossStreak += 1;
+                        winStreak = 0;
 
                         setMatchLogs(fightNumber, isWinner, parseInt(-(betLevel[presentLevel])));
 
                         presentLevel += 1;
+
+                        if (lossStreak > highestLossStreak) {
+                            highestLossStreak = lossStreak;
+                        }
                     }
                 }
 
@@ -352,6 +375,7 @@ function printProfit() {
 
     console.log('--------------------------');
     console.log(`%cWin: ${winMatches.length} | Loss: ${lossMatches.length} | Total: ${matchLogs.length}`, 'font-weight: bold; color: yellow');
+    console.log(`%Win Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${parseInt(matchLogs.map(({sum}) => sum).reduce((a, b) => a + b, 0)).toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
