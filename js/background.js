@@ -23,8 +23,8 @@ let pinger;
 
 let presentLevel = 0;
 let isBetSubmitted = false;
-let finalBetside = wala;
-let isBetOnHigherRoi = true;
+let finalBetside = '';
+let isBetOnHigherRoi = false;
 
 let matchIndex = 1;
 let matchIndexMultiplier = 1;
@@ -38,7 +38,7 @@ let highestWinStreak = 0;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 74;
+let maxWaitTimes = 68;
 
 let isDemoOnly = false;
 
@@ -232,7 +232,7 @@ const websocketConnect = (crfToken) => {
 
             console.log('--------------------------');
 
-            if (matchIndex >= multiplier && betLowRoiOverwrite === false) {
+            if (matchIndex >= multiplier && betLowRoiOverwrite === false && lossStreak <= 4) {
                 if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
@@ -323,9 +323,27 @@ function stopTimer() {
 function setFinalBet(fightData) {
     reverseBet();
 
+    if (finalBetside === '') {
+        isBetOnHigherRoi = shuffleBetOnRoi();
+    }
+
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
         ? meron : wala;
+}
+function shuffleBetOnRoi() {
+    const shuffleNames = (array) => {
+        let oldElement;
+        for (let i = array.length - 1; i > 0; i--) {
+            let rand = Math.floor(Math.random() * (i + 1));
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
+        }
+
+        return array;
+    }
+    return shuffleNames([true, false, true, false, true, false, true, false])[0];
 }
 function reverseBet() {
     if (betLowRoiOverwrite === true) {
@@ -336,7 +354,9 @@ function reverseBet() {
     isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 function paymentSafe(isDraw) {
-    console.log('--------------------------');
+    if (isDraw === false) {
+        console.log('--------------------------');
+    }
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
 }
 function printProfit() {
