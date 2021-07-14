@@ -16,6 +16,17 @@ let betLevel = [
     41933  // 7
 ];
 
+// let betLevel = [
+//     1000,  // 1
+//     1000,  // 2
+//     1222,  // 3
+//     2580,  // 4
+//     5447,  // 5
+//     11499, // 6
+//     24276, // 7
+//     51249  // 8
+// ];
+
 const meron = 'meron';
 const wala = 'wala';
 
@@ -38,7 +49,7 @@ let highestWinStreak = 0;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 68;
+let maxWaitTimes = 77;
 
 let isDemoOnly = false;
 
@@ -232,7 +243,7 @@ const websocketConnect = (crfToken) => {
 
             console.log('--------------------------');
 
-            if (matchIndex >= multiplier && betLowRoiOverwrite === false && lossStreak <= 4) {
+            if (matchIndex >= multiplier && betLowRoiOverwrite === false) {
                 if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
@@ -286,7 +297,7 @@ const websocketConnect = (crfToken) => {
         if (!(presentLevel > betLevel.length - 1)) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
-                    console.log('%c- Terminated -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    console.log('%c- Terminated -', 'font-weight: bold; color: red; font-size: 12px;');
                     websocket.close();
                     websocket = undefined;
                     clearInterval(retryPinger);
@@ -324,7 +335,8 @@ function setFinalBet(fightData) {
     reverseBet();
 
     if (finalBetside === '') {
-        isBetOnHigherRoi = shuffleBetOnRoi();
+        // isBetOnHigherRoi = shuffleBetOnRoi();
+        isBetOnHigherRoi = false;
     }
 
     finalBetside = (isBetOnHigherRoi
