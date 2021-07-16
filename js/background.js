@@ -16,17 +16,6 @@ let betLevel = [
     41933  // 7
 ];
 
-// let betLevel = [
-//     1000,  // 1
-//     1000,  // 2
-//     1222,  // 3
-//     2580,  // 4
-//     5447,  // 5
-//     11499, // 6
-//     24276, // 7
-//     51249  // 8
-// ];
-
 const meron = 'meron';
 const wala = 'wala';
 
@@ -36,6 +25,7 @@ let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = '';
 let isBetOnHigherRoi = false;
+let isMatchWin = false;
 
 let matchIndex = 1;
 let matchIndexMultiplier = 1;
@@ -186,6 +176,7 @@ const websocketConnect = (crfToken) => {
                 }
                 if (isBetSubmitted === true) {
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
+                    isMatchWin = false;
 
                     if (isWinner) {
                         winStreak += 1;
@@ -199,6 +190,8 @@ const websocketConnect = (crfToken) => {
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
                         }
+
+                        isMatchWin = isWinner;
                     } else {
                         lossStreak += 1;
                         winStreak = 0;
@@ -237,7 +230,7 @@ const websocketConnect = (crfToken) => {
             const multiplier = 7 * matchIndexMultiplier;
             const matchModulus = (matchIndex / 10) % 2;
 
-            if (matchModulus === 0 || matchModulus === 1) {
+            if ((matchModulus === 0 || matchModulus === 1) && isMatchWin === true) {
                 printProfit();
             }
 
