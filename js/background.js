@@ -26,6 +26,7 @@ let isBetSubmitted = false;
 let finalBetside = '';
 let isBetOnHigherRoi = false;
 let isMatchWin = false;
+let isPendingPrintProfit = false;
 
 let matchIndex = 1;
 let matchIndexMultiplier = 1;
@@ -36,10 +37,12 @@ let winStreak = 0;
 let betLowRoiOverwrite = false;
 let highestLossStreak = 0;
 let highestWinStreak = 0;
+let betAmountPlaced = 0;
+let isBettingWithAccumulatedAmount = false;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 77;
+let maxWaitTimes = 82;
 
 let isDemoOnly = false;
 
@@ -142,7 +145,6 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
-                // reverseBet();
                 isBetSubmitted = false;
                 return;
             }
@@ -178,14 +180,17 @@ const websocketConnect = (crfToken) => {
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
                     isMatchWin = false;
 
-                    if (isWinner) {
-                        winStreak += 1;
+                    const winningSum = (betAmountPlaced * odds) - betAmountPlaced;
+
+                    if (isWinner === true) {
+                        if (presentLevel === 0) {
+                            winStreak += 1;
+                        }
+
                         lossStreak = 0;
                         betLowRoiOverwrite = false;
 
-                        setMatchLogs(fightNumber, isWinner, (betLevel[presentLevel] * odds) - betLevel[presentLevel]);
-
-                        presentLevel = 0;
+                        setMatchLogs(fightNumber, isWinner, winningSum);
 
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
@@ -196,7 +201,7 @@ const websocketConnect = (crfToken) => {
                         lossStreak += 1;
                         winStreak = 0;
 
-                        setMatchLogs(fightNumber, isWinner, parseInt(-(betLevel[presentLevel])));
+                        setMatchLogs(fightNumber, isWinner, -betAmountPlaced);
 
                         presentLevel += 1;
 
@@ -204,9 +209,20 @@ const websocketConnect = (crfToken) => {
                             highestLossStreak = lossStreak;
                         }
                     }
+                    if (isBettingWithAccumulatedAmount === true) {
+                        isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
+
+                        if (isWinner === false) {
+                            presentLevel = 0;
+                        }
+                    }
+                    if (isWinner === true) {
+                        presentLevel = 0;
+                    }
                 }
 
                 isBetSubmitted = false;
+                betAmountPlaced = 0;
 
                 return;
             }
@@ -218,11 +234,9 @@ const websocketConnect = (crfToken) => {
             if (isBetSubmitted === true) {
                 return;
             }
-
             if (timerIndex === 0) {
                 startTimer();
             }
-
             if (timerIndex <= maxWaitTimes) {
                 return;
             }
@@ -230,7 +244,13 @@ const websocketConnect = (crfToken) => {
             const multiplier = 7 * matchIndexMultiplier;
             const matchModulus = (matchIndex / 10) % 2;
 
-            if ((matchModulus === 0 || matchModulus === 1) && isMatchWin === true) {
+            if (matchModulus === 0 || matchModulus === 1) {
+                isPendingPrintProfit = true;
+            }
+            if (isMatchWin === true && isPendingPrintProfit === true) {
+                isPendingPrintProfit = false;
+                isMatchWin = false;
+
                 printProfit();
             }
 
@@ -256,7 +276,15 @@ const websocketConnect = (crfToken) => {
 
             setFinalBet(data[2]);
 
-            chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet: betLevel[presentLevel]});
+            let bet = betLevel[presentLevel];
+
+            if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
+                isBettingWithAccumulatedAmount = true;
+            }
+
+            betAmountPlaced = parseInt(bet);
+
+            chrome.tabs.sendMessage(tab.id, {text: "inputBet", bet});
 
             if (isDemoOnly === false) {
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -274,7 +302,7 @@ const websocketConnect = (crfToken) => {
 
             const livesRemaining = betLevel.length - presentLevel;
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betLevel[presentLevel]} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
+            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
         }
