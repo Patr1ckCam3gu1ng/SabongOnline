@@ -29,7 +29,6 @@ let isMatchWin = false;
 let isPendingPrintProfit = false;
 
 let matchIndex = 1;
-let matchIndexMultiplier = 1;
 let winCount = 0;
 let lossCount = 0;
 let lossStreak = 0;
@@ -39,6 +38,8 @@ let highestLossStreak = 0;
 let highestWinStreak = 0;
 let betAmountPlaced = 0;
 let isBettingWithAccumulatedAmount = false;
+let reservedBetsCount = 0;
+let isFromReservedBet = false;
 
 let timer;
 let timerIndex = 0;
@@ -172,13 +173,16 @@ const websocketConnect = (crfToken) => {
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
+                    console.log('--------------------------');
                     console.log(`No bets detected! ${winner} wins`);
+
                     isBetSubmitted = false;
                     return;
                 }
                 if (isBetSubmitted === true) {
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
                     isMatchWin = false;
+                    isFromReservedBet = false
 
                     const winningSum = (betAmountPlaced * odds) - betAmountPlaced;
 
@@ -212,12 +216,21 @@ const websocketConnect = (crfToken) => {
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
 
-                        if (isWinner === false) {
+                        if (isWinner) {
+                            reservedBetsCount += 1;
+                        } else {
                             presentLevel = 0;
+                            reservedBetsCount -= 1;
                         }
                     }
                     if (isWinner === true) {
                         presentLevel = 0;
+                    } else {
+                        if ([0, 1].includes((reservedBetsCount / 2) % 2) && presentLevel <= 2) {
+                            presentLevel = 0;
+                            reservedBetsCount -= 2;
+                            isFromReservedBet = true;
+                        }
                     }
                 }
 
@@ -237,14 +250,12 @@ const websocketConnect = (crfToken) => {
             if (timerIndex === 0) {
                 startTimer();
             }
+
             if (timerIndex <= maxWaitTimes) {
                 return;
             }
 
-            const multiplier = 7 * matchIndexMultiplier;
-            const matchModulus = (matchIndex / 10) % 2;
-
-            if (matchModulus === 0 || matchModulus === 1) {
+            if ([0, 1].includes((matchIndex / 10) % 2)) {
                 isPendingPrintProfit = true;
             }
             if (isMatchWin === true && isPendingPrintProfit === true) {
@@ -256,20 +267,17 @@ const websocketConnect = (crfToken) => {
 
             console.log('--------------------------');
 
-            if (matchIndex >= multiplier && betLowRoiOverwrite === false) {
+            if ([0, 1].includes(matchIndex / 7 % 2) && betLowRoiOverwrite === false) {
                 if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
                     resetIndexCounter();
-
-                    matchIndexMultiplier += 1;
                 }
             }
             if (lossStreak >= 4 && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                resetIndexCounter();
             }
 
             stopTimer();
@@ -302,7 +310,10 @@ const websocketConnect = (crfToken) => {
 
             const livesRemaining = betLevel.length - presentLevel;
 
-            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`, 'font-weight: bold; color: pink');
+            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount || isFromReservedBet ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining 
+                    => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isFromReservedBet ? '(R)' : ''} pesos 
+                    => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
+                'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
         }
