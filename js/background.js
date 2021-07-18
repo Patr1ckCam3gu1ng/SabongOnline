@@ -43,7 +43,7 @@ let isFromReservedBet = false;
 
 let timer;
 let timerIndex = 0;
-let maxWaitTimes = 82;
+let maxWaitTimes = 74;
 
 let isDemoOnly = false;
 
@@ -217,18 +217,18 @@ const websocketConnect = (crfToken) => {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
 
                         if (isWinner) {
-                            reservedBetsCount += 1;
-                        } else {
-                            presentLevel = 0;
-                            reservedBetsCount -= 1;
+                            reservedBetsCount += odds;
                         }
+
+                        presentLevel = 0;
                     }
                     if (isWinner === true) {
                         presentLevel = 0;
                     } else {
-                        if ([0, 1].includes((reservedBetsCount / 2) % 2) && presentLevel <= 2) {
+                        const reservedBetsLimit = 2;
+                        if (reservedBetsCount > 1 && [0, 1].includes((reservedBetsCount / reservedBetsLimit) % reservedBetsLimit) && presentLevel <= reservedBetsLimit) {
                             presentLevel = 0;
-                            reservedBetsCount -= 2;
+                            reservedBetsCount -= reservedBetsLimit;
                             isFromReservedBet = true;
                         }
                     }
@@ -265,14 +265,15 @@ const websocketConnect = (crfToken) => {
                 printProfit();
             }
 
-            console.log('--------------------------');
-
-            if ([0, 1].includes(matchIndex / 7 % 2) && betLowRoiOverwrite === false) {
+            if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false) {
+                console.log('%c--------------------------', 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
-                    resetIndexCounter();
                 }
+                resetIndexCounter();
+            } else {
+                console.log('--------------------------');
             }
             if (lossStreak >= 4 && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
@@ -310,9 +311,7 @@ const websocketConnect = (crfToken) => {
 
             const livesRemaining = betLevel.length - presentLevel;
 
-            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount || isFromReservedBet ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining 
-                    => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isFromReservedBet ? '(R)' : ''} pesos 
-                    => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
+            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount || isFromReservedBet ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isFromReservedBet ? '(R)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -367,27 +366,12 @@ function setFinalBet(fightData) {
     reverseBet();
 
     if (finalBetside === '') {
-        // isBetOnHigherRoi = shuffleBetOnRoi();
         isBetOnHigherRoi = false;
     }
 
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
         ? meron : wala;
-}
-function shuffleBetOnRoi() {
-    const shuffleNames = (array) => {
-        let oldElement;
-        for (let i = array.length - 1; i > 0; i--) {
-            let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
-        }
-
-        return array;
-    }
-    return shuffleNames([true, false, true, false, true, false, true, false])[0];
 }
 function reverseBet() {
     if (betLowRoiOverwrite === true) {
