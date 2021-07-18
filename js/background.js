@@ -7,13 +7,13 @@ let reconnectRetries = 0;
 let retryPinger;
 
 let betLevel = [
-    1000,  // 1
-    1000,  // 2
-    2111,  // 3
-    4457,  // 4
-    9409,  // 5
-    19863, // 6
-    41933  // 7
+    1300,   // 1
+    1300,   // 2
+    2744,   // 3
+    5793,   // 4
+    12230,  // 5
+    25819,  // 6
+    54507   // 7
 ];
 
 const meron = 'meron';
@@ -31,6 +31,7 @@ let isPendingPrintProfit = false;
 let matchIndex = 1;
 let winCount = 0;
 let lossCount = 0;
+let drawCount = 0;
 let lossStreak = 0;
 let winStreak = 0;
 let betLowRoiOverwrite = false;
@@ -161,6 +162,7 @@ const websocketConnect = (crfToken) => {
                         paymentSafe(isDraw);
                         reverseBet();
                         isBetSubmitted = false;
+                        drawCount += 1;
                         return;
                     } else {
                         if (isWinner) {
@@ -180,9 +182,9 @@ const websocketConnect = (crfToken) => {
                     return;
                 }
                 if (isBetSubmitted === true) {
+                    const reserveBetLimit = 2;
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
                     isMatchWin = false;
-                    isFromReservedBet = false
 
                     const winningSum = (betAmountPlaced * odds) - betAmountPlaced;
 
@@ -224,12 +226,18 @@ const websocketConnect = (crfToken) => {
                     }
                     if (isWinner === true) {
                         presentLevel = 0;
+                        if (isFromReservedBet === true) {
+                            reservedBetsCount += reserveBetLimit;
+                        }
+                        isFromReservedBet = false
                     } else {
-                        const reservedBetsLimit = 2;
-                        if (reservedBetsCount > 1 && [0, 1].includes((reservedBetsCount / reservedBetsLimit) % reservedBetsLimit) && presentLevel <= reservedBetsLimit) {
-                            presentLevel = 0;
-                            reservedBetsCount -= reservedBetsLimit;
+                        if (reservedBetsCount >= reserveBetLimit && presentLevel === reserveBetLimit && isFromReservedBet === false) {
+                            presentLevel -= 1;
+                            reservedBetsCount -= reserveBetLimit;
                             isFromReservedBet = true;
+                        }
+                        if (presentLevel > reserveBetLimit && isFromReservedBet === true) {
+                            isFromReservedBet = false;
                         }
                     }
                 }
@@ -267,7 +275,9 @@ const websocketConnect = (crfToken) => {
 
             if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false) {
                 console.log('%c--------------------------', 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                if (lossCount >= winCount && (lossCount >= 5 || winCount >= 5)) {
+                const halveDraw = parseInt(drawCount / 2);
+                const lossCountCalc = parseInt(lossCount + halveDraw);
+                if (lossCountCalc >= winCount && (lossCountCalc >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
                 }
@@ -311,7 +321,7 @@ const websocketConnect = (crfToken) => {
 
             const livesRemaining = betLevel.length - presentLevel;
 
-            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount || isFromReservedBet ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isFromReservedBet ? '(R)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
+            console.log(`${livesRemaining + (isBettingWithAccumulatedAmount ? 1 : 0) + (reservedBetsCount >= 2 ? 1 : 0)} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isFromReservedBet ? '(R)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -357,6 +367,7 @@ function startTimer() {
 function resetIndexCounter() {
     lossCount = 0;
     winCount = 0;
+    drawCount = 0;
 }
 function stopTimer() {
     clearTimeout(timer);
