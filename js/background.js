@@ -6,24 +6,14 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-// let betLevel = [
-//     1300,   // 1
-//     1300,   // 2
-//     2744,   // 3
-//     5793,   // 4
-//     12230,  // 5
-//     25819,  // 6
-//     54507   // 7
-// ];
-
 let betLevel = [
-    6000,   // 1
-    6000,   // 2
-    12667,  // 3
-    26741,  // 4
-    56453,  // 5
-    // 119179, // 6
-    // 251600  // 7
+    1300,   // 1
+    1300,   // 2
+    2744,   // 3
+    5793,   // 4
+    12230,  // 5
+    25819,  // 6
+    54507   // 7
 ];
 
 const meron = 'meron';
@@ -50,6 +40,7 @@ let highestWinStreak = 0;
 let betAmountPlaced = 0;
 let isBettingWithAccumulatedAmount = false;
 let isBetFromTakenProfit = false;
+let remainingSkipMatches = 0;
 
 let timer;
 let timerIndex = 0;
@@ -156,14 +147,15 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
-                isBetSubmitted = false;
+                reverseBet();
+
+                isBetSubmitted = false
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
                 const isWinner = winner === finalBetside;
                 const isDraw = winner === 'draw';
-
-                isBetFromTakenProfit = false;
+                let isBetFromProfitUsedAlready = false;
 
                 if (isBetSubmitted === true) {
                     matchIndex += 1;
@@ -214,7 +206,10 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
                     } else {
-                        lossStreak += 1;
+                        if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
+                            lossStreak += 1;
+                        }
+
                         winStreak = 0;
 
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced);
@@ -224,18 +219,30 @@ const websocketConnect = (crfToken) => {
                         }
 
                         presentLevel += 1;
+
+                        if (isBettingWithAccumulatedAmount === true) {
+                            presentLevel -= 1;
+                        }
+                        if (isBetFromTakenProfit === true) {
+                            presentLevel -= 1;
+                            isBetFromProfitUsedAlready = true;
+                        }
                     }
+
+                    isBetFromTakenProfit = false;
+
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
                     if (isWinner === false) {
                         const { profit } = calculateProfit();
 
-                        if (profit > betLevel[ 0 ] && presentLevel === 2) {
-                            presentLevel -= 1;
+                        if (profit > betLevel[ 0 ] && presentLevel === 2 && isBetFromProfitUsedAlready === false) {
                             isBetFromTakenProfit = true;
                         }
                     }
+
+                    isBetFromProfitUsedAlready = false;
                 }
 
                 isBetSubmitted = false;
@@ -251,10 +258,12 @@ const websocketConnect = (crfToken) => {
             if (isBetSubmitted === true) {
                 return;
             }
+            if (remainingSkipMatches > 0) {
+                return;
+            }
             if (timerIndex === 0) {
                 startTimer();
             }
-
             if (timerIndex <= maxWaitTimes) {
                 return;
             }
@@ -271,8 +280,10 @@ const websocketConnect = (crfToken) => {
 
             if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false) {
                 console.log('%c--------------------------', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+
                 const halveDraw = parseInt(drawCount / 2);
                 const lossCountCalc = parseInt(lossCount + halveDraw);
+
                 if (lossCountCalc >= winCount && (lossCountCalc >= 5 || winCount >= 5)) {
                     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     reverseBet();
@@ -282,9 +293,8 @@ const websocketConnect = (crfToken) => {
                 console.log('--------------------------');
             }
 
-            const lossStreakMinimumTrigger = betLevel.length > 5 ? 4 : 3;
 
-            if (lossStreak >= lossStreakMinimumTrigger && betLowRoiOverwrite === false) {
+            if (lossStreak >= getLossStreakMinimumTrigger() && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
@@ -295,6 +305,10 @@ const websocketConnect = (crfToken) => {
             setFinalBet(data[ 2 ]);
 
             let bet = betLevel[ presentLevel ];
+
+            if (isBetFromTakenProfit === true) {
+                bet = betLevel[ 0 ];
+            }
 
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
@@ -319,11 +333,16 @@ const websocketConnect = (crfToken) => {
             }
 
             const { profit } = calculateProfit();
+            const hasProfitForBetting = (profit - (isBettingWithAccumulatedAmount ? betLevel[ 0 ] : 0)) > betLevel[ 0 ];
 
-            const livesRemaining
-                = betLevel.length - presentLevel
-                + (isBettingWithAccumulatedAmount ? 1 : 0)
-                + (profit > betLevel[ 0 ] ? 1 : 0);
+            let livesRemaining = betLevel.length - presentLevel
+
+            if (isBettingWithAccumulatedAmount === true) {
+                livesRemaining += 1;
+            }
+            if (presentLevel < 3 && hasProfitForBetting) {
+                livesRemaining += 1;
+            }
 
             console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? 'higher ROI ⤴' : 'lower ROI ⤵'}`,
                 'font-weight: bold; color: pink');
@@ -403,7 +422,7 @@ function reverseBet() {
 }
 
 function paymentSafe(isDraw) {
-    if (isDraw === false) {
+    if (isDraw === false && isBetSubmitted === false) {
         console.log('--------------------------');
     }
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
@@ -427,6 +446,9 @@ function calculateProfit() {
         lossMatches: lossMatches.length,
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
+}
+function getLossStreakMinimumTrigger() {
+    return betLevel.length > 5 ? 4 : 3;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
