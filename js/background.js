@@ -206,16 +206,16 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
                     } else {
-                        if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
-                            lossStreak += 1;
-                        }
+                        lossStreak += 1;
 
                         winStreak = 0;
 
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced);
 
                         if (lossStreak > highestLossStreak) {
-                            highestLossStreak = lossStreak;
+                            if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
+                                highestLossStreak = lossStreak;
+                            }
                         }
 
                         presentLevel += 1;
@@ -293,8 +293,7 @@ const websocketConnect = (crfToken) => {
                 console.log('--------------------------');
             }
 
-
-            if (lossStreak >= getLossStreakMinimumTrigger() && betLowRoiOverwrite === false) {
+            if (lossStreak >= 4 && betLowRoiOverwrite === false) {
                 betLowRoiOverwrite = true;
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
@@ -366,6 +365,7 @@ const websocketConnect = (crfToken) => {
                     websocket = undefined;
                     clearInterval(retryPinger);
                     clearInterval(pinger);
+                    isBetSubmitted = false;
                     return;
                 }
                 if (crfTokenValue !== '') {
@@ -446,9 +446,6 @@ function calculateProfit() {
         lossMatches: lossMatches.length,
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
-}
-function getLossStreakMinimumTrigger() {
-    return betLevel.length > 5 ? 4 : 3;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
