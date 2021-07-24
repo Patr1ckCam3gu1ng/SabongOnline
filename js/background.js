@@ -6,14 +6,24 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
+// let betLevel = [
+//     1300,   // 1
+//     1300,   // 2
+//     2744,   // 3
+//     5793,   // 4
+//     12230,  // 5
+//     25819,  // 6
+//     54507   // 7
+// ];
+
 let betLevel = [
-    1300,   // 1
-    1300,   // 2
-    2744,   // 3
-    5793,   // 4
-    12230,  // 5
-    25819,  // 6
-    54507   // 7
+    6000,   // 1
+    6000,   // 2
+    12667,  // 3
+    26741,  // 4
+    56453,  // 5
+    119179, // 6
+    251600  // 7
 ];
 
 const meron = 'meron';
@@ -40,11 +50,15 @@ let highestWinStreak = 0;
 let betAmountPlaced = 0;
 let isBettingWithAccumulatedAmount = false;
 let isBetFromTakenProfit = false;
-let remainingSkipMatches = 0;
-let isCompromiseOdds = false;
+let isBelowMinimumOdds = false;
+let matchOdds = 0;
 
 let timer;
 let timerIndex = 0;
+
+const oddsMinimum = 169.9;
+
+//should remain 'let' so we can change it in the console:
 let maxWaitTimes = 74;
 
 let isDemoOnly = false;
@@ -136,6 +150,7 @@ const websocketConnect = (crfToken) => {
             const winner = fightData.winner;
             const isOpenBet = fightData.open_bet === 'yes';
             const isNewFight = fightData.newFight === 'yes';
+            const isWaitingDecision = fightData.waiting_decision === 'yes';
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
             const fightNumber = fightData.fight_number;
@@ -146,6 +161,10 @@ const websocketConnect = (crfToken) => {
                 timerIndex = 0;
             }
 
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
+                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                return;
+            }
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
                 reverseBet();
@@ -158,8 +177,6 @@ const websocketConnect = (crfToken) => {
                 const isDraw = winner === 'draw';
                 let isBetFromProfitUsedAlready = false;
 
-                isCompromiseOdds = false;
-
                 if (isBetSubmitted === true) {
                     matchIndex += 1;
 
@@ -167,6 +184,8 @@ const websocketConnect = (crfToken) => {
                         paymentSafe(isDraw);
                         reverseBet();
                         isBetSubmitted = false;
+                        isBelowMinimumOdds = false;
+
                         drawCount += 1;
                         return;
                     } else {
@@ -180,10 +199,11 @@ const websocketConnect = (crfToken) => {
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
-                    console.log('--------------------------');
-                    console.log(`No bets detected! ${winner} wins`);
+                    // printLine();
+                    // console.log(`No bets detected! ${winner} wins`);
 
                     isBetSubmitted = false;
+                    isBelowMinimumOdds = false;
                     return;
                 }
                 if (isBetSubmitted === true) {
@@ -225,8 +245,7 @@ const websocketConnect = (crfToken) => {
 
                         if (isBettingWithAccumulatedAmount === true) {
                             presentLevel -= 1;
-                        }
-                        if (isBetFromTakenProfit === true) {
+                        } else if (isBetFromTakenProfit === true) {
                             presentLevel -= 1;
                             isBetFromProfitUsedAlready = true;
                         }
@@ -250,6 +269,7 @@ const websocketConnect = (crfToken) => {
 
                 isBetSubmitted = false;
                 betAmountPlaced = 0;
+                isBelowMinimumOdds = false;
 
                 return;
             }
@@ -261,9 +281,6 @@ const websocketConnect = (crfToken) => {
             if (isBetSubmitted === true) {
                 return;
             }
-            if (remainingSkipMatches > 0) {
-                return;
-            }
             if (timerIndex === 0) {
                 startTimer();
             }
@@ -272,18 +289,18 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            if ([0, 1].includes((matchIndex / 10) % 2)) {
+            if ([0, 1].includes((matchIndex / 10) % 2) && isBelowMinimumOdds === false) {
                 isPendingPrintProfit = true;
             }
-            if (isMatchWin === true && isPendingPrintProfit === true) {
+            if (isMatchWin === true && isPendingPrintProfit === true && isBelowMinimumOdds === false) {
                 isPendingPrintProfit = false;
                 isMatchWin = false;
 
                 printProfit();
             }
 
-            if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false) {
-                console.log('%c--------------------------', 'color: black;');
+            if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false && isBelowMinimumOdds === false) {
+                printLine();
 
                 const halveDraw = parseInt(drawCount / 2);
                 const lossCountCalc = parseInt(lossCount + halveDraw);
@@ -295,18 +312,28 @@ const websocketConnect = (crfToken) => {
 
                 resetIndexCounter();
             } else {
-                console.log('%c--------------------------', 'color: black;');
+                if (isBelowMinimumOdds === false) {
+                    printLine();
+                }
             }
 
-            if (lossStreak >= 3 && betLowRoiOverwrite === false) {
+            if (lossStreak >= 3 && betLowRoiOverwrite === false && isBelowMinimumOdds === false) {
                 betLowRoiOverwrite = true;
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
-            stopTimer();
-
             setFinalBet(data[ 2 ]);
+
+            const { meron_odds, wala_odds } = data[ 2 ];
+            matchOdds = finalBetside === meron ? meron_odds : wala_odds;
+
+            if (oddsMinimum > matchOdds && finalBetside !== '') {
+                isBelowMinimumOdds = true;
+                return;
+            }
+
+            stopTimer();
 
             let bet = betLevel[ presentLevel ];
 
@@ -351,7 +378,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher${isCompromiseOdds ? '(C)' : ''} ROI ⤴` : `lower${isCompromiseOdds ? '(C)' : ''} ROI ⤵`}`,
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -409,17 +436,9 @@ function stopTimer() {
 }
 
 function setFinalBet(fightData) {
-    const compromiseOdds = 2.2;
-
-    if (fightData.meron_odds >= compromiseOdds) {
-        isCompromiseOdds = true;
-        return meron;
-    } else if (fightData.wala_odds >= compromiseOdds) {
-        isCompromiseOdds = true;
-        return wala;
+    if (isBelowMinimumOdds === false) {
+        reverseBet();
     }
-
-    reverseBet();
 
     if (finalBetside === '') {
         isBetOnHigherRoi = false;
@@ -441,15 +460,14 @@ function reverseBet() {
 
 function paymentSafe(isDraw) {
     if (isDraw === false && isBetSubmitted === false) {
-        console.log('--------------------------');
+        printLine();
     }
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
 }
 
 function printProfit() {
     const { profit, winMatches, lossMatches } = calculateProfit();
-
-    console.log('--------------------------');
+    printLine();
     console.log(`%cWin: ${winMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
@@ -464,6 +482,9 @@ function calculateProfit() {
         lossMatches: lossMatches.length,
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
+}
+function printLine() {
+    console.log('%c-', 'color: black;');
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
