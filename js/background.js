@@ -6,24 +6,14 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-// let betLevel = [
-//     1300,   // 1
-//     1300,   // 2
-//     2744,   // 3
-//     5793,   // 4
-//     12230,  // 5
-//     25819,  // 6
-//     54507   // 7
-// ];
-
 let betLevel = [
-    6000,   // 1
-    6000,   // 2
-    12667,  // 3
-    26741,  // 4
-    56453,  // 5
-    119179, // 6
-    251600  // 7
+    1300,   // 1
+    1300,   // 2
+    2744,   // 3
+    5793,   // 4
+    12230,  // 5
+    25819,  // 6
+    54507   // 7
 ];
 
 const meron = 'meron';
@@ -56,7 +46,7 @@ let matchOdds = 0;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 169.9;
+const oddsMinimum = 170;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 74;
@@ -120,6 +110,9 @@ const websocketConnect = (crfToken) => {
                 } catch (e) {
                 }
             }, 15000);
+
+            setLocalVariablesFromCache();
+
             return;
         }
         if (event.data.substr(0, 2) === '0{') {
@@ -179,6 +172,7 @@ const websocketConnect = (crfToken) => {
 
                 if (isBetSubmitted === true) {
                     matchIndex += 1;
+                    chrome.storage.local.set({ matchIndex });
 
                     if (isDraw) {
                         paymentSafe(isDraw);
@@ -187,6 +181,8 @@ const websocketConnect = (crfToken) => {
                         isBelowMinimumOdds = false;
 
                         drawCount += 1;
+
+                        chrome.storage.local.set({ drawCount });
                         return;
                     } else {
                         if (isWinner) {
@@ -196,12 +192,12 @@ const websocketConnect = (crfToken) => {
                             lossCount += 1;
                             console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
                         }
+
+                        chrome.storage.local.set({ winCount });
+                        chrome.storage.local.set({ lossCount });
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
-                    // printLine();
-                    // console.log(`No bets detected! ${winner} wins`);
-
                     isBetSubmitted = false;
                     isBelowMinimumOdds = false;
                     return;
@@ -220,11 +216,16 @@ const websocketConnect = (crfToken) => {
                         lossStreak = 0;
                         betLowRoiOverwrite = false;
 
+                        chrome.storage.local.set({ betLowRoiOverwrite });
+
                         setMatchLogs(fightNumber, isWinner, winningSum);
 
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
+                            chrome.storage.local.set({ highestWinStreak });
                         }
+                        chrome.storage.local.set({ winStreak });
+                        chrome.storage.local.set({ lossStreak });
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
@@ -238,8 +239,11 @@ const websocketConnect = (crfToken) => {
                         if (lossStreak > highestLossStreak) {
                             if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
                                 highestLossStreak = lossStreak;
+                                chrome.storage.local.set({ highestLossStreak });
                             }
                         }
+                        chrome.storage.local.set({ winStreak });
+                        chrome.storage.local.set({ lossStreak });
 
                         presentLevel += 1;
 
@@ -265,6 +269,8 @@ const websocketConnect = (crfToken) => {
                     }
 
                     isBetFromProfitUsedAlready = false;
+
+                    chrome.storage.local.set({ presentLevel });
                 }
 
                 isBetSubmitted = false;
@@ -319,6 +325,8 @@ const websocketConnect = (crfToken) => {
 
             if (lossStreak >= 3 && betLowRoiOverwrite === false && isBelowMinimumOdds === false) {
                 betLowRoiOverwrite = true;
+
+                chrome.storage.local.set({ betLowRoiOverwrite });
 
                 console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
@@ -414,8 +422,85 @@ const websocketConnect = (crfToken) => {
     };
 }
 
+function setLocalVariablesFromCache() {
+    chrome.storage.local.get(['finalBetside'], function (result) {
+        if (Object.keys(result).length === 0) {
+            finalBetside = '';
+            return;
+        }
+        finalBetside = result.finalBetside;
+    });
+    chrome.storage.local.get(['matchIndex'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        matchIndex = result.matchIndex;
+    });
+    chrome.storage.local.get(['winStreak'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        winStreak = result.winStreak;
+    });
+    chrome.storage.local.get(['lossStreak'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        lossStreak = result.lossStreak;
+    });
+    chrome.storage.local.get(['matchLogs'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        matchLogs = result.matchLogs;
+    });
+    chrome.storage.local.get(['highestLossStreak'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        highestLossStreak = result.highestLossStreak;
+    });
+    chrome.storage.local.get(['highestWinStreak'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        highestWinStreak = result.highestWinStreak;
+    });
+    chrome.storage.local.get(['presentLevel'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        presentLevel = result.presentLevel;
+    });
+    chrome.storage.local.get(['winCount'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        winCount = result.winCount;
+    });
+    chrome.storage.local.get(['lossCount'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        lossCount = result.lossCount;
+    });
+    chrome.storage.local.get(['isBetOnHigherRoi'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        isBetOnHigherRoi = result.isBetOnHigherRoi;
+    });
+    chrome.storage.local.get(['betLowRoiOverwrite'], function (result) {
+        if (Object.keys(result).length === 0) {
+            return;
+        }
+        betLowRoiOverwrite = result.betLowRoiOverwrite;
+    });
+}
+
 function setMatchLogs(fightNumber, isWin, sum) {
     matchLogs.push({ fightNumber, isWin, sum });
+    chrome.storage.local.set({ matchLogs });
 }
 
 function startTimer() {
@@ -428,6 +513,10 @@ function resetIndexCounter() {
     lossCount = 0;
     winCount = 0;
     drawCount = 0;
+
+    chrome.storage.local.set({ lossCount });
+    chrome.storage.local.set({ winCount });
+    chrome.storage.local.set({ drawCount });
 }
 
 function stopTimer() {
@@ -447,11 +536,15 @@ function setFinalBet(fightData) {
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
         ? meron : wala;
+
+    chrome.storage.local.set({ finalBetside });
+    chrome.storage.local.set({ isBetOnHigherRoi });
 }
 
 function reverseBet() {
     if (betLowRoiOverwrite === true) {
         isBetOnHigherRoi = false;
+        chrome.storage.local.set({ isBetOnHigherRoi });
         return;
     }
 
@@ -483,6 +576,7 @@ function calculateProfit() {
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
 }
+
 function printLine() {
     console.log('%c-', 'color: black;');
 }
