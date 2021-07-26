@@ -7,14 +7,34 @@ let reconnectRetries = 0;
 let retryPinger;
 
 let betLevel = [
-    1300,   // 1
-    1300,   // 2
-    2744,   // 3
-    5793,   // 4
-    12230,  // 5
-    25819,  // 6
-    54507   // 7
+    612,    // 1
+    612,    // 2
+    1292,   // 3
+    2728,   // 4
+    5759,   // 5
+    12158,  // 6
+    25667   // 7
 ];
+
+// let betLevel = [
+//     1300,   // 1
+//     1300,   // 2
+//     2744,   // 3
+//     5793,   // 4
+//     12230,  // 5
+//     25819,  // 6
+//     54507,  // 7
+// ];
+
+// let betLevel = [
+//     6000,   // 1
+//     6000,   // 2
+//     12667,  // 3
+//     26741,  // 4
+//     56453,  // 5
+//     119179, // 6
+//     251600  // 7
+// ];
 
 const meron = 'meron';
 const wala = 'wala';
@@ -34,7 +54,8 @@ let lossCount = 0;
 let drawCount = 0;
 let lossStreak = 0;
 let winStreak = 0;
-let betLowRoiOverwrite = false;
+let isShuffleBetSide = false;
+let isShuffleBetSideHasPicked = false;
 let highestLossStreak = 0;
 let highestWinStreak = 0;
 let betAmountPlaced = 0;
@@ -46,10 +67,10 @@ let matchOdds = 0;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 170;
+const oddsMinimum = 174.99;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 74;
+let maxWaitTimes = 84;
 
 let isDemoOnly = false;
 
@@ -137,6 +158,19 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
+        if (fightEvent === 'App\\Events\\ArenaUpdate') {
+            const fightData = data[ 2 ].data;
+            const event = fightData.event;
+
+            if (event === 'arenaclosed') {
+                printLine();
+
+                const { profit } = calculateProfit();
+                console.log(`%cEnd of day profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+            }
+
+            return;
+        }
         if (fightEvent === 'App\\Events\\FightUpdate') {
             const fightData = data[ 2 ].data;
             const fightStatus = fightData.status;
@@ -153,6 +187,8 @@ const websocketConnect = (crfToken) => {
                 clearTimeout(timer);
                 timerIndex = 0;
             }
+
+            isShuffleBetSideHasPicked = false;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
@@ -196,6 +232,10 @@ const websocketConnect = (crfToken) => {
                         chrome.storage.local.set({ winCount });
                         chrome.storage.local.set({ lossCount });
                     }
+                } else {
+                    if (isBelowMinimumOdds === true) {
+                        console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                    }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
@@ -214,9 +254,9 @@ const websocketConnect = (crfToken) => {
                         }
 
                         lossStreak = 0;
-                        betLowRoiOverwrite = false;
+                        isShuffleBetSide = false;
 
-                        chrome.storage.local.set({ betLowRoiOverwrite });
+                        chrome.storage.local.set({ isShuffleBetSide });
 
                         setMatchLogs(fightNumber, isWinner, winningSum);
 
@@ -300,21 +340,21 @@ const websocketConnect = (crfToken) => {
             }
             if (isMatchWin === true && isPendingPrintProfit === true && isBelowMinimumOdds === false) {
                 isPendingPrintProfit = false;
-                isMatchWin = false;
+                // isMatchWin = false;
 
                 printProfit();
             }
 
-            if ([0, 1].includes(matchIndex / 8 % 2) && betLowRoiOverwrite === false && isBelowMinimumOdds === false) {
+            if ([0, 1].includes(matchIndex / 8 % 2) && isShuffleBetSide === false && isBelowMinimumOdds === false) {
                 printLine();
-
-                const halveDraw = parseInt(drawCount / 2);
-                const lossCountCalc = parseInt(lossCount + halveDraw);
-
-                if (lossCountCalc >= winCount && (lossCountCalc >= 5 || winCount >= 5)) {
-                    console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                    reverseBet();
-                }
+                //
+                // const halveDraw = parseInt(drawCount / 2);
+                // const lossCountCalc = parseInt(lossCount + halveDraw);
+                //
+                // if (lossCountCalc >= winCount && (lossCountCalc >= 5 || winCount >= 5)) {
+                //     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                //     reverseBet();
+                // }
 
                 resetIndexCounter();
             } else {
@@ -323,12 +363,12 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            if (lossStreak >= 3 && betLowRoiOverwrite === false && isBelowMinimumOdds === false) {
-                betLowRoiOverwrite = true;
+            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false) {
+                isShuffleBetSide = true;
 
-                chrome.storage.local.set({ betLowRoiOverwrite });
+                chrome.storage.local.set({ isShuffleBetSide });
 
-                console.log(`%cAll bets for Low ROI! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
             setFinalBet(data[ 2 ]);
@@ -336,7 +376,7 @@ const websocketConnect = (crfToken) => {
             const { meron_odds, wala_odds } = data[ 2 ];
             matchOdds = finalBetside === meron ? meron_odds : wala_odds;
 
-            if (oddsMinimum > matchOdds && finalBetside !== '') {
+            if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
                 isBelowMinimumOdds = true;
                 return;
             }
@@ -386,7 +426,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -403,7 +443,9 @@ const websocketConnect = (crfToken) => {
         if (!(presentLevel > betLevel.length - 1)) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
-                    console.log('%c- Terminated -', 'font-weight: bold; color: red; font-size: 12px;');
+                    const localTime = new Date().toLocaleTimeString();
+                    console.log(`%c- Terminated on ${localTime} -`, 'font-weight: bold; color: red; font-size: 12px;');
+
                     websocket.close();
                     websocket = undefined;
                     clearInterval(retryPinger);
@@ -452,6 +494,7 @@ function setLocalVariablesFromCache() {
         if (Object.keys(result).length === 0) {
             return;
         }
+        matchLogs = [];
         matchLogs = result.matchLogs;
     });
     chrome.storage.local.get(['highestLossStreak'], function (result) {
@@ -490,11 +533,11 @@ function setLocalVariablesFromCache() {
         }
         isBetOnHigherRoi = result.isBetOnHigherRoi;
     });
-    chrome.storage.local.get(['betLowRoiOverwrite'], function (result) {
+    chrome.storage.local.get(['isShuffleBetSide'], function (result) {
         if (Object.keys(result).length === 0) {
             return;
         }
-        betLowRoiOverwrite = result.betLowRoiOverwrite;
+        isShuffleBetSide = result.isShuffleBetSide;
     });
 }
 
@@ -525,29 +568,37 @@ function stopTimer() {
 }
 
 function setFinalBet(fightData) {
+    if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
+        return;
+    }
     if (isBelowMinimumOdds === false) {
         reverseBet();
     }
-
     if (finalBetside === '') {
         isBetOnHigherRoi = false;
     }
+    if (isShuffleBetSide === true) {
+        finalBetside = shuffleBetSide();
 
-    finalBetside = (isBetOnHigherRoi
-        ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-        ? meron : wala;
+        if (finalBetside === meron) {
+            isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+        }
+        if (finalBetside === wala) {
+            isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+        }
+
+        isShuffleBetSideHasPicked = true;
+    } else {
+        finalBetside = (isBetOnHigherRoi
+            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+            ? meron : wala;
+    }
 
     chrome.storage.local.set({ finalBetside });
     chrome.storage.local.set({ isBetOnHigherRoi });
 }
 
 function reverseBet() {
-    if (betLowRoiOverwrite === true) {
-        isBetOnHigherRoi = false;
-        chrome.storage.local.set({ isBetOnHigherRoi });
-        return;
-    }
-
     isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
@@ -566,6 +617,21 @@ function printProfit() {
     console.log(`%cTotal Profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
+function shuffleBetSide() {
+    const shuffleNames = (array) => {
+        let oldElement;
+        for (let i = array.length - 1; i > 0; i--) {
+            let rand = Math.floor(Math.random() * (i + 1));
+            oldElement = array[ i ];
+            array[ i ] = array[ rand ];
+            array[ rand ] = oldElement;
+        }
+
+        return array;
+    }
+
+    return shuffleNames([meron, wala])[ 0 ];
+}
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
     const lossMatches = matchLogs.filter(c => c.isWin === false);
