@@ -62,12 +62,14 @@ let betAmountPlaced = 0;
 let isBettingWithAccumulatedAmount = false;
 let isBetFromTakenProfit = false;
 let isBelowMinimumOdds = false;
+let isAboveMaximumOdds = false;
 let matchOdds = 0;
 
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 174.99;
+const oddsMinimum = 179.99;
+const oddsMaximum = 210;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -191,7 +193,11 @@ const websocketConnect = (crfToken) => {
             isShuffleBetSideHasPicked = false;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                return;
+            }
+            if(isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
+                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
             if (fightStatus === 'cancelled' && isOpenBet === false) {
@@ -215,6 +221,7 @@ const websocketConnect = (crfToken) => {
                         reverseBet();
                         isBetSubmitted = false;
                         isBelowMinimumOdds = false;
+                        isAboveMaximumOdds = false;
 
                         drawCount += 1;
 
@@ -233,13 +240,14 @@ const websocketConnect = (crfToken) => {
                         chrome.storage.local.set({ lossCount });
                     }
                 } else {
-                    if (isBelowMinimumOdds === true) {
+                    if (isBelowMinimumOdds === true || isAboveMaximumOdds === true) {
                         console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
                     isBelowMinimumOdds = false;
+                    isAboveMaximumOdds = false;
                     return;
                 }
                 if (isBetSubmitted === true) {
@@ -316,6 +324,7 @@ const websocketConnect = (crfToken) => {
                 isBetSubmitted = false;
                 betAmountPlaced = 0;
                 isBelowMinimumOdds = false;
+                isAboveMaximumOdds = false;
 
                 return;
             }
@@ -335,17 +344,17 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            if ([0, 1].includes((matchIndex / 10) % 2) && isBelowMinimumOdds === false) {
+            if ([0, 1].includes((matchIndex / 10) % 2) && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isPendingPrintProfit = true;
             }
-            if (isMatchWin === true && isPendingPrintProfit === true && isBelowMinimumOdds === false) {
+            if (isMatchWin === true && isPendingPrintProfit === true && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isPendingPrintProfit = false;
                 // isMatchWin = false;
 
                 printProfit();
             }
 
-            if ([0, 1].includes(matchIndex / 8 % 2) && isShuffleBetSide === false && isBelowMinimumOdds === false) {
+            if ([0, 1].includes(matchIndex / 8 % 2) && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 printLine();
                 //
                 // const halveDraw = parseInt(drawCount / 2);
@@ -358,12 +367,12 @@ const websocketConnect = (crfToken) => {
 
                 resetIndexCounter();
             } else {
-                if (isBelowMinimumOdds === false) {
+                if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                     printLine();
                 }
             }
 
-            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false) {
+            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isShuffleBetSide = true;
 
                 chrome.storage.local.set({ isShuffleBetSide });
@@ -378,6 +387,10 @@ const websocketConnect = (crfToken) => {
 
             if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
                 isBelowMinimumOdds = true;
+                return;
+            }
+            if(matchOdds > oddsMaximum && finalBetside !== '') {
+                isAboveMaximumOdds = true;
                 return;
             }
 
@@ -571,7 +584,7 @@ function setFinalBet(fightData) {
     if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
         return;
     }
-    if (isBelowMinimumOdds === false) {
+    if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
         reverseBet();
     }
     if (finalBetside === '') {
@@ -618,7 +631,7 @@ function printProfit() {
 }
 
 function shuffleBetSide() {
-    const shuffleNames = (array) => {
+    const shuffleArrays = (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
@@ -630,7 +643,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    return shuffleNames([meron, wala])[ 0 ];
+    return shuffleArrays([meron, wala])[ parseInt(shuffleArrays([0, 1])) ];
 }
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
