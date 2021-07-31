@@ -69,7 +69,7 @@ let timer;
 let timerIndex = 0;
 
 const oddsMinimum = 179.99;
-const oddsMaximum = 210;
+const oddsMaximum = 218;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -277,6 +277,8 @@ const websocketConnect = (crfToken) => {
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
+
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
                     } else {
                         lossStreak += 1;
 
