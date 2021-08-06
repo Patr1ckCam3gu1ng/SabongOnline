@@ -351,22 +351,12 @@ const websocketConnect = (crfToken) => {
             }
             if (isMatchWin === true && isPendingPrintProfit === true && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isPendingPrintProfit = false;
-                // isMatchWin = false;
 
                 printProfit();
             }
 
             if ([0, 1].includes(matchIndex / 8 % 2) && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 printLine();
-                //
-                // const halveDraw = parseInt(drawCount / 2);
-                // const lossCountCalc = parseInt(lossCount + halveDraw);
-                //
-                // if (lossCountCalc >= winCount && (lossCountCalc >= 5 || winCount >= 5)) {
-                //     console.log(`%cReversing... Loss is ${lossCount} but win is only ${winCount}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                //     reverseBet();
-                // }
-
                 resetIndexCounter();
             } else {
                 if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
@@ -637,15 +627,15 @@ function shuffleBetSide() {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[ i ];
-            array[ i ] = array[ rand ];
-            array[ rand ] = oldElement;
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
         }
 
         return array;
     }
 
-    return shuffleArrays([meron, wala])[ parseInt(shuffleArrays([0, 1])) ];
+    return shuffleArrays([wala, meron]) [parseInt(shuffleArrays([0, 1]))];
 }
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
