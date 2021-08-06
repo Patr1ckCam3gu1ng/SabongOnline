@@ -6,25 +6,25 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let betLevel = [
-    612,    // 1
-    612,    // 2
-    1292,   // 3
-    2728,   // 4
-    5759,   // 5
-    12158,  // 6
-    25667   // 7
-];
-
 // let betLevel = [
-//     1300,   // 1
-//     1300,   // 2
-//     2744,   // 3
-//     5793,   // 4
-//     12230,  // 5
-//     25819,  // 6
-//     54507,  // 7
+//     612,    // 1
+//     612,    // 2
+//     1292,   // 3
+//     2728,   // 4
+//     5759,   // 5
+//     12158,  // 6
+//     25667   // 7
 // ];
+
+let betLevel = [
+    1300,   // 1
+    1300,   // 2
+    2744,   // 3
+    5793,   // 4
+    12230,  // 5
+    25819,  // 6
+    54507,  // 7
+];
 
 // let betLevel = [
 //     6000,   // 1
@@ -68,7 +68,7 @@ let matchOdds = 0;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 179.99;
+const oddsMinimum = 177;
 const oddsMaximum = 218;
 
 //should remain 'let' so we can change it in the console:
