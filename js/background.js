@@ -271,7 +271,7 @@ const websocketConnect = (crfToken) => {
                         if (presentLevel === 0) {
                             winStreak += 1;
                         }
-                        if(isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
+                        if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
                             reverseBet();
                         }
 
@@ -386,7 +386,7 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
-            setFinalBet(data[ 2 ]);
+            await setFinalBet(data[ 2 ]);
 
             const { meron_odds, wala_odds } = data[ 2 ];
             matchOdds = finalBetside === meron ? meron_odds : wala_odds;
@@ -586,7 +586,7 @@ function stopTimer() {
     timerIndex = 0;
 }
 
-function setFinalBet(fightData) {
+async function setFinalBet(fightData) {
     if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
         return;
     }
@@ -597,7 +597,7 @@ function setFinalBet(fightData) {
         isBetOnHigherRoi = false;
     }
     if (isShuffleBetSide === true) {
-        finalBetside = shuffleBetSide();
+        finalBetside = await shuffleBetSide();
 
         if (finalBetside === meron) {
             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
@@ -636,21 +636,26 @@ function printProfit() {
     console.log(`%cTotal Profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
-function shuffleBetSide() {
-    const shuffleArrays = (array) => {
+async function shuffleBetSide() {
+    const shuffleArrays = async (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
+            oldElement = array[ i ];
+            array[ i ] = array[ rand ];
+            array[ rand ] = oldElement;
+
+            await new Promise(r => setTimeout(r, 800));
         }
 
         return array;
     }
+    const shuffledBetSide = await shuffleArrays([wala, meron]);
+    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 1]));
 
-    return shuffleArrays([wala, meron]) [parseInt(shuffleArrays([0, 1]))];
+    return shuffledBetSide[ shuffledBetSideIndex ];
 }
+
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
     const lossMatches = matchLogs.filter(c => c.isWin === false);
