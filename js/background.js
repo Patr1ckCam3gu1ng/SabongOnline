@@ -36,7 +36,7 @@ let betLevel = [
 //     251600  // 7
 // ];
 
-const raceTime = '02:30:00 PM';
+const raceTime = '02:00:00 PM';
 
 const meron = 'meron';
 const wala = 'wala';
@@ -676,7 +676,9 @@ function isRaceTime() {
     const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
     const timeNow = new Date(now.getTime());
 
-    return raceStarts > timeNow;
+    return raceStarts > timeNow &&
+        (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
+            new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
