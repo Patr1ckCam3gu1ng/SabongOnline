@@ -36,6 +36,8 @@ let betLevel = [
 //     251600  // 7
 // ];
 
+const raceTime = '12:59:00 PM';
+
 const meron = 'meron';
 const wala = 'wala';
 
@@ -64,6 +66,7 @@ let isBetFromTakenProfit = false;
 let isBelowMinimumOdds = false;
 let isAboveMaximumOdds = false;
 let matchOdds = 0;
+let isReminded = false;
 
 let timer;
 let timerIndex = 0;
@@ -147,6 +150,14 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
+        if (isRaceTime()) {
+            if (isReminded === false) {
+                console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
+                isReminded = true;
+            }
+            return;
+        }
+
         const fightEvent = data[ 0 ];
         const isBetting = data[ 1 ] === 'betting';
 
@@ -196,7 +207,7 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
-            if(isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
                 console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
@@ -381,7 +392,7 @@ const websocketConnect = (crfToken) => {
                 isBelowMinimumOdds = true;
                 return;
             }
-            if(matchOdds > oddsMaximum && finalBetside !== '') {
+            if (matchOdds > oddsMaximum && finalBetside !== '') {
                 isAboveMaximumOdds = true;
                 return;
             }
@@ -647,9 +658,15 @@ function calculateProfit() {
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
 }
-
 function printLine() {
     console.log('%c-', 'color: black;');
+}
+function isRaceTime() {
+    const now = new Date();
+    const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
+    const timeNow = new Date(now.getTime());
+
+    return raceStarts > timeNow;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
