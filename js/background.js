@@ -383,6 +383,8 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             await setFinalBet(data[ 2 ]);
 
             const { meron_odds, wala_odds } = data[ 2 ];
