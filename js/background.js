@@ -385,9 +385,12 @@ const websocketConnect = (crfToken) => {
 
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            await setFinalBet(data[ 2 ]);
+            const dataBetOdds = { value: data[ 2 ] };
+            const clonedDataBetOdds = { ...dataBetOdds };
 
-            const { meron_odds, wala_odds } = data[ 2 ];
+            await setFinalBet(clonedDataBetOdds.value);
+
+            const { meron_odds, wala_odds } = clonedDataBetOdds.value;
             matchOdds = finalBetside === meron ? meron_odds : wala_odds;
 
             if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
