@@ -75,7 +75,7 @@ const oddsMinimum = 177;
 const oddsMaximum = 218;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 84;
+let maxWaitTimes = 70;
 
 let isDemoOnly = false;
 
@@ -151,11 +151,14 @@ const websocketConnect = (crfToken) => {
         }
 
         if (isRaceTime()) {
-            if (isReminded === false) {
-                console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
-                isReminded = true;
+            if (isOffTimeRace() === false) {
+                if (isReminded === false) {
+                    console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
+                    isReminded = true;
+                }
+
+                return;
             }
-            return;
         }
 
         const fightEvent = data[ 0 ];
@@ -672,11 +675,14 @@ function isRaceTime() {
     const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
     const timeNow = new Date(now.getTime());
 
-    return raceStarts > timeNow &&
-        (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
-            new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime()) === false;
+    return raceStarts > timeNow;
 }
+function isOffTimeRace() {
+    const now = new Date();
 
+    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
+}
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
