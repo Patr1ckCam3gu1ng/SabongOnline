@@ -650,8 +650,8 @@ async function shuffleBetSide() {
 
         return array;
     }
-    const shuffledBetSide = await shuffleArrays([wala, meron]);
-    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 1]));
+    const shuffledBetSide = await shuffleArrays([wala, meron, meron, wala]);
+    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 1, 1, 0]));
 
     return shuffledBetSide[ shuffledBetSideIndex ];
 }
