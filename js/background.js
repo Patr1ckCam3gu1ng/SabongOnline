@@ -271,9 +271,6 @@ const websocketConnect = (crfToken) => {
                         if (presentLevel === 0) {
                             winStreak += 1;
                         }
-                        if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
-                            reverseBet();
-                        }
 
                         lossStreak = 0;
                         isShuffleBetSide = false;
@@ -645,13 +642,13 @@ async function shuffleBetSide() {
             array[ i ] = array[ rand ];
             array[ rand ] = oldElement;
 
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 700));
         }
 
         return array;
     }
-    const shuffledBetSide = await shuffleArrays([wala, meron, meron, wala]);
-    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 1, 1, 0]));
+    const shuffledBetSide = await shuffleArrays([wala, meron]);
+    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 0, 0, 1, 1, 1]));
 
     return shuffledBetSide[ shuffledBetSideIndex ];
 }
