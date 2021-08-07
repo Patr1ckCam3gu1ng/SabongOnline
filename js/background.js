@@ -271,6 +271,9 @@ const websocketConnect = (crfToken) => {
                         if (presentLevel === 0) {
                             winStreak += 1;
                         }
+                        if(isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
+                            reverseBet();
+                        }
 
                         lossStreak = 0;
                         isShuffleBetSide = false;
