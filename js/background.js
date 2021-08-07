@@ -383,12 +383,10 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
             const dataBetOdds = { value: data[ 2 ] };
             const clonedDataBetOdds = { ...dataBetOdds };
 
-            await setFinalBet(clonedDataBetOdds.value);
+            setFinalBet(clonedDataBetOdds.value);
 
             const { meron_odds, wala_odds } = clonedDataBetOdds.value;
             matchOdds = finalBetside === meron ? meron_odds : wala_odds;
@@ -588,36 +586,36 @@ function stopTimer() {
     timerIndex = 0;
 }
 
-async function setFinalBet(fightData) {
-    if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
-        return;
-    }
-    if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-        reverseBet();
-    }
-    if (finalBetside === '') {
-        isBetOnHigherRoi = false;
-    }
-    if (isShuffleBetSide === true) {
-        finalBetside = await shuffleBetSide();
+ function setFinalBet(fightData) {
+     if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
+         return;
+     }
+     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+         reverseBet();
+     }
+     if (finalBetside === '') {
+         isBetOnHigherRoi = false;
+     }
+     if (isShuffleBetSide === true) {
+         finalBetside = shuffleBetSide();
 
-        if (finalBetside === meron) {
-            isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
-        }
-        if (finalBetside === wala) {
-            isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-        }
+         if (finalBetside === meron) {
+             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+         }
+         if (finalBetside === wala) {
+             isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+         }
 
-        isShuffleBetSideHasPicked = true;
-    } else {
-        finalBetside = (isBetOnHigherRoi
-            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-            ? meron : wala;
-    }
+         isShuffleBetSideHasPicked = true;
+     } else {
+         finalBetside = (isBetOnHigherRoi
+             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+             ? meron : wala;
+     }
 
-    chrome.storage.local.set({ finalBetside });
-    chrome.storage.local.set({ isBetOnHigherRoi });
-}
+     chrome.storage.local.set({ finalBetside });
+     chrome.storage.local.set({ isBetOnHigherRoi });
+ }
 
 function reverseBet() {
     isBetOnHigherRoi = !isBetOnHigherRoi;
@@ -638,22 +636,20 @@ function printProfit() {
     console.log(`%cTotal Profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
-async function shuffleBetSide() {
-    const shuffleArrays = async (array) => {
+function shuffleBetSide() {
+    const shuffleArrays = (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
             oldElement = array[ i ];
             array[ i ] = array[ rand ];
             array[ rand ] = oldElement;
-
-            await new Promise(r => setTimeout(r, 700));
         }
 
         return array;
     }
-    const shuffledBetSide = await shuffleArrays([wala, meron]);
-    const shuffledBetSideIndex = parseInt(await shuffleArrays([0, 0, 0, 1, 1, 1]));
+    const shuffledBetSide = shuffleArrays([wala, meron]);
+    const shuffledBetSideIndex = parseInt(shuffleArrays([0, 1, 0, 1, 0, 1]));
 
     return shuffledBetSide[ shuffledBetSideIndex ];
 }
