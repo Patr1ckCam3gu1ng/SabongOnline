@@ -674,7 +674,7 @@ function isRaceTime() {
 
     return raceStarts > timeNow &&
         (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
-            new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
+            new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime()) === false;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
