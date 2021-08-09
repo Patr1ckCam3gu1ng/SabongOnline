@@ -586,6 +586,8 @@ function setFinalBet(fightData) {
         finalBetside = shuffleBetSide();
         finalBetside = shuffleBetSide();
         finalBetside = shuffleBetSide();
+        finalBetside = shuffleBetSide();
+        finalBetside = shuffleBetSide();
 
         if (finalBetside === meron) {
             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
