@@ -635,7 +635,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    return shuffleArrays([wala, meron]) [parseInt(shuffleArrays([0, 1]))];
+    return shuffleArrays([wala, meron, meron, wala]) [parseInt(shuffleArrays([0, 1, 1, 0]))];
 }
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
