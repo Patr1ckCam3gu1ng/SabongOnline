@@ -36,6 +36,8 @@ let betLevel = [
 //     251600  // 7
 // ];
 
+const raceTime = '12:59:00 PM';
+
 const meron = 'meron';
 const wala = 'wala';
 
@@ -64,6 +66,7 @@ let isBetFromTakenProfit = false;
 let isBelowMinimumOdds = false;
 let isAboveMaximumOdds = false;
 let matchOdds = 0;
+let isReminded = false;
 
 let timer;
 let timerIndex = 0;
@@ -72,7 +75,7 @@ const oddsMinimum = 177;
 const oddsMaximum = 218;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 84;
+let maxWaitTimes = 70;
 
 let isDemoOnly = false;
 
@@ -147,6 +150,17 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
+        if (isRaceTime()) {
+            if (isOffTimeRace() === false) {
+                if (isReminded === false) {
+                    console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
+                    isReminded = true;
+                }
+
+                return;
+            }
+        }
+
         const fightEvent = data[ 0 ];
         const isBetting = data[ 1 ] === 'betting';
 
@@ -196,7 +210,7 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
-            if(isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
                 console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
@@ -372,16 +386,19 @@ const websocketConnect = (crfToken) => {
                 console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
-            setFinalBet(data[ 2 ]);
+            const dataBetOdds = { value: data[ 2 ] };
+            const clonedDataBetOdds = { ...dataBetOdds };
 
-            const { meron_odds, wala_odds } = data[ 2 ];
+            setFinalBet(clonedDataBetOdds.value);
+
+            const { meron_odds, wala_odds } = clonedDataBetOdds.value;
             matchOdds = finalBetside === meron ? meron_odds : wala_odds;
 
             if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
                 isBelowMinimumOdds = true;
                 return;
             }
-            if(matchOdds > oddsMaximum && finalBetside !== '') {
+            if (matchOdds > oddsMaximum && finalBetside !== '') {
                 isAboveMaximumOdds = true;
                 return;
             }
@@ -572,40 +589,39 @@ function stopTimer() {
     timerIndex = 0;
 }
 
-function setFinalBet(fightData) {
-    if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
-        return;
-    }
-    if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-        reverseBet();
-    }
-    if (finalBetside === '') {
-        isBetOnHigherRoi = false;
-    }
-    if (isShuffleBetSide === true) {
-        finalBetside = shuffleBetSide();
-        finalBetside = shuffleBetSide();
-        finalBetside = shuffleBetSide();
-        finalBetside = shuffleBetSide();
-        finalBetside = shuffleBetSide();
+ function setFinalBet(fightData) {
+     if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
+         return;
+     }
+     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+         reverseBet();
+     }
+     if (finalBetside === '') {
+         isBetOnHigherRoi = false;
+     }
+     if (isShuffleBetSide === true) {
+         finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
 
-        if (finalBetside === meron) {
-            isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
-        }
-        if (finalBetside === wala) {
-            isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-        }
+         if (finalBetside === meron) {
+             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+         }
+         if (finalBetside === wala) {
+             isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+         }
 
-        isShuffleBetSideHasPicked = true;
-    } else {
-        finalBetside = (isBetOnHigherRoi
-            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-            ? meron : wala;
-    }
+         isShuffleBetSideHasPicked = true;
+     } else {
+         finalBetside = (isBetOnHigherRoi
+             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+             ? meron : wala;
+     }
 
-    chrome.storage.local.set({ finalBetside });
-    chrome.storage.local.set({ isBetOnHigherRoi });
-}
+     chrome.storage.local.set({ finalBetside });
+     chrome.storage.local.set({ isBetOnHigherRoi });
+ }
 
 function reverseBet() {
     isBetOnHigherRoi = !isBetOnHigherRoi;
@@ -631,16 +647,17 @@ function shuffleBetSide() {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
+            oldElement = array[ i ];
+            array[ i ] = array[ rand ];
+            array[ rand ] = oldElement;
         }
 
         return array;
     }
 
-    return shuffleArrays([wala, meron, meron, wala]) [parseInt(shuffleArrays([0, 1, 1, 0]))];
+    return shuffleArrays([wala, meron, meron, wala]) [ parseInt(shuffleArrays([0, 1, 1, 0])) ];
 }
+
 function calculateProfit() {
     const winMatches = matchLogs.filter(c => c.isWin === true);
     const lossMatches = matchLogs.filter(c => c.isWin === false);
@@ -651,11 +668,22 @@ function calculateProfit() {
         profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
     }
 }
-
 function printLine() {
     console.log('%c-', 'color: black;');
 }
+function isRaceTime() {
+    const now = new Date();
+    const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
+    const timeNow = new Date(now.getTime());
 
+    return raceStarts > timeNow;
+}
+function isOffTimeRace() {
+    const now = new Date();
+
+    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
+}
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
