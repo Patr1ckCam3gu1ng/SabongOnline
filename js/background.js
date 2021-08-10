@@ -601,6 +601,9 @@ function stopTimer() {
      }
      if (isShuffleBetSide === true) {
          finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
+         finalBetside = shuffleBetSide();
 
          if (finalBetside === meron) {
              isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
@@ -651,10 +654,8 @@ function shuffleBetSide() {
 
         return array;
     }
-    const shuffledBetSide = shuffleArrays([wala, meron]);
-    const shuffledBetSideIndex = parseInt(shuffleArrays([0, 1, 0, 1, 0, 1]));
 
-    return shuffledBetSide[ shuffledBetSideIndex ];
+    return shuffleArrays([wala, meron, meron, wala]) [ parseInt(shuffleArrays([0, 1, 1, 0])) ];
 }
 
 function calculateProfit() {
