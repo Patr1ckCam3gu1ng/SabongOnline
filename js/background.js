@@ -206,14 +206,14 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                return;
-            }
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
-                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                return;
-            }
+            // if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
+            //     console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+            //     return;
+            // }
+            // if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
+            //     console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+            //     return;
+            // }
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
                 reverseBet();
@@ -391,17 +391,17 @@ const websocketConnect = (crfToken) => {
 
             setFinalBet(clonedDataBetOdds.value);
 
-            const { meron_odds, wala_odds } = clonedDataBetOdds.value;
-            matchOdds = finalBetside === meron ? meron_odds : wala_odds;
-
-            if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
-                isBelowMinimumOdds = true;
-                return;
-            }
-            if (matchOdds > oddsMaximum && finalBetside !== '') {
-                isAboveMaximumOdds = true;
-                return;
-            }
+            // const { meron_odds, wala_odds } = clonedDataBetOdds.value;
+            // matchOdds = finalBetside === meron ? meron_odds : wala_odds;
+            //
+            // if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
+            //     isBelowMinimumOdds = true;
+            //     return;
+            // }
+            // if (matchOdds > oddsMaximum && finalBetside !== '') {
+            //     isAboveMaximumOdds = true;
+            //     return;
+            // }
 
             stopTimer();
 
@@ -678,8 +678,8 @@ function isRaceTime() {
 function isOffTimeRace() {
     const now = new Date();
 
-    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:01:00 AM").getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
+    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:00:00 AM").getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "04:00:00 AM").getTime());
 }
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
