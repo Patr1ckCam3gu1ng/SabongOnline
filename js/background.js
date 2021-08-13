@@ -154,7 +154,16 @@ const websocketConnect = (crfToken) => {
         if (isRaceTime()) {
             if (isOffTimeRace() === false && isWinner === true) {
                 if (isReminded === false) {
-                    printProfit();
+                    const {profit, commission} = calculateProfit();
+
+                    console.log(`%c------------------`, 'font-weight: bold; color: yellow');
+                    console.log(`%cRunning commission: Php ${commission.toLocaleString()}`, 'font-weight: bold; color: yellow');
+                    printLine();
+                    console.log(`%cEnd of day profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+                    console.log(`%c------------------`, 'font-weight: bold; color: yellow');
+
+                    printLine();
+                    printLine();
 
                     console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
                     isReminded = true;
@@ -666,7 +675,8 @@ function calculateProfit() {
     return {
         winMatches: winMatches.length,
         lossMatches: lossMatches.length,
-        profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0))
+        profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0)),
+        commission: parseInt(matchLogs.map(({ betAmountPlaced }) => betAmountPlaced).reduce((a, b) => a + b, 0)),
     }
 }
 function printLine() {
