@@ -67,6 +67,7 @@ let isBelowMinimumOdds = false;
 let isAboveMaximumOdds = false;
 let matchOdds = 0;
 let isReminded = false;
+let isWinner = false;
 
 let timer;
 let timerIndex = 0;
@@ -151,7 +152,7 @@ const websocketConnect = (crfToken) => {
         }
 
         if (isRaceTime()) {
-            if (isOffTimeRace() === false) {
+            if (isOffTimeRace() === false && isWinner === true) {
                 if (isReminded === false) {
                     console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
                     isReminded = true;
@@ -222,7 +223,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
-                const isWinner = winner === finalBetside;
+                isWinner = winner === finalBetside;
+
                 const isDraw = winner === 'draw';
                 let isBetFromProfitUsedAlready = false;
 
@@ -280,7 +282,7 @@ const websocketConnect = (crfToken) => {
 
                         chrome.storage.local.set({ isShuffleBetSide });
 
-                        setMatchLogs(fightNumber, isWinner, winningSum);
+                        setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced);
 
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
@@ -298,7 +300,7 @@ const websocketConnect = (crfToken) => {
 
                         winStreak = 0;
 
-                        setMatchLogs(fightNumber, isWinner, -betAmountPlaced);
+                        setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
                         if (lossStreak > highestLossStreak) {
                             if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
@@ -563,8 +565,8 @@ function setLocalVariablesFromCache() {
     });
 }
 
-function setMatchLogs(fightNumber, isWin, sum) {
-    matchLogs.push({ fightNumber, isWin, sum });
+function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced) {
+    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced });
     chrome.storage.local.set({ matchLogs });
 }
 
