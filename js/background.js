@@ -154,6 +154,8 @@ const websocketConnect = (crfToken) => {
         if (isRaceTime()) {
             if (isOffTimeRace() === false && isWinner === true) {
                 if (isReminded === false) {
+                    printProfit();
+
                     console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
                     isReminded = true;
                 }
@@ -681,7 +683,7 @@ function isOffTimeRace() {
     const now = new Date();
 
     return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:00:00 AM").getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "04:00:00 AM").getTime());
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "02:30:00 AM").getTime());
 }
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
