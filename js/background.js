@@ -340,13 +340,13 @@ const websocketConnect = (crfToken) => {
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
-                    if (isWinner === false) {
-                        const { profit } = calculateProfit();
-
-                        if (profit > betLevel[ 0 ] && presentLevel === 2 && isBetFromProfitUsedAlready === false) {
-                            isBetFromTakenProfit = true;
-                        }
-                    }
+                    // if (isWinner === false) {
+                    //     const { profit } = calculateProfit();
+                    //
+                    //     if (profit > betLevel[ 0 ] && presentLevel === 2 && isBetFromProfitUsedAlready === false) {
+                    //         isBetFromTakenProfit = true;
+                    //     }
+                    // }
 
                     isBetFromProfitUsedAlready = false;
 
@@ -394,7 +394,7 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            if (lossStreak >= 4 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+            if (lossStreak >= 2 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isShuffleBetSide = true;
             }
 
@@ -614,7 +614,7 @@ function isBetOddsIrregular(clonedDataBetOdds) {
      if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
          return;
      }
-     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false && [0, 1].includes(((matchIndex + 1) / 3) % 2) === true) {
+     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
          reverseBet();
      }
      if (finalBetside === '') {
@@ -673,7 +673,10 @@ function shuffleBetSide() {
         return array;
     }
 
-    return shuffleArrays([wala, meron, meron, wala]) [ parseInt(shuffleArrays([0, 1, 1, 0])) ];
+    let shuffled = shuffleArrays([wala, meron, wala, meron]);
+    shuffled = shuffleArrays([wala, meron, wala, meron]);
+
+    return shuffled[ parseInt(shuffleArrays([0, 1, 1, 0])) ];
 }
 
 function calculateProfit() {
