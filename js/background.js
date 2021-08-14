@@ -68,6 +68,7 @@ let isAboveMaximumOdds = false;
 let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
+let ignoreRaceTime = false;
 
 let timer;
 let timerIndex = 0;
@@ -151,8 +152,8 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        if (isRaceTime()) {
-            if (isOffTimeRace() === false && isWinner === true) {
+        if (isRaceTime() && ignoreRaceTime === false) {
+            if (isOffTimeRace() === false) {
                 if (isReminded === false) {
                     const {profit, commission} = calculateProfit();
 
