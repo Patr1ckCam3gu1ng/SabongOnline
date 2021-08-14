@@ -621,7 +621,9 @@ function isBetOddsIrregular(clonedDataBetOdds) {
          isBetOnHigherRoi = false;
      }
      if (isShuffleBetSide === true) {
-         finalBetside = shuffleBetSide();
+         finalBetside = (shuffleBetSide()
+             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+             ? meron : wala;
 
          if (finalBetside === meron) {
              isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
@@ -673,10 +675,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    let shuffled = shuffleArrays([wala, meron, wala, meron]);
-    shuffled = shuffleArrays([wala, meron, wala, meron]);
-
-    return shuffled[ parseInt(shuffleArrays([0, 1, 1, 0])) ];
+    return shuffleArrays([true, false])[ parseInt(shuffleArrays([0, 1])) ];
 }
 
 function calculateProfit() {
