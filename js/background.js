@@ -36,7 +36,7 @@ let betLevel = [
 //     251600  // 7
 // ];
 
-const raceTime = '10:30:00 AM';
+const raceTime = '12:58:00 PM';
 
 const meron = 'meron';
 const wala = 'wala';
