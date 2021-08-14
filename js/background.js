@@ -36,7 +36,7 @@ let betLevel = [
 //     251600  // 7
 // ];
 
-const raceTime = '12:59:00 PM';
+const raceTime = '10:30:00 AM';
 
 const meron = 'meron';
 const wala = 'wala';
@@ -73,8 +73,8 @@ let ignoreRaceTime = false;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 177;
-const oddsMaximum = 218;
+const oddsMinimum = 175;
+const oddsMaximum = 215;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 70;
@@ -155,7 +155,7 @@ const websocketConnect = (crfToken) => {
         if (isRaceTime() && ignoreRaceTime === false) {
             if (isOffTimeRace() === false) {
                 if (isReminded === false) {
-                    const {profit, commission} = calculateProfit();
+                    const { profit, commission } = calculateProfit();
 
                     console.log(`%c------------------`, 'font-weight: bold; color: yellow');
                     console.log(`%cRunning commission: Php ${commission.toLocaleString()}`, 'font-weight: bold; color: yellow');
@@ -219,14 +219,15 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
-            // if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-            //     console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-            //     return;
-            // }
-            // if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
-            //     console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-            //     return;
-            // }
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
+                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                return;
+            }
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
+                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                return;
+            }
+
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
                 reverseBet();
@@ -235,13 +236,14 @@ const websocketConnect = (crfToken) => {
                 return;
             }
             if (fightStatus === 'finished' && isOpenBet === false && isBetting === true) {
+                matchIndex += 1;
+
                 isWinner = winner === finalBetside;
 
                 const isDraw = winner === 'draw';
                 let isBetFromProfitUsedAlready = false;
 
                 if (isBetSubmitted === true) {
-                    matchIndex += 1;
                     chrome.storage.local.set({ matchIndex });
 
                     if (isDraw) {
@@ -392,12 +394,8 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+            if (lossStreak >= 4 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 isShuffleBetSide = true;
-
-                chrome.storage.local.set({ isShuffleBetSide });
-
-                console.log(`%cBets will be now randomize! Succeeding lose streak was ${lossStreak}`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
             }
 
             const dataBetOdds = { value: data[ 2 ] };
@@ -405,17 +403,9 @@ const websocketConnect = (crfToken) => {
 
             setFinalBet(clonedDataBetOdds.value);
 
-            // const { meron_odds, wala_odds } = clonedDataBetOdds.value;
-            // matchOdds = finalBetside === meron ? meron_odds : wala_odds;
-            //
-            // if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
-            //     isBelowMinimumOdds = true;
-            //     return;
-            // }
-            // if (matchOdds > oddsMaximum && finalBetside !== '') {
-            //     isAboveMaximumOdds = true;
-            //     return;
-            // }
+            if (isBetOddsIrregular(clonedDataBetOdds)) {
+                return;
+            }
 
             stopTimer();
 
@@ -603,11 +593,28 @@ function stopTimer() {
     timerIndex = 0;
 }
 
+function isBetOddsIrregular(clonedDataBetOdds) {
+    const { meron_odds, wala_odds } = clonedDataBetOdds.value;
+
+    matchOdds = finalBetside === meron ? meron_odds : wala_odds;
+
+    if (oddsMinimum > matchOdds && finalBetside !== '' && lossStreak >= 1) {
+        isBelowMinimumOdds = true;
+        return true;
+    }
+    if (matchOdds > oddsMaximum && finalBetside !== '') {
+        isAboveMaximumOdds = true;
+        return true;
+    }
+
+    return false;
+}
+
  function setFinalBet(fightData) {
      if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
          return;
      }
-     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false && [0, 1].includes(((matchIndex + 1) / 3) % 2) === true) {
          reverseBet();
      }
      if (finalBetside === '') {
@@ -694,7 +701,7 @@ function isOffTimeRace() {
     const now = new Date();
 
     return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:00:00 AM").getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "02:30:00 AM").getTime());
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "03:30:00 AM").getTime());
 }
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
