@@ -675,7 +675,15 @@ function shuffleBetSide() {
         return array;
     }
 
-    return shuffleArrays([true, false])[ parseInt(shuffleArrays([0, 1])) ];
+    let shuffledBetPicked = '';
+    let index = 0;
+
+    while (index < (Math.floor(Math.random() * 100) + 1)) {
+        shuffledBetPicked = shuffleArrays([true, false])[ parseInt(shuffleArrays([0, 1])) ];
+        index++;
+    }
+
+    return shuffledBetPicked;
 }
 
 function calculateProfit() {
