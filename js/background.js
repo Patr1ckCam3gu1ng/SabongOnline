@@ -448,9 +448,9 @@ const websocketConnect = (crfToken) => {
             if (presentLevel < 2 && hasProfitForBetting === true) {
                 livesRemaining += 1;
             }
-            if (presentLevel === 2 && isBetFromTakenProfit === true) {
-                livesRemaining += 1;
-            }
+            // if (presentLevel === 2 && isBetFromTakenProfit === true) {
+            //     livesRemaining += 1;
+            // }
 
             console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
                 'font-weight: bold; color: pink');
