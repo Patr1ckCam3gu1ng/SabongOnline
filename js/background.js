@@ -330,7 +330,7 @@ const websocketConnect = (crfToken) => {
                         if (isBettingWithAccumulatedAmount === true) {
                             presentLevel -= 1;
                         } else if (isBetFromTakenProfit === true) {
-                            presentLevel -= 1;
+                            // presentLevel -= 1;
                             isBetFromProfitUsedAlready = true;
                         }
                     }
@@ -446,7 +446,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
             if (presentLevel < 2 && hasProfitForBetting === true) {
-                livesRemaining += 1;
+                // livesRemaining += 1;
             }
             // if (presentLevel === 2 && isBetFromTakenProfit === true) {
             //     livesRemaining += 1;
