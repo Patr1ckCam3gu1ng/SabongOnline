@@ -678,7 +678,7 @@ function printProfit() {
     console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: ${todaysTotalNetProfit} | Today's Average Profit: ${todaysAverageProfit `(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: ${todaysTotalNetProfit} | Today's Average Profit: ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
