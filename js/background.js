@@ -678,7 +678,7 @@ function printProfit() {
     console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit.toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
@@ -752,7 +752,7 @@ function calculateTodaysProfit() {
     const wonMatchesTotalGrossProfit = parseInt(wonMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
     const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
 
-    const averageProfit = (wonMatchesTotalGrossProfit / wonMatches.length) - parseInt(betLevel[ 0 ]);
+    const averageProfit = ((wonMatchesTotalGrossProfit / wonMatches.length) - parseInt(betLevel[ 0 ])).toFixed(0);
 
     return {
         totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
