@@ -70,6 +70,8 @@ let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
 
+let dailyProfitQuotaLimit = 12000;
+
 let timer;
 let timerIndex = 0;
 
@@ -155,12 +157,11 @@ const websocketConnect = (crfToken) => {
         if (isRaceTime() && ignoreRaceTime === false) {
             if (isOffTimeRace() === false) {
                 if (isReminded === false) {
-                    const { profit, commission } = calculateProfit();
+                    const { grossProfit } = calculateProfit();
 
                     console.log(`%c------------------`, 'font-weight: bold; color: yellow');
-                    console.log(`%cRunning commission: Php ${commission.toLocaleString()}`, 'font-weight: bold; color: yellow');
                     printLine();
-                    console.log(`%cEnd of day profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+                    console.log(`%cEnd of day profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
                     console.log(`%c------------------`, 'font-weight: bold; color: yellow');
 
                     printLine();
@@ -176,6 +177,21 @@ const websocketConnect = (crfToken) => {
 
         const fightEvent = data[ 0 ];
         const isBetting = data[ 1 ] === 'betting';
+
+        if(isDailyQuotaReached() === true) {
+            const { totalNetProfit } = calculateTodaysProfit();
+
+            printProfit();
+
+            printLine();
+
+            console.log(`%cJob Well Done! Daily quota reached: ${totalNetProfit}`, 'font-weight: bold; color: green');
+
+            clearInterval(pinger);
+            websocket.close();
+
+            return;
+        }
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -194,8 +210,8 @@ const websocketConnect = (crfToken) => {
             if (event === 'arenaclosed') {
                 printLine();
 
-                const { profit } = calculateProfit();
-                console.log(`%cEnd of day profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+                const { grossProfit } = calculateProfit();
+                console.log(`%cEnd of day profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
             }
 
             return;
@@ -330,7 +346,7 @@ const websocketConnect = (crfToken) => {
                         if (isBettingWithAccumulatedAmount === true) {
                             presentLevel -= 1;
                         } else if (isBetFromTakenProfit === true) {
-                            presentLevel -= 1;
+                            // presentLevel -= 1;
                             isBetFromProfitUsedAlready = true;
                         }
                     }
@@ -437,8 +453,8 @@ const websocketConnect = (crfToken) => {
                 chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
             }
 
-            const { profit } = calculateProfit();
-            const hasProfitForBetting = (profit - (isBettingWithAccumulatedAmount ? betLevel[ 0 ] : 0)) > betLevel[ 0 ];
+            const { grossProfit } = calculateProfit();
+            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[ 0 ] : 0)) > betLevel[ 0 ];
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -446,7 +462,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
             if (presentLevel < 2 && hasProfitForBetting === true) {
-                livesRemaining += 1;
+                // livesRemaining += 1;
             }
             // if (presentLevel === 2 && isBetFromTakenProfit === true) {
             //     livesRemaining += 1;
@@ -655,11 +671,16 @@ function paymentSafe(isDraw) {
 }
 
 function printProfit() {
-    const { profit, winMatches, lossMatches } = calculateProfit();
+    const { grossProfit, wonMatches, lossMatches, todaysTotalNetProfit, todaysAverageProfit, todaysAverageProfitPercentage } = calculateProfit();
+
     printLine();
-    console.log(`%cWin: ${winMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
+
+    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
-    console.log(`%cTotal Profit: Php ${profit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+    console.log(`%c---`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit.toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%c---`, 'font-weight: bold; color: yellow');
+    console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
 function shuffleBetSide() {
@@ -686,20 +707,10 @@ function shuffleBetSide() {
     return shuffledBetPicked;
 }
 
-function calculateProfit() {
-    const winMatches = matchLogs.filter(c => c.isWin === true);
-    const lossMatches = matchLogs.filter(c => c.isWin === false);
-
-    return {
-        winMatches: winMatches.length,
-        lossMatches: lossMatches.length,
-        profit: parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0)),
-        commission: parseInt(matchLogs.map(({ betAmountPlaced }) => betAmountPlaced).reduce((a, b) => a + b, 0)),
-    }
-}
 function printLine() {
     console.log('%c-', 'color: black;');
 }
+
 function isRaceTime() {
     const now = new Date();
     const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
@@ -707,12 +718,55 @@ function isRaceTime() {
 
     return raceStarts > timeNow;
 }
+
 function isOffTimeRace() {
     const now = new Date();
 
     return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:00:00 AM").getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "03:30:00 AM").getTime());
 }
+
+function calculateProfit() {
+    const wonMatches = matchLogs.filter(c => c.isWin === true);
+    const lossMatches = matchLogs.filter(c => c.isWin === false);
+
+    const grossProfit = parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
+    const { totalNetProfit: todaysTotalNetProfit, averageProfit: todaysAverageProfit, averageProfitPercentage: todaysAverageProfitPercentage } = calculateTodaysProfit();
+
+    return {
+        wonMatches: wonMatches.length,
+        lossMatches: lossMatches.length,
+        //
+        grossProfit: grossProfit,
+        //
+        todaysTotalNetProfit,
+        todaysAverageProfit,
+        todaysAverageProfitPercentage
+    }
+}
+
+function calculateTodaysProfit() {
+    const wonMatches = [...matchLogs].slice(1).filter(c => c.isWin === true);
+    const lossMatches = [...matchLogs].slice(1).filter(c => c.isWin === false);
+
+    const wonMatchesTotalGrossProfit = parseInt(wonMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
+    const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
+
+    const averageProfit = ((wonMatchesTotalGrossProfit / wonMatches.length) - parseInt(betLevel[ 0 ])).toFixed(0);
+
+    return {
+        totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
+        averageProfit,
+        averageProfitPercentage: ((averageProfit / parseInt(betLevel[ 0 ])) * 100).toFixed(0)
+    }
+}
+
+function isDailyQuotaReached() {
+    const { totalNetProfit } = calculateTodaysProfit();
+
+    return totalNetProfit >= dailyProfitQuotaLimit;
+}
+
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
