@@ -70,7 +70,7 @@ let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
 
-let dailyProfitQuotaLimit = 12000;
+let dailyProfitQuotaLimit = 11000;
 
 let timer;
 let timerIndex = 0;
@@ -188,6 +188,7 @@ const websocketConnect = (crfToken) => {
             console.log(`%cJob Well Done! Daily quota reached: ${totalNetProfit}`, 'font-weight: bold; color: green');
 
             clearInterval(pinger);
+            clearInterval(retryPinger);
             websocket.close();
 
             return;
@@ -482,7 +483,7 @@ const websocketConnect = (crfToken) => {
         clearInterval(pinger);
         console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
-        if (!(presentLevel > betLevel.length - 1)) {
+        if (!(presentLevel > betLevel.length - 1) && isDailyQuotaReached() === false) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
                     const localTime = new Date().toLocaleTimeString();
