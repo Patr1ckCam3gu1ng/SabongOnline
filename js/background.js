@@ -40,6 +40,7 @@ const raceTime = '12:01:00 PM';
 
 const meron = 'meron';
 const wala = 'wala';
+const skip = 'skip';
 
 let pinger;
 
@@ -229,6 +230,10 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && finalBetside === skip) {
+                console.log(`%cSkipping Match! Match to be skipped intentionally as per shuffle result`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                return;
+            }
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
@@ -412,6 +417,11 @@ const websocketConnect = (crfToken) => {
             const clonedDataBetOdds = { ...dataBetOdds };
 
             setFinalBet(clonedDataBetOdds.value);
+
+            if (finalBetside === skip) {
+                stopTimer();
+                return;
+            }
 
             if (isBetOddsIrregular(clonedDataBetOdds)) {
                 return;
@@ -631,26 +641,34 @@ function isBetOddsIrregular(clonedDataBetOdds) {
          isBetOnHigherRoi = false;
      }
      if (isShuffleBetSide === true) {
-         finalBetside = (shuffleBetSide()
-             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-             ? meron : wala;
+         const shuffleBetSideResult = shuffleBetSide();
 
-         if (finalBetside === meron) {
-             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+         if (shuffleBetSideResult === skip) {
+             isShuffleBetSideHasPicked = true;
+             finalBetside = skip;
          }
-         if (finalBetside === wala) {
-             isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-         }
+         else {
+             finalBetside = (shuffleBetSideResult === 'true'
+                 ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+                 ? meron : wala;
 
-         isShuffleBetSideHasPicked = true;
+             if (finalBetside === meron) {
+                 isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+             }
+             if (finalBetside === wala) {
+                 isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+             }
+
+             isShuffleBetSideHasPicked = true;
+         }
      } else {
          finalBetside = (isBetOnHigherRoi
              ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
              ? meron : wala;
      }
 
-     chrome.storage.local.set({ finalBetside });
-     chrome.storage.local.set({ isBetOnHigherRoi });
+     chrome.storage.local.set({finalBetside});
+     chrome.storage.local.set({isBetOnHigherRoi});
  }
 
 function reverseBet() {
@@ -682,23 +700,32 @@ function shuffleBetSide() {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[ i ];
-            array[ i ] = array[ rand ];
-            array[ rand ] = oldElement;
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
         }
 
         return array;
     }
 
-    let shuffledBetPicked = '';
+    let shuffledTrueFalse;
+    let shuffledIndex;
+
     let index = 0;
 
-    while (index < (Math.floor(Math.random() * 100) + 1)) {
-        shuffledBetPicked = shuffleArrays([true, false])[ parseInt(shuffleArrays([0, 1])) ];
+    while (index < (Math.floor(parseInt(((Math.random() * 500) + 1).toFixed(0))))) {
+        shuffledTrueFalse = shuffleArrays(['true', 'false', skip]);
         index++;
     }
 
-    return shuffledBetPicked;
+    index = 0;
+
+    while (index < (Math.floor(parseInt(((Math.random() * 500) + 1).toFixed(0))))) {
+        shuffledIndex = parseInt(shuffleArrays([0, 1]));
+        index++;
+    }
+
+    return shuffledTrueFalse[shuffledIndex];
 }
 
 function printLine() {
