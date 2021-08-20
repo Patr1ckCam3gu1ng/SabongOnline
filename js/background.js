@@ -185,7 +185,7 @@ const websocketConnect = (crfToken) => {
 
             printLine();
 
-            console.log(`%cJob Well Done! Daily quota reached: ${totalNetProfit}`, 'font-weight: bold; color: green');
+            console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
             clearInterval(pinger);
             clearInterval(retryPinger);
@@ -207,13 +207,6 @@ const websocketConnect = (crfToken) => {
         if (fightEvent === 'App\\Events\\ArenaUpdate') {
             const fightData = data[ 2 ].data;
             const event = fightData.event;
-
-            if (event === 'arenaclosed') {
-                printLine();
-
-                const { grossProfit } = calculateProfit();
-                console.log(`%cEnd of day profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-            }
 
             return;
         }
