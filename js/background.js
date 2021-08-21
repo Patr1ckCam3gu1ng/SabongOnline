@@ -773,11 +773,11 @@ function calculateTodaysProfit() {
     const wonMatchesTotalGrossProfit = parseInt(wonMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
     const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
 
-    const averageProfit = (wonMatchesTotalGrossProfit / wonMatches.length).toFixed(0);
+    const averageProfit = (wonMatchesTotalGrossProfit / wonMatches.length).toFixed(0).toLocaleString();
 
     return {
         totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
-        averageProfit: averageProfit.toFixed(0).toLocaleString(),
+        averageProfit: averageProfit,
         averageProfitPercentage: ((averageProfit / parseInt(betLevel[ 0 ])) * 100).toFixed(0)
     }
 }
