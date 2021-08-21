@@ -36,7 +36,7 @@ let betLevel = [
 //     251600  // 7
 // ];
 
-const raceTime = '12:01:00 PM';
+const raceTime = '10:00:00 AM';
 
 const meron = 'meron';
 const wala = 'wala';
@@ -743,8 +743,8 @@ function isRaceTime() {
 function isOffTimeRace() {
     const now = new Date();
 
-    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "12:00:00 AM").getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "03:30:00 AM").getTime());
+    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "03:00:00 AM").getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
 }
 
 function calculateProfit() {
