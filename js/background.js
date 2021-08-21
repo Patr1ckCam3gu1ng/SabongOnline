@@ -80,7 +80,7 @@ const oddsMinimum = 175;
 const oddsMaximum = 215;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 70;
+let maxWaitTimes = 78;
 
 let isDemoOnly = false;
 
@@ -690,7 +690,7 @@ function printProfit() {
     console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit.toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
@@ -777,7 +777,7 @@ function calculateTodaysProfit() {
 
     return {
         totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
-        averageProfit,
+        averageProfit: averageProfit.toFixed(0).toLocaleString(),
         averageProfitPercentage: ((averageProfit / parseInt(betLevel[ 0 ])) * 100).toFixed(0)
     }
 }
