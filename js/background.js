@@ -737,7 +737,7 @@ function isRaceTime() {
     const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
     const timeNow = new Date(now.getTime());
 
-    return raceStarts > timeNow;
+    return raceStarts > timeNow && new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "03:00:00 PM").getTime();
 }
 
 function isOffTimeRace() {
