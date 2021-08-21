@@ -155,20 +155,12 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        if (isRaceTime() && ignoreRaceTime === false) {
+        if ((isRaceTime() || afternoonRaceTime()) && ignoreRaceTime === false) {
             if (isOffTimeRace() === false) {
                 if (isReminded === false) {
                     const { grossProfit } = calculateProfit();
 
-                    console.log(`%c------------------`, 'font-weight: bold; color: yellow');
-                    printLine();
-                    console.log(`%cEnd of day profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-                    console.log(`%c------------------`, 'font-weight: bold; color: yellow');
-
-                    printLine();
-                    printLine();
-
-                    console.log(`%c- Race time starts at ${raceTime} -`, 'font-weight: bold; color: #f00;');
+                    console.log(`%c- Race time starts have not yet commenced -`, 'font-weight: bold; color: #f00;');
                     isReminded = true;
                 }
 
@@ -179,7 +171,7 @@ const websocketConnect = (crfToken) => {
         const fightEvent = data[ 0 ];
         const isBetting = data[ 1 ] === 'betting';
 
-        if(isDailyQuotaReached() === true) {
+        if (isDailyQuotaReached() === true) {
             const { totalNetProfit } = calculateTodaysProfit();
 
             printProfit();
@@ -737,7 +729,7 @@ function isRaceTime() {
     const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
     const timeNow = new Date(now.getTime());
 
-    return raceStarts > timeNow && new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "03:00:00 PM").getTime();
+    return raceStarts > timeNow;
 }
 
 function isOffTimeRace() {
@@ -745,6 +737,16 @@ function isOffTimeRace() {
 
     return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "03:00:00 AM").getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
+}
+
+function afternoonRaceTime() {
+    const raceTime = '04:00:00 PM';
+
+    const now = new Date();
+    const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
+    const timeNow = new Date(now.getTime());
+
+    return timeNow > raceStarts;
 }
 
 function calculateProfit() {
