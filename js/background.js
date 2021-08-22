@@ -185,6 +185,7 @@ const websocketConnect = (crfToken) => {
 
                 isReminded = true;
             }
+
             return;
         }
 
@@ -192,15 +193,15 @@ const websocketConnect = (crfToken) => {
         const isBetting = data[ 1 ] === 'betting';
 
         if (isDailyQuotaReached() === true) {
-            const { totalNetProfit } = calculateTodaysProfit();
-
-            printProfit();
-
-            printLine();
-
             if (isQuotaReachedPrinted === false) {
+                const { totalNetProfit } = calculateTodaysProfit();
+
+                printProfit();
+
+                printLine();
 
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+
                 isQuotaReachedPrinted = true;
             }
 
@@ -209,6 +210,15 @@ const websocketConnect = (crfToken) => {
             // websocket.close();
 
             return;
+        }
+        else {
+            const { totalNetProfit } = calculateTodaysProfit();
+            chrome.storage.local.clear();
+
+            matchLogs.push({ fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
+
+            isReminded = false;
+            isQuotaReachedPrinted = false;
         }
 
         if (presentLevel > betLevel.length - 1) {
