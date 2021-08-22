@@ -154,20 +154,37 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        if ((isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') || isWithinAllottedRacetime('01:00:00 PM', '04:45:00 PM') ||
-            isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM') || isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) === false
-            && ignoreRaceTime === false) {
+        let isWithinAllottedRaceTime = false;
+        let nearestRaceTime = '';
 
+        if(isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM')){
+            isWithinAllottedRaceTime = true;
+            nearestRaceTime = '10:00:00 AM';
+        }
+        else if(isWithinAllottedRacetime('01:00:00 PM', '04:45:00 PM')){
+            isWithinAllottedRaceTime = true;
+            nearestRaceTime = '01:00:00 PM';
+        }
+        else if(isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM')) {
+            isWithinAllottedRaceTime = true;
+            nearestRaceTime = '08:00:00 PM';
+        }
+        else if(isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')){
+            isWithinAllottedRaceTime = true;
+            nearestRaceTime = '04:00:00 AM';
+        }
+
+        if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
+                console.log(`%c- Race not allowed yet. Be back at ${nearestRaceTime}!-`, 'font-weight: bold; color: #f00;');
 
-                console.log(`%c- Race not allowed yet. Be back at ${printRaceTime}!-`, 'font-weight: bold; color: #f00;');
+                const { totalNetProfit } = calculateTodaysProfit();
+                chrome.storage.local.clear();
+
+                matchLogs.push({fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
+
                 isReminded = true;
             }
-
-            const { totalNetProfit } = calculateTodaysProfit();
-            chrome.storage.local.clear();
-            matchLogs.push({fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
-
             return;
         }
 
