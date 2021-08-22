@@ -165,6 +165,10 @@ const websocketConnect = (crfToken) => {
                 isReminded = true;
             }
 
+            const { totalNetProfit } = calculateTodaysProfit();
+            chrome.storage.local.clear();
+            matchLogs.push({fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
+
             return;
         }
 
@@ -219,7 +223,7 @@ const websocketConnect = (crfToken) => {
             const fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes) {
-                console.log(`%Bet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
