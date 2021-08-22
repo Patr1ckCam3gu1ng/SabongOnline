@@ -36,11 +36,8 @@ let betLevel = [
 //     251600  // 7
 // ];
 
-const raceTime = '10:00:00 AM';
-
 const meron = 'meron';
 const wala = 'wala';
-const skip = 'skip';
 
 let pinger;
 
@@ -50,6 +47,7 @@ let finalBetside = '';
 let isBetOnHigherRoi = false;
 let isMatchWin = false;
 let isPendingPrintProfit = false;
+let isQuotaReachedPrinted = false;
 
 let matchIndex = 1;
 let winCount = 0;
@@ -70,6 +68,7 @@ let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
+let printRaceTime = '';
 
 let dailyProfitQuotaLimit = 11000;
 
@@ -80,7 +79,7 @@ const oddsMinimum = 175;
 const oddsMaximum = 215;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 78;
+let maxWaitTimes = 82;
 
 let isDemoOnly = false;
 
@@ -155,17 +154,18 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        if ((isRaceTime() || afternoonRaceTime()) && ignoreRaceTime === false) {
-            if (isOffTimeRace() === false) {
-                if (isReminded === false) {
-                    const { grossProfit } = calculateProfit();
+        if ((isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') || isWithinAllottedRacetime('01:00:00 PM', '04:45:00 PM') ||
+            isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM') || isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM'))
+            && ignoreRaceTime === false) {
 
-                    console.log(`%c- Race time starts have not yet commenced -`, 'font-weight: bold; color: #f00;');
-                    isReminded = true;
-                }
+            if (isReminded === false) {
+                const { grossProfit } = calculateProfit();
 
-                return;
+                console.log(`%c- Race not allowed yet. Be back at ${printRaceTime}!-`, 'font-weight: bold; color: #f00;');
+                isReminded = true;
             }
+
+            return;
         }
 
         const fightEvent = data[ 0 ];
@@ -178,11 +178,15 @@ const websocketConnect = (crfToken) => {
 
             printLine();
 
-            console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+            if (isQuotaReachedPrinted === false) {
 
-            clearInterval(pinger);
-            clearInterval(retryPinger);
-            websocket.close();
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                isQuotaReachedPrinted = true;
+            }
+
+            // clearInterval(pinger);
+            // clearInterval(retryPinger);
+            // websocket.close();
 
             return;
         }
@@ -214,6 +218,10 @@ const websocketConnect = (crfToken) => {
             const walaOdds = fightData.wala_equalpoint;
             const fightNumber = fightData.fight_number;
 
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes) {
+                console.log(`%Bet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+            }
+
             // Fix issue whereas the betting is closed but bet is not yet submitted
             if (timerIndex > 0) {
                 clearTimeout(timer);
@@ -222,10 +230,6 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && finalBetside === skip) {
-                console.log(`%cSkipping Match! Match to be skipped intentionally as per shuffle result`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                return;
-            }
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
@@ -409,11 +413,6 @@ const websocketConnect = (crfToken) => {
             const clonedDataBetOdds = { ...dataBetOdds };
 
             setFinalBet(clonedDataBetOdds.value);
-
-            if (finalBetside === skip) {
-                stopTimer();
-                return;
-            }
 
             if (isBetOddsIrregular(clonedDataBetOdds)) {
                 return;
@@ -635,32 +634,26 @@ function isBetOddsIrregular(clonedDataBetOdds) {
      if (isShuffleBetSide === true) {
          const shuffleBetSideResult = shuffleBetSide();
 
-         if (shuffleBetSideResult === skip) {
-             isShuffleBetSideHasPicked = true;
-             finalBetside = skip;
-         }
-         else {
-             finalBetside = (shuffleBetSideResult === 'true'
-                 ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-                 ? meron : wala;
+         finalBetside = (shuffleBetSideResult === 'true'
+             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+             ? meron : wala;
 
-             if (finalBetside === meron) {
-                 isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
-             }
-             if (finalBetside === wala) {
-                 isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-             }
-
-             isShuffleBetSideHasPicked = true;
+         if (finalBetside === meron) {
+             isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
          }
+         if (finalBetside === wala) {
+             isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+         }
+
+         isShuffleBetSideHasPicked = true;
      } else {
          finalBetside = (isBetOnHigherRoi
              ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
              ? meron : wala;
      }
 
-     chrome.storage.local.set({finalBetside});
-     chrome.storage.local.set({isBetOnHigherRoi});
+     chrome.storage.local.set({ finalBetside });
+     chrome.storage.local.set({ isBetOnHigherRoi });
  }
 
 function reverseBet() {
@@ -676,13 +669,14 @@ function paymentSafe(isDraw) {
 
 function printProfit() {
     const { grossProfit, wonMatches, lossMatches, todaysTotalNetProfit, todaysAverageProfit, todaysAverageProfitPercentage } = calculateProfit();
+    const totalMatches = [...matchLogs].slice(1);
 
     printLine();
 
-    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches}`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${todaysAverageProfit} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${parseInt(todaysAverageProfit).toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
@@ -706,7 +700,7 @@ function shuffleBetSide() {
     let index = 0;
 
     while (index < (Math.floor(parseInt(((Math.random() * 500) + 1).toFixed(0))))) {
-        shuffledTrueFalse = shuffleArrays(['true', 'false', skip]);
+        shuffledTrueFalse = shuffleArrays([true, false]);
         index++;
     }
 
@@ -724,29 +718,31 @@ function printLine() {
     console.log('%c-', 'color: black;');
 }
 
-function isRaceTime() {
+function isMorningRace() {
     const now = new Date();
-    const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
-    const timeNow = new Date(now.getTime());
+    const earliestRaceTime = '10:00:00 AM';
 
-    return raceStarts > timeNow;
+    const result = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + earliestRaceTime).getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "11:59:00 AM").getTime());
+
+    if (result === false) {
+        printRaceTime = earliestRaceTime;
+    }
+
+    return result;
 }
 
-function isOffTimeRace() {
+function isWithinAllottedRacetime(startTime, endTime) {
     const now = new Date();
 
-    return (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + "03:00:00 AM").getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "07:30:00 AM").getTime());
-}
+    const result = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + startTime).getTime() &&
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + endTime).getTime());
 
-function afternoonRaceTime() {
-    const raceTime = '04:00:00 PM';
+    if (result === false) {
+        printRaceTime = startTime;
+    }
 
-    const now = new Date();
-    const raceStarts = new Date(now.toLocaleDateString() + " " + raceTime).getTime()
-    const timeNow = new Date(now.getTime());
-
-    return timeNow > raceStarts;
+    return result;
 }
 
 function calculateProfit() {
