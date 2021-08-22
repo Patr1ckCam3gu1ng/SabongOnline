@@ -161,7 +161,7 @@ const websocketConnect = (crfToken) => {
             isWithinAllottedRaceTime = true;
             nearestRaceTime = '10:00:00 AM';
         }
-        else if(isWithinAllottedRacetime('01:00:00 PM', '04:45:00 PM')){
+        else if(isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM')){
             isWithinAllottedRaceTime = true;
             nearestRaceTime = '01:00:00 PM';
         }
