@@ -714,7 +714,7 @@ function shuffleBetSide() {
         index++;
     }
 
-    return shuffledTrueFalse[shuffledIndex];
+    return !shuffledTrueFalse[ shuffledIndex ];
 }
 
 function printLine() {
