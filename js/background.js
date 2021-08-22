@@ -159,7 +159,6 @@ const websocketConnect = (crfToken) => {
             && ignoreRaceTime === false) {
 
             if (isReminded === false) {
-                const { grossProfit } = calculateProfit();
 
                 console.log(`%c- Race not allowed yet. Be back at ${printRaceTime}!-`, 'font-weight: bold; color: #f00;');
                 isReminded = true;
@@ -677,7 +676,7 @@ function printProfit() {
 
     printLine();
 
-    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches}`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${parseInt(todaysAverageProfit).toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
