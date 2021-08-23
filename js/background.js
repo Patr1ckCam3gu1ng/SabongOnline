@@ -160,7 +160,7 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
             isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
-            isWithinAllottedRacetime('11:00:00 PM', '02:45:00 PM') ||
+            (isWithinAllottedRacetime('11:00:00 PM', '11:59:00 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:45:00 AM')) ||
             isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
 
             isWithinAllottedRaceTime = true;
