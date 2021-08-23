@@ -102,6 +102,7 @@ const tabsOnUpdated = {
             });
     }
 }
+
 const websocketConnect = (crfToken) => {
     if (websocket === undefined) {
         console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
@@ -155,33 +156,22 @@ const websocketConnect = (crfToken) => {
         }
 
         let isWithinAllottedRaceTime = false;
-        let nearestRaceTime = '';
 
-        if(isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM')){
+        if (isWithinAllottedRacetime('10:00:00 AM', '02:45:00 PM') ||
+            isWithinAllottedRacetime('03:00:00 PM', '06:45:00 PM') ||
+            isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM') ||
+            isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
+
             isWithinAllottedRaceTime = true;
-            nearestRaceTime = '10:00:00 AM';
-        }
-        else if(isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM')){
-            isWithinAllottedRaceTime = true;
-            nearestRaceTime = '01:00:00 PM';
-        }
-        else if(isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM')) {
-            isWithinAllottedRaceTime = true;
-            nearestRaceTime = '08:00:00 PM';
-        }
-        else if(isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')){
-            isWithinAllottedRaceTime = true;
-            nearestRaceTime = '04:00:00 AM';
+            isReminded = false;
+            isQuotaReachedPrinted = false;
+
+            flushMatchLogs();
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
-                console.log(`%c- Race not allowed yet. Be back at ${nearestRaceTime}!-`, 'font-weight: bold; color: #f00;');
-
-                const { totalNetProfit } = calculateTodaysProfit();
-                chrome.storage.local.clear();
-
-                matchLogs.push({fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
+                console.log(`%c- Race not allowed yet. Be back at later! -`, 'font-weight: bold; color: #f00;');
 
                 isReminded = true;
             }
@@ -210,15 +200,6 @@ const websocketConnect = (crfToken) => {
             // websocket.close();
 
             return;
-        }
-        else {
-            const { totalNetProfit } = calculateTodaysProfit();
-            chrome.storage.local.clear();
-
-            matchLogs.push({ fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 })
-
-            isReminded = false;
-            isQuotaReachedPrinted = false;
         }
 
         if (presentLevel > betLevel.length - 1) {
@@ -814,6 +795,14 @@ function isDailyQuotaReached() {
     const { totalNetProfit } = calculateTodaysProfit();
 
     return totalNetProfit >= dailyProfitQuotaLimit;
+}
+
+function flushMatchLogs() {
+    const { totalNetProfit } = calculateTodaysProfit();
+    chrome.storage.local.clear();
+
+    matchLogs = [];
+    matchLogs.push({ fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
