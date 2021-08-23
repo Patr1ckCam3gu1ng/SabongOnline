@@ -69,6 +69,7 @@ let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
 let printRaceTime = '';
+let isFlushed = false;
 
 let dailyProfitQuotaLimit = 11000;
 
@@ -166,7 +167,13 @@ const websocketConnect = (crfToken) => {
             isReminded = false;
             isQuotaReachedPrinted = false;
 
-            flushMatchLogs();
+            if (isFlushed === false) {
+                flushMatchLogs();
+                isFlushed = true;
+            }
+        }
+        else {
+            isFlushed = false;
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
@@ -229,7 +236,8 @@ const websocketConnect = (crfToken) => {
             const walaOdds = fightData.wala_equalpoint;
             const fightNumber = fightData.fight_number;
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes) {
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
+                printLine();
                 console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
