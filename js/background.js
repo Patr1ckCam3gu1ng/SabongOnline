@@ -160,7 +160,7 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
             isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
-            isWithinAllottedRacetime('08:00:00 PM', '10:45:00 PM') ||
+            isWithinAllottedRacetime('11:00:00 PM', '02:45:00 PM') ||
             isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
 
             isWithinAllottedRaceTime = true;
@@ -198,8 +198,6 @@ const websocketConnect = (crfToken) => {
 
         if (isDailyQuotaReached() === true) {
             if (isQuotaReachedPrinted === false) {
-                const { totalNetProfit } = calculateTodaysProfit();
-
                 printProfit();
 
                 printLine();
@@ -814,10 +812,15 @@ function isDailyQuotaReached() {
 
 function flushMatchLogs() {
     const { totalNetProfit } = calculateTodaysProfit();
+
+    const sum = totalNetProfit;
+
     chrome.storage.local.clear();
 
     matchLogs = [];
-    matchLogs.push({ fightNumber: 1, isWin: true, sum: totalNetProfit, betAmountPlaced: 0 });
+    matchLogs.push(
+        { fightNumber: 1, isWin: true, sum: 0, betAmountPlaced: 0 },
+        { fightNumber: 2, isWin: true, sum, betAmountPlaced: 0 });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
