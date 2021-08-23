@@ -71,7 +71,7 @@ let ignoreRaceTime = false;
 let printRaceTime = '';
 let isFlushed = false;
 
-let dailyProfitQuotaLimit = 11000;
+let dailyProfitQuotaLimit = 8000;
 
 let timer;
 let timerIndex = 0;
@@ -158,9 +158,9 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '02:45:00 PM') ||
-            isWithinAllottedRacetime('03:00:00 PM', '06:45:00 PM') ||
-            isWithinAllottedRacetime('08:00:00 PM', '11:45:00 PM') ||
+        if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
+            isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
+            isWithinAllottedRacetime('08:00:00 PM', '10:45:00 PM') ||
             isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
 
             isWithinAllottedRaceTime = true;
