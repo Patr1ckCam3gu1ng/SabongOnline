@@ -164,8 +164,6 @@ const websocketConnect = (crfToken) => {
             isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
 
             isWithinAllottedRaceTime = true;
-            isReminded = false;
-            isQuotaReachedPrinted = false;
 
             if (isFlushed === false) {
                 flushMatchLogs();
@@ -173,7 +171,10 @@ const websocketConnect = (crfToken) => {
             }
         }
         else {
+
             isFlushed = false;
+            isReminded = false;
+            isQuotaReachedPrinted = false;
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
