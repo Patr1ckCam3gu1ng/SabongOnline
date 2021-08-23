@@ -165,16 +165,18 @@ const websocketConnect = (crfToken) => {
 
             isWithinAllottedRaceTime = true;
 
-            if (isFlushed === false) {
-                flushMatchLogs();
-                isFlushed = true;
-            }
+            // if (isFlushed === false) {
+            //     flushMatchLogs();
+            //     isFlushed = true;
+            // }
         }
         else {
 
             isFlushed = false;
             isReminded = false;
             isQuotaReachedPrinted = false;
+
+            flushMatchLogs();
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
