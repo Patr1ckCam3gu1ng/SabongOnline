@@ -71,7 +71,7 @@ let ignoreRaceTime = false;
 let printRaceTime = '';
 let isFlushed = false;
 
-let dailyProfitQuotaLimit = 8000;
+let dailyProfitQuotaLimit = 6000;
 
 let timer;
 let timerIndex = 0;
