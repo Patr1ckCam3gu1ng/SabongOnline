@@ -658,7 +658,7 @@ function isBetOddsIrregular(clonedDataBetOdds) {
      if (isShuffleBetSide === true) {
          const shuffleBetSideResult = shuffleBetSide();
 
-         finalBetside = (shuffleBetSideResult === 'true'
+         finalBetside = (shuffleBetSideResult
              ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
              ? meron : wala;
 
