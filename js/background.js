@@ -71,7 +71,7 @@ let ignoreRaceTime = false;
 let printRaceTime = '';
 let isFlushed = false;
 
-let dailyProfitQuotaLimit = 6000;
+let dailyProfitQuotaLimit = 4000;
 
 let timer;
 let timerIndex = 0;
@@ -158,15 +158,15 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
+        if (isWithinAllottedRacetime('10:00:00 AM', '01:45:00 PM') ||
             isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
             (isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:45:00 AM')) ||
-            isWithinAllottedRacetime('04:00:00 AM', '07:45:00 AM')) {
+            isWithinAllottedRacetime('02:00:00 AM', '07:45:00 AM')) {
 
             isWithinAllottedRaceTime = true;
 
-            isReminded = false;
-            isFlushed = false;
+            // isReminded = false;
+            // isFlushed = false;
 
             // if (isFlushed === false) {
             //     flushMatchLogs();
@@ -175,12 +175,12 @@ const websocketConnect = (crfToken) => {
         }
         else {
 
-            isQuotaReachedPrinted = false;
+            // isQuotaReachedPrinted = false;
 
-            if (isFlushed === false) {
-                flushMatchLogs();
-                isFlushed = true;
-            }
+            // if (isFlushed === false) {
+            //     flushMatchLogs();
+            //     isFlushed = true;
+            // }
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
