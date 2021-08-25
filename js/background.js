@@ -16,14 +16,24 @@ let retryPinger;
 //     25667   // 7
 // ];
 
+// let betLevel = [
+//     1300,   // 1
+//     1300,   // 2
+//     2744,   // 3
+//     5793,   // 4
+//     12230,  // 5
+//     25819,  // 6
+//     54507,  // 7
+// ];
+
 let betLevel = [
-    1300,   // 1
-    1300,   // 2
-    2744,   // 3
-    5793,   // 4
-    12230,  // 5
-    25819,  // 6
-    54507,  // 7
+    2500,       // 1
+    2500,       // 2
+    5278,       // 3
+    11142,      // 4
+    23522,      // 5
+    49658,      // 6
+    104833,     // 7
 ];
 
 // let betLevel = [
@@ -158,7 +168,7 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '01:45:00 PM') ||
+        if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
             isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
             (isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) ||
             isWithinAllottedRacetime('05:00:00 AM', '07:45:00 AM')) {
