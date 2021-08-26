@@ -183,8 +183,7 @@ const websocketConnect = (crfToken) => {
             //     flushMatchLogs();
             //     isFlushed = true;
             // }
-        }
-        else {
+        } else {
 
             // isQuotaReachedPrinted = false;
 
@@ -204,8 +203,8 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        const fightEvent = data[ 0 ];
-        const isBetting = data[ 1 ] === 'betting';
+        const fightEvent = data[0];
+        const isBetting = data[1] === 'betting';
 
         if (isDailyQuotaReached() === true) {
             if (isQuotaReachedPrinted === false) {
@@ -213,11 +212,11 @@ const websocketConnect = (crfToken) => {
 
                 printLine();
 
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
 
-                flushMatchLogs();
+                // flushMatchLogs();
             }
 
             // clearInterval(pinger);
@@ -238,13 +237,13 @@ const websocketConnect = (crfToken) => {
         }
 
         if (fightEvent === 'App\\Events\\ArenaUpdate') {
-            const fightData = data[ 2 ].data;
+            const fightData = data[2].data;
             const event = fightData.event;
 
             return;
         }
         if (fightEvent === 'App\\Events\\FightUpdate') {
-            const fightData = data[ 2 ].data;
+            const fightData = data[2].data;
             const fightStatus = fightData.status;
             const winner = fightData.winner;
             const isOpenBet = fightData.open_bet === 'yes';
@@ -256,7 +255,7 @@ const websocketConnect = (crfToken) => {
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
-                console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -268,11 +267,11 @@ const websocketConnect = (crfToken) => {
             isShuffleBetSideHasPicked = false;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too low: ${ finalBetside } => ${ matchOdds } ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
-                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too high: ${ finalBetside } => ${ matchOdds } ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
 
@@ -308,10 +307,10 @@ const websocketConnect = (crfToken) => {
                     } else {
                         if (isWinner) {
                             winCount += 1;
-                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
+                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${ winner } wins`);
                         } else {
                             lossCount += 1;
-                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
+                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${ winner } wins`);
                         }
 
                         chrome.storage.local.set({ winCount });
@@ -319,7 +318,7 @@ const websocketConnect = (crfToken) => {
                     }
                 } else {
                     if (isBelowMinimumOdds === true || isAboveMaximumOdds === true) {
-                        console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                        console.log(`%c${ winner === 'draw' ? 'It\'s a draw!' : `${ winner } wins` }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
@@ -356,7 +355,7 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
 
-                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
                     } else {
                         lossStreak += 1;
 
@@ -446,7 +445,7 @@ const websocketConnect = (crfToken) => {
                 isShuffleBetSide = true;
             }
 
-            const dataBetOdds = { value: data[ 2 ] };
+            const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
 
             setFinalBet(clonedDataBetOdds.value);
@@ -457,12 +456,19 @@ const websocketConnect = (crfToken) => {
 
             stopTimer();
 
-            let bet = betLevel[ presentLevel ];
+            let bet = betLevel[presentLevel];
 
             if (isBetFromTakenProfit === true) {
-                bet = betLevel[ 0 ];
+                bet = betLevel[0];
             }
+            // Take the last profit, then, top-up it to the bet capital
+            if (isWinner === true && matchLogs[matchLogs.length - 2] > 0) {
+                const betAddon = matchLogs[matchLogs.length - 1].sum;
 
+                if (typeof betAddon !== "undefined") {
+                    bet += parseInt(betAddon);
+                }
+            }
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
             }
@@ -486,7 +492,7 @@ const websocketConnect = (crfToken) => {
             }
 
             const { grossProfit } = calculateProfit();
-            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[ 0 ] : 0)) > betLevel[ 0 ];
+            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[0] : 0)) > betLevel[0];
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -500,7 +506,7 @@ const websocketConnect = (crfToken) => {
             //     livesRemaining += 1;
             // }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isBetFromTakenProfit ? '(P)' : '' } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
