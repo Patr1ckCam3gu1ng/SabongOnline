@@ -6,6 +6,7 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
+// let dailyProfitQuotaLimit = 3000;
 // let betLevel = [
 //     612,    // 1
 //     612,    // 2
@@ -16,6 +17,7 @@ let retryPinger;
 //     25667   // 7
 // ];
 
+// let dailyProfitQuotaLimit = 6000;
 // let betLevel = [
 //     1300,   // 1
 //     1300,   // 2
@@ -26,6 +28,7 @@ let retryPinger;
 //     54507,  // 7
 // ];
 
+let dailyProfitQuotaLimit = 14000;
 let betLevel = [
     2500,       // 1
     2500,       // 2
@@ -81,8 +84,6 @@ let ignoreRaceTime = false;
 let printRaceTime = '';
 let isFlushed = false;
 
-let dailyProfitQuotaLimit = 4000;
-
 let timer;
 let timerIndex = 0;
 
@@ -90,7 +91,7 @@ const oddsMinimum = 175;
 const oddsMaximum = 215;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 82;
+let maxWaitTimes = 84;
 
 let isDemoOnly = false;
 
@@ -215,6 +216,8 @@ const websocketConnect = (crfToken) => {
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
+
+                flushMatchLogs();
             }
 
             // clearInterval(pinger);
@@ -828,8 +831,7 @@ function flushMatchLogs() {
     chrome.storage.local.clear();
 
     matchLogs = [];
-    matchLogs.push(
-        { fightNumber: 2, isWin: true, sum, betAmountPlaced: 0 });
+    matchLogs.push({ fightNumber: 1, isWin: true, sum, betAmountPlaced: 0 });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
