@@ -877,7 +877,7 @@ function isDailyQuotaReached() {
 function flushMatchLogs() {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    const sum = totalNetProfit;
+    const sum = matchLogs[0].sum + totalNetProfit;
 
     chrome.storage.local.clear();
 
