@@ -893,7 +893,8 @@ function flushMatchLogs() {
 
     highestLossStreak = 0;
     highestWinStreak = 0;
-    isBetOnHigherRoi = false;
+    // will be reverse once it re-commence:
+    isBetOnHigherRoi = true;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
