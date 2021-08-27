@@ -230,6 +230,7 @@ const websocketConnect = (crfToken) => {
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
+                isPrintedNowCommencingScheduled = false;
 
                 flushMatchLogs();
 
@@ -267,7 +268,6 @@ const websocketConnect = (crfToken) => {
         }
 
         isReminded = false;
-        isPrintedNowCommencingScheduled = false;
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
