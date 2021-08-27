@@ -457,7 +457,6 @@ const websocketConnect = (crfToken) => {
             stopTimer();
 
             let bet = betLevel[presentLevel];
-            let betCapitalAddon = 0;
 
             if (isBetFromTakenProfit === true) {
                 bet = betLevel[0];
@@ -467,14 +466,14 @@ const websocketConnect = (crfToken) => {
                 const betAddon = matchLogs[matchLogs.length - 1].sum;
 
                 if (typeof betAddon !== "undefined") {
-                    betCapitalAddon = parseInt(betAddon).toFixed(0);
+                    bet += parseInt(betAddon);
                 }
             }
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
             }
 
-            betAmountPlaced = parseInt(bet) + parseInt(betCapitalAddon);
+            betAmountPlaced = parseInt(bet);
 
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", bet });
 
@@ -507,7 +506,7 @@ const websocketConnect = (crfToken) => {
             //     livesRemaining += 1;
             // }
 
-            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ betCapitalAddon > 0 ? ` + ${ betCapitalAddon } = ${ (betAmountPlaced + betCapitalAddon).toFixed(0).toLocaleString() } ` : '' }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isBetFromTakenProfit ? '(P)' : '' } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isBetFromTakenProfit ? '(P)' : '' } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
