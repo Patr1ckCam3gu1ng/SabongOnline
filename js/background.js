@@ -171,7 +171,6 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
             isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
-            isWithinAllottedRacetime('07:00:00 PM', '10:00:00 PM') ||
             (isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) ||
             isWithinAllottedRacetime('05:00:00 AM', '07:45:00 AM')) {
 
@@ -464,7 +463,7 @@ const websocketConnect = (crfToken) => {
                 bet = betLevel[0];
             }
             // Take the last profit, then, top-up it to the bet capital
-            if (isWinner === true && matchLogs[matchLogs.length - 2].sum > 0 && matchLogs.length > 1) {
+            if (isWinner === true && matchLogs[matchLogs.length - 2] > 0 && matchLogs.length > 1) {
                 const betAddon = matchLogs[matchLogs.length - 1].sum;
 
                 if (typeof betAddon !== "undefined") {
