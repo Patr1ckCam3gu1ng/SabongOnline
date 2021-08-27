@@ -118,6 +118,8 @@ let shiftFiveStatus = pending;
 
 let presentShift = '';
 
+let isPrintedNowCommencingScheduled = false;
+
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
         crfTokenValue = crfToken;
@@ -265,6 +267,7 @@ const websocketConnect = (crfToken) => {
         }
 
         isReminded = false;
+        isPrintedNowCommencingScheduled = false;
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -816,8 +819,12 @@ function isMorningRace() {
 }
 
 function printCommencedShift(presentShift) {
+    if (isPrintedNowCommencingScheduled === true) {
+        return;
+    }
 
-    console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
+    console.log(`%c- Now commencing scheduled shift number ${ presentShift }. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
+    isPrintedNowCommencingScheduled = true;
 }
 
 function isWithinAllottedRacetime(startTime, endTime) {
