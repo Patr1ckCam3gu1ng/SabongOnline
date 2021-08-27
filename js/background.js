@@ -6,7 +6,7 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let dailyProfitQuotaLimit = 1500;
+let dailyProfitQuotaLimit = 1800;
 let betLevel = [
     312,        // 1
     312,        // 2
@@ -93,7 +93,6 @@ let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
 let printRaceTime = '';
-let isFlushed = false;
 
 let timer;
 let timerIndex = 0;
@@ -882,6 +881,10 @@ function flushMatchLogs() {
 
     matchLogs = [];
     matchLogs.push({ fightNumber: 1, isWin: true, sum, betAmountPlaced: 0 });
+
+    highestLossStreak = 0;
+    highestWinStreak = 0;
+    isBetOnHigherRoi = false;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
