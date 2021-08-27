@@ -6,6 +6,17 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
+let dailyProfitQuotaLimit = 1500;
+let betLevel = [
+    312,        // 1
+    312,        // 2
+    659,        // 3
+    1391,       // 4
+    2937,       // 5
+    6200,       // 6
+    13089       // 7
+];
+
 // let dailyProfitQuotaLimit = 3000;
 // let betLevel = [
 //     612,    // 1
@@ -28,16 +39,16 @@ let retryPinger;
 //     54507,  // 7
 // ];
 
-let dailyProfitQuotaLimit = 14000;
-let betLevel = [
-    2500,       // 1
-    2500,       // 2
-    5278,       // 3
-    11142,      // 4
-    23522,      // 5
-    49658,      // 6
-    104833,     // 7
-];
+// let dailyProfitQuotaLimit = 14000;
+// let betLevel = [
+//     2500,       // 1
+//     2500,       // 2
+//     5278,       // 3
+//     11142,      // 4
+//     23522,      // 5
+//     49658,      // 6
+//     104833,     // 7
+// ];
 
 // let betLevel = [
 //     6000,   // 1
@@ -96,6 +107,16 @@ let maxWaitTimes = 84;
 let isDemoOnly = false;
 
 let matchLogs = [];
+
+const pending = 'Pending';
+
+let shiftOneStatus = pending;
+let shiftTwoStatus = pending;
+let shiftThreeStatus = pending;
+let shiftFourStatus = pending;
+let shiftFiveStatus = pending;
+
+let presentShift = '';
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -169,29 +190,30 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') ||
-            isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') ||
-            (isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) ||
-            isWithinAllottedRacetime('05:00:00 AM', '07:45:00 AM')) {
-
+        if(isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') && shiftOneStatus === pending){
             isWithinAllottedRaceTime = true;
-
-            // isReminded = false;
-            // isFlushed = false;
-
-            // if (isFlushed === false) {
-            //     flushMatchLogs();
-            //     isFlushed = true;
-            // }
+            isQuotaReachedPrinted = false;
+            presentShift = 'one';
         }
-        else {
-
-            // isQuotaReachedPrinted = false;
-
-            // if (isFlushed === false) {
-            //     flushMatchLogs();
-            //     isFlushed = true;
-            // }
+        else if(isWithinAllottedRacetime('03:00:00 PM', '05:45:00 PM') && shiftTwoStatus === pending){
+            isWithinAllottedRaceTime = true;
+            isQuotaReachedPrinted = false;
+            presentShift = 'two';
+        }
+        else if(isWithinAllottedRacetime('07:00:00 PM', '10:00:00 PM') && shiftThreeStatus === pending){
+            isWithinAllottedRaceTime = true;
+            isQuotaReachedPrinted = false;
+            presentShift = 'three';
+        }
+        else if((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) && shiftFourStatus === pending){
+            isWithinAllottedRaceTime = true;
+            isQuotaReachedPrinted = false;
+            presentShift = 'four';
+        }
+        else if(isWithinAllottedRacetime('05:00:00 AM', '07:45:00 AM') && shiftFiveStatus === pending){
+            isWithinAllottedRaceTime = true;
+            isQuotaReachedPrinted = false;
+            presentShift = 'five';
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
@@ -218,6 +240,31 @@ const websocketConnect = (crfToken) => {
                 isQuotaReachedPrinted = true;
 
                 flushMatchLogs();
+
+                switch (presentShift) {
+                    case 'one':
+                        shiftOneStatus = 'Completed';
+                        shiftFiveStatus = pending;
+                        break;
+                    case 'two':
+                        shiftTwoStatus = 'Completed'
+                        break;
+                    case 'three':
+                        shiftThreeStatus = 'Completed'
+                        break;
+                    case 'four':
+                        shiftFourStatus = 'Completed'
+                        break;
+                    case 'five':
+                        shiftFiveStatus = 'Completed'
+
+                        // reset all
+                        shiftOneStatus = pending;
+                        shiftTwoStatus = pending;
+                        shiftThreeStatus = pending;
+                        shiftFourStatus = pending;
+                        break;
+                }
             }
 
             // clearInterval(pinger);
@@ -226,6 +273,8 @@ const websocketConnect = (crfToken) => {
 
             return;
         }
+
+        isReminded = false;
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
