@@ -200,12 +200,12 @@ const websocketConnect = (crfToken) => {
             isQuotaReachedPrinted = false;
             presentShift = 'two';
         }
-        else if(isWithinAllottedRacetime('07:00:00 PM', '10:00:00 PM') && shiftThreeStatus === pending){
+        else if((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) && shiftThreeStatus === pending){
             isWithinAllottedRaceTime = true;
             isQuotaReachedPrinted = false;
             presentShift = 'three';
         }
-        else if((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) && shiftFourStatus === pending){
+        else if(isWithinAllottedRacetime('02:30:00 AM', '04:30:00 AM') && shiftFourStatus === pending){
             isWithinAllottedRaceTime = true;
             isQuotaReachedPrinted = false;
             presentShift = 'four';
