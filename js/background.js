@@ -465,15 +465,13 @@ const websocketConnect = (crfToken) => {
             if (isBetFromTakenProfit === true) {
                 bet = betLevel[ 0 ];
             }
-            if ((isWinner === true || isDraw === true) && matchLogs.length >= 2) {
-                if (matchLogs[ matchLogs.length - 2 ].sum > 0) {
-                    const presentLevelMatchLogs = matchLogs[ matchLogs.length - 1 ];
-                    const odds = presentLevelMatchLogs.odds;
-                    const betAddon = (betLevel[ presentLevelMatchLogs.presentLevel ] * odds) - betLevel[ presentLevelMatchLogs.presentLevel ];
+            if ((isWinner === true || isDraw === true) && matchLogs[ matchLogs.length - 2 ].sum > 0 && matchLogs.length > 1) {
+                const presentLevelMatchLogs = matchLogs[ matchLogs.length - 1 ];
+                const odds = presentLevelMatchLogs.odds;
+                const betAddon = (betLevel[ presentLevelMatchLogs.presentLevel ] * odds) - betLevel[ presentLevelMatchLogs.presentLevel ];
 
-                    // Take the last profit, then, top-up it to the bet capital
-                    betCapitalAddon = parseInt(betAddon).toFixed(0);
-                }
+                // Take the last profit, then, top-up it to the bet capital
+                betCapitalAddon = parseInt(betAddon).toFixed(0);
             }
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
