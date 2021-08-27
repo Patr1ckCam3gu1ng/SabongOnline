@@ -462,7 +462,7 @@ const websocketConnect = (crfToken) => {
                 bet = betLevel[0];
             }
             // Take the last profit, then, top-up it to the bet capital
-            if (isWinner === true && matchLogs[matchLogs.length - 2] > 0 && matchLogs.length > 1) {
+            if (isWinner === true && matchLogs[matchLogs.length - 2] > 0) {
                 const betAddon = matchLogs[matchLogs.length - 1].sum;
 
                 if (typeof betAddon !== "undefined") {
