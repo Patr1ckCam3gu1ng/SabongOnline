@@ -234,6 +234,8 @@ const websocketConnect = (crfToken) => {
 
                 flushMatchLogs();
 
+                stopTimer();
+
                 switch (presentShift) {
                     case 'one':
                         shiftOneStatus = completed;
@@ -890,6 +892,8 @@ function flushMatchLogs() {
 
     matchLogs = [];
     matchLogs.push({ fightNumber: 1, isWin: true, sum, betAmountPlaced: 0 });
+
+    resetIndexCounter();
 
     highestLossStreak = 0;
     highestWinStreak = 0;
