@@ -109,6 +109,7 @@ let isDemoOnly = false;
 let matchLogs = [];
 
 const pending = 'Pending';
+const completed = 'Completed';
 
 let shiftOneStatus = pending;
 let shiftTwoStatus = pending;
@@ -243,20 +244,20 @@ const websocketConnect = (crfToken) => {
 
                 switch (presentShift) {
                     case 'one':
-                        shiftOneStatus = 'Completed';
+                        shiftOneStatus = completed;
                         shiftFiveStatus = pending;
                         break;
                     case 'two':
-                        shiftTwoStatus = 'Completed'
+                        shiftTwoStatus = completed;
                         break;
                     case 'three':
-                        shiftThreeStatus = 'Completed'
+                        shiftThreeStatus = completed;
                         break;
                     case 'four':
-                        shiftFourStatus = 'Completed'
+                        shiftFourStatus = completed;
                         break;
                     case 'five':
-                        shiftFiveStatus = 'Completed'
+                        shiftFiveStatus = completed;
 
                         // reset all
                         shiftOneStatus = pending;
