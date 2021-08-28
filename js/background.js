@@ -11,11 +11,11 @@ let dailyProfitQuotaLimitExtension = 0;
 let betLevel = [
     312,        // 1
     312,        // 2
-    659,        // 3
-    1391,       // 4
-    2937,       // 5
-    6200,       // 6
-    13089       // 7
+    900,        // 3
+    1900,       // 4
+    4011,       // 5
+    8468,       // 6
+    14097       // 7
 ];
 
 // let dailyProfitQuotaLimit = 3000;
@@ -804,32 +804,29 @@ function shuffleBetSide() {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
+            oldElement = array[ i ];
+            array[ i ] = array[ rand ];
+            array[ rand ] = oldElement;
         }
 
         return array;
     }
 
-    let shuffledTrueFalse;
-    let shuffledIndex;
+    let shuffledTrueFalse = [true, false];
+
+    let shuffledTrueFalseBuckets = [];
 
     let index = 0;
 
-    while (index < (Math.floor(parseInt(((Math.random() * 60) + 1).toFixed(0))))) {
-        shuffledTrueFalse = shuffleArrays([true, false]);
+    while (index < (Math.floor(parseInt(((Math.random() * 100) + 1).toFixed(0))))) {
+        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
+        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
         index++;
     }
 
-    index = 0;
+    const indexPicked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
 
-    while (index < (Math.floor(parseInt(((Math.random() * 30) + 1).toFixed(0))))) {
-        shuffledIndex = parseInt(shuffleArrays([0, 1]));
-        index++;
-    }
-
-    return !shuffledTrueFalse[ shuffledIndex ];
+    return shuffledTrueFalseBuckets[ indexPicked ];
 }
 
 function printLine() {
