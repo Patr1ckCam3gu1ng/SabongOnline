@@ -207,13 +207,7 @@ const websocketConnect = (crfToken) => {
             toggledVariablesWhenCommencedShift('one');
 
         } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStatus === pending) {
-            if (shiftOneStatus === pending) {
-                dailyProfitQuotaLimitExtension = dailyProfitQuotaLimit;
-                shiftOneStatus = completed;
-                if (isPrintedNowCommencingScheduled === false) {
-                    console.log(`%c- Two(2) shifts coincides! This shift's updated to Php${dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension} -`, 'font-weight: bold; color: #FF00F3;');
-                }
-            }
+            shiftCoincides(shiftTwoStartsAt);
             presentShiftTimeStartsAt = shiftTwoStartsAt;
             toggledVariablesWhenCommencedShift('two');
 
@@ -222,14 +216,17 @@ const websocketConnect = (crfToken) => {
             toggledVariablesWhenCommencedShift('three');
 
         } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftThreeStatus === pending) {
+            shiftCoincides(shiftFourStartsAt);
             presentShiftTimeStartsAt = shiftFourStartsAt;
             toggledVariablesWhenCommencedShift('four');
 
         } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFourStatus === pending) {
+            shiftCoincides(shiftFiveStartsAt);
             presentShiftTimeStartsAt = shiftFiveStartsAt;
             toggledVariablesWhenCommencedShift('five');
 
         } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftFiveStatus === pending) {
+            shiftCoincides(shiftSixStartsAt);
             presentShiftTimeStartsAt = shiftSixStartsAt;
             toggledVariablesWhenCommencedShift('six');
         }
@@ -948,6 +945,36 @@ function isQuotaReachedTooEarly() {
     return (Math.abs(startTime - endTime) / 36e5) <= 1.5;
 }
 
+function shiftCoincides(shiftFrom) {
+    if (shiftFrom === pending) {
+        switch (shiftFrom) {
+            case 'one':
+                shiftOneStatus = completed;
+                break;
+            case 'two':
+                shiftTwoStatus = completed;
+                break;
+            case 'three':
+                shiftThreeStatus = completed;
+                break;
+            case 'four':
+                shiftFourStatus = completed;
+                break;
+            case 'five':
+                shiftFiveStatus = completed;
+                break;
+            case 'six':
+                shiftSixStatus = completed;
+                break;
+        }
+
+        dailyProfitQuotaLimitExtension = dailyProfitQuotaLimit;
+
+        if (isPrintedNowCommencingScheduled === false) {
+            console.log(`%c- Two(2) shifts coincides! This shift's updated to Php${dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension} -`, 'font-weight: bold; color: #FF00F3;');
+        }
+    }
+}
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
