@@ -202,13 +202,6 @@ const websocketConnect = (crfToken) => {
         const shiftFiveStartsAt = '02:30:00 AM';
         const shiftSixStartsAt = '05:00:00 AM';
 
-        let shiftOneStatus = pending;
-        let shiftTwoStatus = pending;
-        let shiftThreeStatus = pending;
-        let shiftFourStatus = pending;
-        let shiftFiveStatus = pending;
-        let shiftSixStatus = pending;
-
         if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStatus === pending) {
             presentShiftTimeStartsAt = shiftOneStartsAt;
             toggledVariablesWhenCommencedShift('one');
