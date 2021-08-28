@@ -202,31 +202,38 @@ const websocketConnect = (crfToken) => {
         const shiftFiveStartsAt = '02:30:00 AM';
         const shiftSixStartsAt = '05:00:00 AM';
 
-        if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStartsAt === pending) {
+        let shiftOneStatus = pending;
+        let shiftTwoStatus = pending;
+        let shiftThreeStatus = pending;
+        let shiftFourStatus = pending;
+        let shiftFiveStatus = pending;
+        let shiftSixStatus = pending;
+
+        if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStatus === pending) {
             presentShiftTimeStartsAt = shiftOneStartsAt;
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStartsAt === pending) {
-            shiftCoincides(shiftOneStartsAt);
+        } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStatus === pending) {
+            shiftCoincides(shiftOneStatus);
             presentShiftTimeStartsAt = shiftTwoStartsAt;
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftThreeStartsAt === pending) {
+        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftThreeStatus === pending) {
             presentShiftTimeStartsAt = shiftThreeStartsAt;
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStartsAt === pending) {
-            shiftCoincides(shiftThreeStartsAt);
+        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
+            shiftCoincides(shiftThreeStatus);
             presentShiftTimeStartsAt = shiftFourStartsAt;
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFiveStartsAt === pending) {
-            shiftCoincides(shiftFourStartsAt);
+        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFiveStatus === pending) {
+            shiftCoincides(shiftFourStatus);
             presentShiftTimeStartsAt = shiftFiveStartsAt;
             toggledVariablesWhenCommencedShift('five');
 
-        } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftSixStartsAt === pending) {
-            shiftCoincides(shiftFiveStartsAt);
+        } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftSixStatus === pending) {
+            shiftCoincides(shiftFiveStatus);
             presentShiftTimeStartsAt = shiftSixStartsAt;
             toggledVariablesWhenCommencedShift('six');
         }
@@ -852,6 +859,8 @@ function printCommencedShift(presentShift) {
 
     printLine();
     console.log(`%c- Now commencing scheduled shift number ${ presentShift }. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
+    printLine();
+
     isPrintedNowCommencingScheduled = true;
 }
 
