@@ -211,7 +211,7 @@ const websocketConnect = (crfToken) => {
                 dailyProfitQuotaLimitExtension = dailyProfitQuotaLimit;
                 shiftOneStatus = completed;
                 if (isPrintedNowCommencingScheduled === false) {
-                    console.log(`%c- Two(2) shifts coincides! This shift's quota has now been updated to Php${dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension} -`, 'font-weight: bold; color: #FF00F3;');
+                    console.log(`%c- Two(2) shifts coincides! This shift's updated to Php${dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension} -`, 'font-weight: bold; color: #FF00F3;');
                 }
             }
             presentShiftTimeStartsAt = shiftTwoStartsAt;
@@ -236,6 +236,7 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
+                printLine();
                 console.log(`%c- Race not allowed yet. Be back at later! -`, 'font-weight: bold; color: #f00;');
 
                 presentShiftTimeStartsAt = '';
@@ -857,6 +858,7 @@ function printCommencedShift(presentShift) {
         return;
     }
 
+    printLine();
     console.log(`%c- Now commencing scheduled shift number ${ presentShift }. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
     isPrintedNowCommencingScheduled = true;
 }
