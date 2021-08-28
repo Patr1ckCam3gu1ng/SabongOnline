@@ -7,6 +7,7 @@ let reconnectRetries = 0;
 let retryPinger;
 
 let dailyProfitQuotaLimit = 1800;
+let dailyProfitQuotaLimitExtension = 0;
 let betLevel = [
     312,        // 1
     312,        // 2
@@ -193,10 +194,14 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '12:45:00 PM') && shiftOneStatus === pending) {
+        if (isWithinAllottedRacetime('10:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime('01:00:00 PM', '03:00:00 PM') && shiftTwoStatus === pending) {
+        } else if (isWithinAllottedRacetime('01:00:00 PM', '03:59:59 PM') && shiftTwoStatus === pending) {
+            if (shiftOneStatus === pending) {
+                dailyProfitQuotaLimitExtension = dailyProfitQuotaLimit * 2;
+                shiftOneStatus = completed;
+            }
             toggledVariablesWhenCommencedShift('two');
 
         } else if (isWithinAllottedRacetime('04:00:00 PM', '07:00:00 PM') && shiftFourStatus === pending) {
@@ -237,7 +242,7 @@ const websocketConnect = (crfToken) => {
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
 
-                flushMatchLogs();
+                flushPreviousVariance();
 
                 stopTimer();
 
@@ -890,10 +895,10 @@ function calculateTodaysProfit() {
 function isDailyQuotaReached() {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    return totalNetProfit >= dailyProfitQuotaLimit;
+    return totalNetProfit >= (dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension);
 }
 
-function flushMatchLogs() {
+function flushPreviousVariance() {
     const { totalNetProfit } = calculateTodaysProfit();
 
     const sum = matchLogs[0].sum + totalNetProfit;
@@ -909,6 +914,8 @@ function flushMatchLogs() {
     highestWinStreak = 0;
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
+
+    dailyProfitQuotaLimitExtension = 0;
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
