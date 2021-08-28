@@ -217,15 +217,15 @@ const websocketConnect = (crfToken) => {
             presentShiftTimeStartsAt = shiftTwoStartsAt;
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '07:00:00 PM') && shiftFourStatus === pending) {
+        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftFourStatus === pending) {
             presentShiftTimeStartsAt = shiftThreeStartsAt;
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '01:30:00 AM')) && shiftThreeStatus === pending) {
+        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftThreeStatus === pending) {
             presentShiftTimeStartsAt = shiftFourStartsAt;
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:30:00 AM') && shiftFourStatus === pending) {
+        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFourStatus === pending) {
             presentShiftTimeStartsAt = shiftFiveStartsAt;
             toggledVariablesWhenCommencedShift('five');
 
@@ -820,14 +820,14 @@ function shuffleBetSide() {
 
     let index = 0;
 
-    while (index < (Math.floor(parseInt(((Math.random() * 500) + 1).toFixed(0))))) {
+    while (index < (Math.floor(parseInt(((Math.random() * 60) + 1).toFixed(0))))) {
         shuffledTrueFalse = shuffleArrays([true, false]);
         index++;
     }
 
     index = 0;
 
-    while (index < (Math.floor(parseInt(((Math.random() * 500) + 1).toFixed(0))))) {
+    while (index < (Math.floor(parseInt(((Math.random() * 30) + 1).toFixed(0))))) {
         shuffledIndex = parseInt(shuffleArrays([0, 1]));
         index++;
     }
