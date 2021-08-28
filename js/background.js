@@ -202,31 +202,31 @@ const websocketConnect = (crfToken) => {
         const shiftFiveStartsAt = '02:30:00 AM';
         const shiftSixStartsAt = '05:00:00 AM';
 
-        if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStatus === pending) {
+        if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStartsAt === pending) {
             presentShiftTimeStartsAt = shiftOneStartsAt;
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStatus === pending) {
-            shiftCoincides(shiftTwoStatus);
+        } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStartsAt === pending) {
+            shiftCoincides(shiftOneStartsAt);
             presentShiftTimeStartsAt = shiftTwoStartsAt;
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftFourStatus === pending) {
+        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftThreeStartsAt === pending) {
             presentShiftTimeStartsAt = shiftThreeStartsAt;
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftThreeStatus === pending) {
-            shiftCoincides(shiftThreeStatus);
+        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStartsAt === pending) {
+            shiftCoincides(shiftThreeStartsAt);
             presentShiftTimeStartsAt = shiftFourStartsAt;
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFourStatus === pending) {
-            shiftCoincides(shiftFourStatus);
+        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFiveStartsAt === pending) {
+            shiftCoincides(shiftFourStartsAt);
             presentShiftTimeStartsAt = shiftFiveStartsAt;
             toggledVariablesWhenCommencedShift('five');
 
-        } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftFiveStatus === pending) {
-            shiftCoincides(shiftFiveStatus);
+        } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftSixStartsAt === pending) {
+            shiftCoincides(shiftFiveStartsAt);
             presentShiftTimeStartsAt = shiftSixStartsAt;
             toggledVariablesWhenCommencedShift('six');
         }
@@ -329,8 +329,8 @@ const websocketConnect = (crfToken) => {
             const fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
-                printLine();
                 console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                printLine();
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -813,9 +813,7 @@ function shuffleBetSide() {
     }
 
     let shuffledTrueFalse = [true, false];
-
     let shuffledTrueFalseBuckets = [];
-
     let index = 0;
 
     while (index < (Math.floor(parseInt(((Math.random() * 100) + 1).toFixed(0))))) {
@@ -958,9 +956,6 @@ function shiftCoincides(shiftFrom) {
             break;
         case 'five':
             shiftFiveStatus = completed;
-            break;
-        case 'six':
-            shiftSixStatus = completed;
             break;
     }
 
