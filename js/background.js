@@ -121,7 +121,6 @@ let shiftSixStatus = pending;
 let presentShift = '';
 
 let isPrintedNowCommencingScheduled = false;
-let presentShiftTimeStartsAt = '';
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -195,39 +194,26 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        const shiftOneStartsAt = '10:00:00 AM';
-        const shiftTwoStartsAt = '01:00:00 PM';
-        const shiftThreeStartsAt = '04:00:00 PM';
-        const shiftFourStartsAt = '11:00:00 PM';
-        const shiftFiveStartsAt = '02:30:00 AM';
-        const shiftSixStartsAt = '05:00:00 AM';
-
-        if (isWithinAllottedRacetime(shiftOneStartsAt, '12:59:59 PM') && shiftOneStatus === pending) {
-            presentShiftTimeStartsAt = shiftOneStartsAt;
+        if (isWithinAllottedRacetime('10:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime(shiftTwoStartsAt, '03:59:59 PM') && shiftTwoStatus === pending) {
-            shiftCoincides(shiftOneStatus);
-            presentShiftTimeStartsAt = shiftTwoStartsAt;
+        } else if (isWithinAllottedRacetime('01:00:00 PM', '03:59:59 PM') && shiftTwoStatus === pending) {
+            setCompletedPreviousShift(shiftOneStatus);
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime(shiftThreeStartsAt, '08:00:00 PM') && shiftThreeStatus === pending) {
-            presentShiftTimeStartsAt = shiftThreeStartsAt;
+        } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime(shiftFourStartsAt, '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
-            shiftCoincides(shiftThreeStatus);
-            presentShiftTimeStartsAt = shiftFourStartsAt;
+        } else if ((isWithinAllottedRacetime('11:00:00 PM', '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
+            setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime(shiftFiveStartsAt, '04:59:59 AM') && shiftFiveStatus === pending) {
-            shiftCoincides(shiftFourStatus);
-            presentShiftTimeStartsAt = shiftFiveStartsAt;
+        } else if (isWithinAllottedRacetime('02:30:00 AM', '04:59:59 AM') && shiftFiveStatus === pending) {
+            setCompletedPreviousShift(shiftFourStatus);
             toggledVariablesWhenCommencedShift('five');
 
-        } else if (isWithinAllottedRacetime(shiftSixStartsAt, '07:30:00 AM') && shiftSixStatus === pending) {
-            shiftCoincides(shiftFiveStatus);
-            presentShiftTimeStartsAt = shiftSixStartsAt;
+        } else if (isWithinAllottedRacetime('05:00:00 AM', '07:30:00 AM') && shiftSixStatus === pending) {
+            setCompletedPreviousShift(shiftFiveStatus);
             toggledVariablesWhenCommencedShift('six');
         }
 
@@ -235,8 +221,6 @@ const websocketConnect = (crfToken) => {
             if (isReminded === false) {
                 printLine();
                 console.log(`%c- Race not allowed yet. Be back at later! -`, 'font-weight: bold; color: #f00;');
-
-                presentShiftTimeStartsAt = '';
                 isReminded = true;
             }
 
@@ -247,56 +231,52 @@ const websocketConnect = (crfToken) => {
         const isBetting = data[1] === 'betting';
 
         if (isDailyQuotaReached() === true) {
-            if (isQuotaReachedTooEarly() === true) {
-                dailyProfitQuotaLimitExtension = (dailyProfitQuotaLimit / 4) * 3;
-            } else {
-                if (isQuotaReachedPrinted === false) {
-                    printProfit();
+            if (isQuotaReachedPrinted === false) {
+                printProfit();
 
-                    printLine();
+                printLine();
 
-                    console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
-                    isQuotaReachedPrinted = true;
-                    isPrintedNowCommencingScheduled = false;
+                isQuotaReachedPrinted = true;
+                isPrintedNowCommencingScheduled = false;
 
-                    flushPreviousVariance();
+                flushPreviousVariance();
 
-                    stopTimer();
+                stopTimer();
 
-                    switch (presentShift) {
-                        case 'one':
-                            shiftOneStatus = completed;
-                            shiftSixStatus = pending;
-                            break;
-                        case 'two':
-                            shiftTwoStatus = completed;
-                            break;
-                        case 'three':
-                            shiftThreeStatus = completed;
-                            break;
-                        case 'four':
-                            shiftFourStatus = completed;
-                            break;
-                        case 'five':
-                            shiftFiveStatus = completed;
-                            break;
-                        case 'six':
-                            shiftSixStatus = completed;
+                switch (presentShift) {
+                    case 'one':
+                        shiftOneStatus = completed;
+                        shiftSixStatus = pending;
+                        break;
+                    case 'two':
+                        shiftTwoStatus = completed;
+                        break;
+                    case 'three':
+                        shiftThreeStatus = completed;
+                        break;
+                    case 'four':
+                        shiftFourStatus = completed;
+                        break;
+                    case 'five':
+                        shiftFiveStatus = completed;
+                        break;
+                    case 'six':
+                        shiftSixStatus = completed;
 
-                            // reset all
-                            shiftOneStatus = pending;
-                            shiftTwoStatus = pending;
-                            shiftThreeStatus = pending;
-                            shiftFourStatus = pending;
-                            shiftFiveStatus = pending;
+                        // reset all
+                        shiftOneStatus = pending;
+                        shiftTwoStatus = pending;
+                        shiftThreeStatus = pending;
+                        shiftFourStatus = pending;
+                        shiftFiveStatus = pending;
 
-                            break;
-                    }
+                        break;
                 }
-
-                return;
             }
+
+            return;
         }
 
         isReminded = false;
@@ -831,20 +811,6 @@ function printLine() {
     console.log('%c-', 'color: black;');
 }
 
-function isMorningRace() {
-    const now = new Date();
-    const earliestRaceTime = '10:00:00 AM';
-
-    const result = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + earliestRaceTime).getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + "11:59:00 AM").getTime());
-
-    if (result === false) {
-        printRaceTime = earliestRaceTime;
-    }
-
-    return result;
-}
-
 function printCommencedShift(presentShift) {
     if (isPrintedNowCommencingScheduled === true) {
         return;
@@ -930,19 +896,7 @@ function flushPreviousVariance() {
     dailyProfitQuotaLimitExtension = 0;
 }
 
-function isQuotaReachedTooEarly() {
-    if (presentShiftTimeStartsAt === '') {
-        return false;
-    }
-
-    const now = new Date();
-    const startTime = new Date(now.toLocaleDateString() + " " + presentShiftTimeStartsAt);
-    const endTime = new Date(now.toLocaleDateString() + " " + now.toLocaleTimeString());
-
-    return (Math.abs(startTime - endTime) / 36e5) <= 1.5;
-}
-
-function shiftCoincides(shiftFrom) {
+function setCompletedPreviousShift(shiftFrom) {
     switch (shiftFrom) {
         case 'one':
             shiftOneStatus = completed;
@@ -972,7 +926,7 @@ function shiftCoincides(shiftFrom) {
 
         stopTimer();
 
-        console.log(`%c- Two(2) shifts coincides! -`, 'font-weight: bold; color: #FF00F3;');
+        console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
     }
 }
 
