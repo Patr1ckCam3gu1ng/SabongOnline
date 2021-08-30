@@ -309,8 +309,8 @@ const websocketConnect = (crfToken) => {
             const fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
-                console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 printLine();
+                console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -331,6 +331,7 @@ const websocketConnect = (crfToken) => {
             }
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
+                printLine();
                 paymentSafe(false);
                 reverseBet();
 
