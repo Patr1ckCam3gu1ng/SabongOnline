@@ -204,7 +204,7 @@ const websocketConnect = (crfToken) => {
         } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime('11:00:00 PM', '12:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
+        } else if ((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
             setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
