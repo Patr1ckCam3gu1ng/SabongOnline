@@ -897,25 +897,40 @@ function flushPreviousVariance() {
 }
 
 function setCompletedPreviousShift(shiftFrom) {
-    switch (shiftFrom) {
-        case 'one':
-            shiftOneStatus = completed;
-            break;
-        case 'two':
-            shiftTwoStatus = completed;
-            break;
-        case 'three':
-            shiftThreeStatus = completed;
-            break;
-        case 'four':
-            shiftFourStatus = completed;
-            break;
-        case 'five':
-            shiftFiveStatus = completed;
-            break;
-    }
-
     if (isPrintedNowCommencingScheduled === false) {
+        switch (shiftFrom) {
+            case 'one':
+                if (shiftOneStatus === completed) {
+                    return;
+                }
+                shiftOneStatus = completed;
+                break;
+            case 'two':
+                if (shiftTwoStatus === completed) {
+                    return;
+                }
+                shiftTwoStatus = completed;
+                break;
+            case 'three':
+                if (shiftThreeStatus === completed) {
+                    return;
+                }
+                shiftThreeStatus = completed;
+                break;
+            case 'four':
+                if (shiftFourStatus === completed) {
+                    return;
+                }
+                shiftFourStatus = completed;
+                break;
+            case 'five':
+                if (shiftFiveStatus === completed) {
+                    return;
+                }
+                shiftFiveStatus = completed;
+                break;
+        }
+
         printLine();
 
         const { todaysTotalNetProfit } = calculateProfit();
@@ -923,7 +938,6 @@ function setCompletedPreviousShift(shiftFrom) {
         console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
 
         flushPreviousVariance();
-
         stopTimer();
 
         console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
