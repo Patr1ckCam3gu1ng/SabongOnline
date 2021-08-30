@@ -800,11 +800,11 @@ function shuffleBetSide() {
         return array;
     }
 
-    let shuffledTrueFalse = [true, false];
+    let shuffledTrueFalse = [true, false, true, false];
     let shuffledTrueFalseBuckets = [];
     let index = 0;
 
-    while (index < (Math.floor(parseInt(((Math.random() * 100) + 1).toFixed(0))))) {
+    while (index < (Math.floor(parseInt(((Math.random() * 3) + 1).toFixed(0))))) {
         shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
         shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
         shuffledTrueFalseBuckets = [...shuffleArrays(shuffledTrueFalseBuckets)]
@@ -814,7 +814,7 @@ function shuffleBetSide() {
     let indexPicked = 0;
     index = 0;
 
-    while (index <= (Math.floor(parseInt(((Math.random() * 100) + 1).toFixed(0))))) {
+    while (index <= (Math.floor(parseInt(((Math.random() * 3) + 1).toFixed(0))))) {
         indexPicked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
         index++;
     }
