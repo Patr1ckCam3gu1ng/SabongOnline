@@ -927,32 +927,41 @@ function setCompletedPreviousShift(shiftFrom) {
             if (shiftOneStatus === completed) {
                 return;
             }
+            isPrintedNowCommencingScheduled = false;
             shiftOneStatus = completed;
             break;
         case 'two':
             if (shiftTwoStatus === completed) {
                 return;
             }
+            isPrintedNowCommencingScheduled = false;
             shiftTwoStatus = completed;
             break;
         case 'three':
             if (shiftThreeStatus === completed) {
                 return;
             }
+            isPrintedNowCommencingScheduled = false;
             shiftThreeStatus = completed;
             break;
         case 'four':
             if (shiftFourStatus === completed) {
                 return;
             }
+            isPrintedNowCommencingScheduled = false;
             shiftFourStatus = completed;
             break;
         case 'five':
             if (shiftFiveStatus === completed) {
                 return;
             }
+            isPrintedNowCommencingScheduled = false;
             shiftFiveStatus = completed;
             break;
+    }
+
+    if (isPrintedNowCommencingScheduled === true) {
+        return;
     }
 
     printLine();
