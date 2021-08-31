@@ -195,24 +195,30 @@ const websocketConnect = (crfToken) => {
         let isWithinAllottedRaceTime = false;
 
         if (isWithinAllottedRacetime('10:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
+            maxWaitTimes = 84;
             toggledVariablesWhenCommencedShift('one');
 
         } else if (isWithinAllottedRacetime('01:00:00 PM', '03:59:59 PM') && shiftTwoStatus === pending) {
+            maxWaitTimes = 84;
             setCompletedPreviousShift(shiftOneStatus);
             toggledVariablesWhenCommencedShift('two');
 
         } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
+            maxWaitTimes = 84;
             toggledVariablesWhenCommencedShift('three');
 
         } else if ((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
+            maxWaitTimes = 84;
             setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
         } else if (isWithinAllottedRacetime('02:30:00 AM', '04:59:59 AM') && shiftFiveStatus === pending) {
+            maxWaitTimes = 62;
             setCompletedPreviousShift(shiftFourStatus);
             toggledVariablesWhenCommencedShift('five');
 
         } else if (isWithinAllottedRacetime('05:00:00 AM', '07:30:00 AM') && shiftSixStatus === pending) {
+            maxWaitTimes = 62;
             setCompletedPreviousShift(shiftFiveStatus);
             toggledVariablesWhenCommencedShift('six');
         }
@@ -309,7 +315,6 @@ const websocketConnect = (crfToken) => {
             const fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
-                printLine();
                 console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
