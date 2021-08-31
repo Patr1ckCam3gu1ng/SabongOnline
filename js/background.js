@@ -118,7 +118,6 @@ let shiftTwoStatus = pending;
 let shiftThreeStatus = pending;
 let shiftFourStatus = pending;
 let shiftFiveStatus = pending;
-let shiftSixStatus = pending;
 
 let presentShift = '';
 
@@ -196,34 +195,29 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('10:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
+        if (isWithinAllottedRacetime('09:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime('01:00:00 PM', '03:59:59 PM') && shiftTwoStatus === pending) {
+        } else if (isWithinAllottedRacetime('01:00:00 PM', '04:59:59 PM') && shiftTwoStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftOneStatus);
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
+        } else if (isWithinAllottedRacetime('05:00:00 PM', '08:59:59 PM') && shiftThreeStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftTwoStatus);
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
+        } else if ((isWithinAllottedRacetime('09:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '12:59:59 AM')) && shiftFourStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime('02:30:00 AM', '04:59:59 AM') && shiftFiveStatus === pending) {
+        } else if (isWithinAllottedRacetime('01:00:00 AM', '05:00:00 AM') && shiftFiveStatus === pending) {
             maxWaitTimes = 62;
             setCompletedPreviousShift(shiftFourStatus);
             toggledVariablesWhenCommencedShift('five');
-
-        } else if (isWithinAllottedRacetime('05:00:00 AM', '07:30:00 AM') && shiftSixStatus === pending) {
-            maxWaitTimes = 62;
-            setCompletedPreviousShift(shiftFiveStatus);
-            toggledVariablesWhenCommencedShift('six');
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
@@ -257,7 +251,7 @@ const websocketConnect = (crfToken) => {
                 switch (presentShift) {
                     case 'one':
                         shiftOneStatus = completed;
-                        shiftSixStatus = pending;
+                        shiftFiveStatus = pending;
                         break;
                     case 'two':
                         shiftTwoStatus = completed;
@@ -270,16 +264,12 @@ const websocketConnect = (crfToken) => {
                         break;
                     case 'five':
                         shiftFiveStatus = completed;
-                        break;
-                    case 'six':
-                        shiftSixStatus = completed;
 
                         // reset all
                         shiftOneStatus = pending;
                         shiftTwoStatus = pending;
                         shiftThreeStatus = pending;
                         shiftFourStatus = pending;
-                        shiftFiveStatus = pending;
 
                         break;
                 }
