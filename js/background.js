@@ -101,8 +101,10 @@ let timerIndex = 0;
 const oddsMinimum = 175;
 const oddsMaximum = 220;
 
+const maxWaitTimesDefault = 78;
+
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 84;
+let maxWaitTimes = maxWaitTimesDefault;
 
 let isDemoOnly = false;
 
@@ -195,21 +197,21 @@ const websocketConnect = (crfToken) => {
         let isWithinAllottedRaceTime = false;
 
         if (isWithinAllottedRacetime('10:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
-            maxWaitTimes = 84;
+            maxWaitTimes = maxWaitTimesDefault;
             toggledVariablesWhenCommencedShift('one');
 
         } else if (isWithinAllottedRacetime('01:00:00 PM', '03:59:59 PM') && shiftTwoStatus === pending) {
-            maxWaitTimes = 84;
+            maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftOneStatus);
             toggledVariablesWhenCommencedShift('two');
 
         } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
-            maxWaitTimes = 84;
+            maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftTwoStatus);
             toggledVariablesWhenCommencedShift('three');
 
         } else if ((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
-            maxWaitTimes = 84;
+            maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
@@ -289,9 +291,12 @@ const websocketConnect = (crfToken) => {
         isReminded = false;
 
         if (presentLevel > betLevel.length - 1) {
+            printLine();
+
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
             console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
+
             clearInterval(pinger);
             websocket.close();
 
@@ -338,7 +343,7 @@ const websocketConnect = (crfToken) => {
             }
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
-                printLine();
+                // printLine();
                 paymentSafe(false);
                 reverseBet();
 
