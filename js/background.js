@@ -572,6 +572,13 @@ const websocketConnect = (crfToken) => {
             isQuotaReachedPrinted = false;
             presentShift = value;
             printCommencedShift(presentShift);
+
+            if (isPrintedNowCommencingScheduled === true) {
+                return;
+            }
+
+            timerIndex += 12;
+            isBettingWithAccumulatedAmount = false;
         }
     }
     websocket.onclose = function () {
@@ -968,12 +975,14 @@ function setCompletedPreviousShift(shiftFrom) {
 
     const { todaysTotalNetProfit } = calculateProfit();
 
-    console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
+    if (todaysTotalNetProfit > 0 ) {
+        console.log(`%c- Quota not reached: Php ${ todaysTotalNetProfit } -`, 'font-weight: bold; color: #FF00F3;');
 
-    flushPreviousVariance();
-    stopTimer();
+        flushPreviousVariance();
+        stopTimer();
 
-    console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
+        console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
