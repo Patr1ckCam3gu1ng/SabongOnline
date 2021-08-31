@@ -205,6 +205,7 @@ const websocketConnect = (crfToken) => {
 
         } else if (isWithinAllottedRacetime('04:00:00 PM', '08:00:00 PM') && shiftThreeStatus === pending) {
             maxWaitTimes = 84;
+            setCompletedPreviousShift(shiftTwoStatus);
             toggledVariablesWhenCommencedShift('three');
 
         } else if ((isWithinAllottedRacetime('11:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '02:29:59 AM')) && shiftFourStatus === pending) {
@@ -921,51 +922,49 @@ function flushPreviousVariance() {
 }
 
 function setCompletedPreviousShift(shiftFrom) {
-    if (isPrintedNowCommencingScheduled === false) {
-        switch (shiftFrom) {
-            case 'one':
-                if (shiftOneStatus === completed) {
-                    return;
-                }
-                shiftOneStatus = completed;
-                break;
-            case 'two':
-                if (shiftTwoStatus === completed) {
-                    return;
-                }
-                shiftTwoStatus = completed;
-                break;
-            case 'three':
-                if (shiftThreeStatus === completed) {
-                    return;
-                }
-                shiftThreeStatus = completed;
-                break;
-            case 'four':
-                if (shiftFourStatus === completed) {
-                    return;
-                }
-                shiftFourStatus = completed;
-                break;
-            case 'five':
-                if (shiftFiveStatus === completed) {
-                    return;
-                }
-                shiftFiveStatus = completed;
-                break;
-        }
-
-        printLine();
-
-        const { todaysTotalNetProfit } = calculateProfit();
-
-        console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
-
-        flushPreviousVariance();
-        stopTimer();
-
-        console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
+    switch (shiftFrom) {
+        case 'one':
+            if (shiftOneStatus === completed) {
+                return;
+            }
+            shiftOneStatus = completed;
+            break;
+        case 'two':
+            if (shiftTwoStatus === completed) {
+                return;
+            }
+            shiftTwoStatus = completed;
+            break;
+        case 'three':
+            if (shiftThreeStatus === completed) {
+                return;
+            }
+            shiftThreeStatus = completed;
+            break;
+        case 'four':
+            if (shiftFourStatus === completed) {
+                return;
+            }
+            shiftFourStatus = completed;
+            break;
+        case 'five':
+            if (shiftFiveStatus === completed) {
+                return;
+            }
+            shiftFiveStatus = completed;
+            break;
     }
+
+    printLine();
+
+    const { todaysTotalNetProfit } = calculateProfit();
+
+    console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
+
+    flushPreviousVariance();
+    stopTimer();
+
+    console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
