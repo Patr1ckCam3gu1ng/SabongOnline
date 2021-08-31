@@ -6,17 +6,17 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let dailyProfitQuotaLimit = 1800;
 let dailyProfitQuotaLimitExtension = 0;
-let betLevel = [
-    312,        // 1
-    312,        // 2
-    900,        // 3
-    1900,       // 4
-    4011,       // 5
-    8468,       // 6
-    17877      // 7
-];
+// let dailyProfitQuotaLimit = 1800;
+// let betLevel = [
+//     312,        // 1
+//     312,        // 2
+//     900,        // 3
+//     1900,       // 4
+//     4011,       // 5
+//     8468,       // 6
+//     17877      // 7
+// ];
 
 // let dailyProfitQuotaLimit = 3000;
 // let betLevel = [
@@ -28,6 +28,17 @@ let betLevel = [
 //     12158,  // 6
 //     25667   // 7
 // ];
+
+let dailyProfitQuotaLimit = 3700;
+let betLevel = [
+    772,    // 1
+    772,    // 2
+    1090,   // 3
+    2452,   // 4
+    5518,   // 5
+    12415,  // 6
+    27934   // 7
+];
 
 // let dailyProfitQuotaLimit = 6000;
 // let betLevel = [
