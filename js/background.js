@@ -578,7 +578,6 @@ const websocketConnect = (crfToken) => {
             }
 
             timerIndex += 12;
-            isBettingWithAccumulatedAmount = false;
         }
     }
     websocket.onclose = function () {
@@ -922,10 +921,14 @@ function flushPreviousVariance() {
 
     highestLossStreak = 0;
     highestWinStreak = 0;
+    lossStreak = 0;
+    winStreak = 0;
+    isBettingWithAccumulatedAmount = false;
+    matchIndex = 0;
+    dailyProfitQuotaLimitExtension = 0;
+
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
-
-    dailyProfitQuotaLimitExtension = 0;
 }
 
 function setCompletedPreviousShift(shiftFrom) {
