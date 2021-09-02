@@ -931,8 +931,9 @@ function flushPreviousVariance() {
     lossStreak = 0;
     winStreak = 0;
     isBettingWithAccumulatedAmount = false;
-    matchIndex = 0;
+    matchIndex = 1;
     dailyProfitQuotaLimitExtension = 0;
+    isPendingPrintProfit = false;
 
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
