@@ -18,6 +18,17 @@ let dailyProfitQuotaLimitExtension = 0;
 //     17877      // 7
 // ];
 
+let dailyProfitQuotaLimit = 3000;
+let betLevel = [
+    710,        // 1
+    710,        // 2
+    900,        // 3
+    1900,       // 4
+    4011,       // 5
+    8468,       // 6
+    17877,      // 7
+];
+
 // let dailyProfitQuotaLimit = 3000;
 // let betLevel = [
 //     612,    // 1
@@ -29,16 +40,16 @@ let dailyProfitQuotaLimitExtension = 0;
 //     25667   // 7
 // ];
 
-let dailyProfitQuotaLimit = 3700;
-let betLevel = [
-    772,    // 1
-    772,    // 2
-    1090,   // 3
-    2452,   // 4
-    5518,   // 5
-    12415,  // 6
-    27934   // 7
-];
+// let dailyProfitQuotaLimit = 3700;
+// let betLevel = [
+//     772,    // 1
+//     772,    // 2
+//     1090,   // 3
+//     2452,   // 4
+//     5518,   // 5
+//     12415,  // 6
+//     27934   // 7
+// ];
 
 // let dailyProfitQuotaLimit = 6000;
 // let betLevel = [
