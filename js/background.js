@@ -236,7 +236,7 @@ const websocketConnect = (crfToken) => {
             setCompletedPreviousShift(shiftThreeStatus);
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime('01:00:00 AM', '05:00:00 AM') && shiftFiveStatus === pending) {
+        } else if (isWithinAllottedRacetime('01:00:00 AM', '07:30:00 AM') && shiftFiveStatus === pending) {
             maxWaitTimes = 62;
             setCompletedPreviousShift(shiftFourStatus);
             toggledVariablesWhenCommencedShift('five');
@@ -861,9 +861,9 @@ function printCommencedShift(presentShift) {
         return;
     }
 
-    printLine();
+    console.log(`%c- ----------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
     console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
-    printLine();
+    console.log(`%c- ----------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
 
     isPrintedNowCommencingScheduled = true;
 }
