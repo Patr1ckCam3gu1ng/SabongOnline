@@ -144,6 +144,7 @@ let shiftFiveStatus = pending;
 let presentShift = '';
 
 let isPrintedNowCommencingScheduled = false;
+let startTimelapse = 0;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -246,7 +247,7 @@ const websocketConnect = (crfToken) => {
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
                 printLine();
-                console.log(`%c- Race not allowed yet. Be back at later! -`, 'font-weight: bold; color: #f00;');
+                console.log(`%c- Race not allowed yet. Be back later! -`, 'font-weight: bold; color: #f00;');
                 isReminded = true;
             }
 
@@ -259,9 +260,12 @@ const websocketConnect = (crfToken) => {
         if (isDailyQuotaReached() === true) {
             if (isQuotaReachedPrinted === false) {
                 printProfit();
-
                 printLine();
 
+                const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
+                console.log(`%Total Timelapse: ${totalTimelapse}`, 'font-weight: bold; color: yellow');
+
+                printLine();
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
@@ -862,11 +866,15 @@ function printCommencedShift(presentShift) {
         return;
     }
 
-    console.log(`%c- ---------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
-    console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
-    console.log(`%c- ---------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
+    printLine();
+
+    console.log(`%c- ----------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- ----------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
 
     isPrintedNowCommencingScheduled = true;
+
+    startTimelapse = window.performance.now();
 }
 
 function isWithinAllottedRacetime(startTime, endTime) {
@@ -1006,6 +1014,13 @@ function setCompletedPreviousShift(shiftFrom) {
 
         console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
     }
+}
+
+function millisecondsConverter(millis) {
+    const minutes = Math.floor(millis / 60000);
+    const seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
+
+    return (seconds === 60 ? (minutes + 1) + ":00" : minutes + " hours and " + (seconds < 10 ? "0" : "") + `${seconds} seconds`);
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
