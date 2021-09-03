@@ -123,7 +123,7 @@ let timerIndex = 0;
 const oddsMinimum = 175;
 const oddsMaximum = 220;
 
-const maxWaitTimesDefault = 78;
+const maxWaitTimesDefault = 84;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = maxWaitTimesDefault;
@@ -145,6 +145,15 @@ let presentShift = '';
 
 let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
+
+let raceSchedules = [
+    [],                                 // 0
+    ['09:00:00 AM', '12:59:59 PM'],     // 1
+    ['01:00:00 PM', '04:59:59 PM'],     // 2
+    ['05:00:00 PM', '08:59:59 PM'],     // 3
+    [['09:00:00 PM', '11:59:59 PM'], ['12:00:00 AM', '12:59:59 AM']],   // 4
+    ['01:00:00 AM', '07:30:00 AM']      // 5
+];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -218,27 +227,27 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime('09:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
+        if (isWithinAllottedRacetime(raceSchedules[1]) && shiftOneStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('five');
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime('01:00:00 PM', '04:59:59 PM') && shiftTwoStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[2]) && shiftTwoStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('one');
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime('05:00:00 PM', '08:59:59 PM') && shiftThreeStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[3]) && shiftThreeStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('two');
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime('09:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '12:59:59 AM')) && shiftFourStatus === pending) {
+        } else if ((isWithinAllottedRacetime(raceSchedules[4][0]) || isWithinAllottedRacetime(raceSchedules[4][1])) && shiftFourStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('three');
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime('01:00:00 AM', '07:30:00 AM') && shiftFiveStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[5]) && shiftFiveStatus === pending) {
             maxWaitTimes = 62;
             setCompletedPreviousShift('four');
             toggledVariablesWhenCommencedShift('five');
@@ -254,8 +263,8 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        const fightEvent = data[ 0 ];
-        const isBetting = data[ 1 ] === 'betting';
+        const fightEvent = data[0];
+        const isBetting = data[1] === 'betting';
 
         if (isDailyQuotaReached() === true) {
             if (isQuotaReachedPrinted === false) {
@@ -321,13 +330,13 @@ const websocketConnect = (crfToken) => {
         }
 
         if (fightEvent === 'App\\Events\\ArenaUpdate') {
-            const fightData = data[ 2 ].data;
+            const fightData = data[2].data;
             const event = fightData.event;
 
             return;
         }
         if (fightEvent === 'App\\Events\\FightUpdate') {
-            const fightData = data[ 2 ].data;
+            const fightData = data[2].data;
             const fightStatus = fightData.status;
             const winner = fightData.winner;
             const isOpenBet = fightData.open_bet === 'yes';
@@ -530,7 +539,7 @@ const websocketConnect = (crfToken) => {
                 isShuffleBetSide = true;
             }
 
-            const dataBetOdds = { value: data[ 2 ] };
+            const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
 
             setFinalBet(clonedDataBetOdds.value);
@@ -541,10 +550,10 @@ const websocketConnect = (crfToken) => {
 
             stopTimer();
 
-            let bet = betLevel[ presentLevel ];
+            let bet = betLevel[presentLevel];
 
             if (isBetFromTakenProfit === true) {
-                bet = betLevel[ 0 ];
+                bet = betLevel[0];
             }
 
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
@@ -570,7 +579,7 @@ const websocketConnect = (crfToken) => {
             }
 
             const { grossProfit } = calculateProfit();
-            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[ 0 ] : 0)) > betLevel[ 0 ];
+            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[0] : 0)) > betLevel[0];
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -827,9 +836,9 @@ function shuffleBetSide() {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
             let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[ i ];
-            array[ i ] = array[ rand ];
-            array[ rand ] = oldElement;
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
         }
 
         return array;
@@ -854,7 +863,7 @@ function shuffleBetSide() {
         index++;
     }
 
-    return shuffledTrueFalseBuckets[ indexPicked ];
+    return shuffledTrueFalseBuckets[indexPicked];
 }
 
 function printLine() {
@@ -924,7 +933,7 @@ function calculateTodaysProfit() {
     return {
         totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
         averageProfit: averageProfit,
-        averageProfitPercentage: ((averageProfit / parseInt(betLevel[ 0 ])) * 100).toFixed(0)
+        averageProfitPercentage: ((averageProfit / parseInt(betLevel[0])) * 100).toFixed(0)
     }
 }
 
@@ -937,7 +946,7 @@ function isDailyQuotaReached() {
 function flushPreviousVariance() {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    const sum = matchLogs[ 0 ].sum + totalNetProfit;
+    const sum = matchLogs[0].sum + totalNetProfit;
 
     chrome.storage.local.clear();
 
@@ -1006,8 +1015,8 @@ function setCompletedPreviousShift(shiftFrom) {
 
     const { todaysTotalNetProfit } = calculateProfit();
 
-    if (todaysTotalNetProfit > 0 ) {
-        console.log(`%c- Quota not reached: Php ${ todaysTotalNetProfit } -`, 'font-weight: bold; color: #FF00F3;');
+    if (todaysTotalNetProfit > 0) {
+        console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
 
         flushPreviousVariance();
         stopTimer();
