@@ -219,26 +219,27 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRacetime('09:00:00 AM', '12:59:59 PM') && shiftOneStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
+            setCompletedPreviousShift('five');
             toggledVariablesWhenCommencedShift('one');
 
         } else if (isWithinAllottedRacetime('01:00:00 PM', '04:59:59 PM') && shiftTwoStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift(shiftOneStatus);
+            setCompletedPreviousShift('one');
             toggledVariablesWhenCommencedShift('two');
 
         } else if (isWithinAllottedRacetime('05:00:00 PM', '08:59:59 PM') && shiftThreeStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift(shiftTwoStatus);
+            setCompletedPreviousShift('two');
             toggledVariablesWhenCommencedShift('three');
 
         } else if ((isWithinAllottedRacetime('09:00:00 PM', '11:59:59 PM') || isWithinAllottedRacetime('12:00:00 AM', '12:59:59 AM')) && shiftFourStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift(shiftThreeStatus);
+            setCompletedPreviousShift('three');
             toggledVariablesWhenCommencedShift('four');
 
         } else if (isWithinAllottedRacetime('01:00:00 AM', '07:30:00 AM') && shiftFiveStatus === pending) {
             maxWaitTimes = 62;
-            setCompletedPreviousShift(shiftFourStatus);
+            setCompletedPreviousShift('four');
             toggledVariablesWhenCommencedShift('five');
         }
 
@@ -861,9 +862,9 @@ function printCommencedShift(presentShift) {
         return;
     }
 
-    console.log(`%c- ----------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
+    console.log(`%c- ---------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
     console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #FF00F3;');
-    console.log(`%c- ----------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
+    console.log(`%c- ---------------------------------------------------------------- -`, 'font-weight: bold; color: #FF00F3;');
 
     isPrintedNowCommencingScheduled = true;
 }
