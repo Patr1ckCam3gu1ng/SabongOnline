@@ -227,27 +227,27 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime(raceSchedules[1]) && shiftOneStatus === pending) {
+        if (isWithinAllottedRacetime(raceSchedules[1][0], raceSchedules[1][1]) && shiftOneStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('five');
             toggledVariablesWhenCommencedShift('one');
 
-        } else if (isWithinAllottedRacetime(raceSchedules[2]) && shiftTwoStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[2][0], raceSchedules[2][1]) && shiftTwoStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('one');
             toggledVariablesWhenCommencedShift('two');
 
-        } else if (isWithinAllottedRacetime(raceSchedules[3]) && shiftThreeStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[3][0], raceSchedules[3][1]) && shiftThreeStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('two');
             toggledVariablesWhenCommencedShift('three');
 
-        } else if ((isWithinAllottedRacetime(raceSchedules[4][0]) || isWithinAllottedRacetime(raceSchedules[4][1])) && shiftFourStatus === pending) {
+        } else if ((isWithinAllottedRacetime(raceSchedules[4][0][0], raceSchedules[4][0][1]) || isWithinAllottedRacetime(raceSchedules[4][1][0], raceSchedules[4][1][1])) && shiftFourStatus === pending) {
             maxWaitTimes = maxWaitTimesDefault;
             setCompletedPreviousShift('three');
             toggledVariablesWhenCommencedShift('four');
 
-        } else if (isWithinAllottedRacetime(raceSchedules[5]) && shiftFiveStatus === pending) {
+        } else if (isWithinAllottedRacetime(raceSchedules[5][0], raceSchedules[5][1]) && shiftFiveStatus === pending) {
             maxWaitTimes = 62;
             setCompletedPreviousShift('four');
             toggledVariablesWhenCommencedShift('five');
