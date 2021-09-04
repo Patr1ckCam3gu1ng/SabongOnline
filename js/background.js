@@ -437,7 +437,7 @@ const websocketConnect = (crfToken) => {
 
                         chrome.storage.local.set({ isShuffleBetSide });
 
-                        setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced);
+                        setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
 
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
@@ -721,8 +721,8 @@ function setLocalVariablesFromCache() {
     });
 }
 
-function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced) {
-    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced });
+function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
+    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced, odds });
     chrome.storage.local.set({ matchLogs });
 }
 
@@ -929,11 +929,12 @@ function calculateTodaysProfit() {
     const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
 
     const averageProfit = (wonMatchesTotalGrossProfit / wonMatches.length).toFixed(0).toLocaleString();
+    const averageProfitPercentage = (parseInt(wonMatches.map(({ odds }) => odds).reduce((a, b) => a + b, 0)) / wonMatches.length) * 100;
 
     return {
         totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
         averageProfit: averageProfit,
-        averageProfitPercentage: ((averageProfit / parseInt(betLevel[0])) * 100).toFixed(0)
+        averageProfitPercentage: averageProfitPercentage.toFixed(0)
     }
 }
 
