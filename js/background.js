@@ -1036,7 +1036,11 @@ function millisecondsConverter(millis) {
     const mins = millis % 60;
     const hrs = (millis - mins) / 60;
 
-    return hrs + ' hours and ' + mins + ' minutes';
+    if (hrs === 0) {
+        return mins + ' minutes';
+    }
+
+    return hrs + ` hour${hrs > 0 ? 's' : ''} and ` + mins + ' minutes';
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
