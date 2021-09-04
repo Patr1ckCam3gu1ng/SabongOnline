@@ -272,7 +272,7 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%Total Timelapse: ${totalTimelapse}`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapse: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
                 printLine();
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
@@ -1026,10 +1026,16 @@ function setCompletedPreviousShift(shiftFrom) {
 }
 
 function millisecondsConverter(millis) {
-    const minutes = Math.floor(millis / 60000);
-    const seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
+    const ms = millis % 1000;
+    millis = (millis - ms) / 1000;
 
-    return (seconds === 60 ? (minutes + 1) + ":00" : minutes + " hours and " + (seconds < 10 ? "0" : "") + `${seconds} seconds`);
+    const secs = millis % 60;
+    millis = (millis - secs) / 60;
+
+    const mins = millis % 60;
+    const hrs = (millis - mins) / 60;
+
+    return hrs + ' hours and ' + mins + ' minutes';
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
