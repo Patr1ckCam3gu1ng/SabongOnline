@@ -33,6 +33,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         document.execCommand('delete', false);
         document.execCommand('delete', false);
         document.execCommand('delete', false);
-        document.execCommand('insertText', false, msg.bet);
+        document.execCommand('insertText', false, msg.betAmountPlaced);
     }
 });
