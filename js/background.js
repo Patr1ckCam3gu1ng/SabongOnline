@@ -562,6 +562,8 @@ const websocketConnect = (crfToken) => {
             if (presentLevel === betLevel.length - 1) {
                 chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
                     function (remainingPoints) {
+                        betAmountPlaced = remainingPoints;
+
                         chrome.tabs.sendMessage(tab.id, { text: "inputBet", remainingPoints });
                     }
                 );
