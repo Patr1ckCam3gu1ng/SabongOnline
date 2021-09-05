@@ -1037,6 +1037,9 @@ function setCompletedPreviousShift(shiftFrom) {
     if (todaysTotalNetProfit > 0) {
         console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
 
+        // Carry over today's profit:
+        matchLogs[0].sum = matchLogs[0].sum + todaysTotalNetProfit;
+
         flushPreviousVariance();
         stopTimer();
 
