@@ -145,7 +145,7 @@ let presentShift = '';
 
 let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
-let finalAddOnCapital = 0;
+let finalAddonPercentageOdds = 0;
 
 let raceSchedules = [
     [],                                 // 0
@@ -452,13 +452,13 @@ const websocketConnect = (crfToken) => {
 
                         let percentage = 0;
 
-                        if (finalAddOnCapital > 0) {
-                            percentage = finalAddOnCapital;
+                        if (finalAddonPercentageOdds > 0) {
+                            percentage = finalAddonPercentageOdds;
                         } else {
                             percentage = ((odds * 100) - 100).toFixed(0);
                         }
 
-                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${finalAddOnCapital > 0 ? `+` + (finalBetside - odds).toFixed(0)` => ` : ''} ${percentage}%`);
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${percentage}%`);
                     } else {
                         lossStreak += 1;
 
@@ -485,7 +485,7 @@ const websocketConnect = (crfToken) => {
                         }
                     }
 
-                    finalAddOnCapital = 0;
+                    finalAddonPercentageOdds = 0;
                     isBetFromTakenProfit = false;
 
                     if (isBettingWithAccumulatedAmount === true) {
@@ -566,12 +566,12 @@ const websocketConnect = (crfToken) => {
                 bet = betLevel[0];
             }
 
-            const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
+            const { updatedBet, addOnCapital, percentage } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
 
             bet = updatedBet;
 
             if (addOnCapital > 0) {
-                finalAddOnCapital = addOnCapital;
+                finalAddonPercentageOdds = percentage;
             }
 
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
@@ -1067,7 +1067,7 @@ function millisecondsConverter(millis) {
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
     const { meron_odds, wala_odds } = clonedDataBetOdds.value;
     let betSideOdds = 0;
-    const minimumBetOdds = 190;
+    const minimumTargetedBetOdds = 190;
 
     if (finalBetside === meron) {
         betSideOdds = meron_odds;
@@ -1076,20 +1076,24 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
         betSideOdds = wala_odds;
     }
 
-    if (isShuffleBetSide === true && presentLevel >= 3 && betSideOdds < minimumBetOdds) {
-        const addOnCapital = (minimumBetOdds - betSideOdds);
+    if (/*isShuffleBetSide === true && presentLevel >= 3 &&*/ betSideOdds < minimumTargetedBetOdds) {
+        const addOnCapital = (minimumTargetedBetOdds - betSideOdds);
+        const percentage = (addOnCapital / 100);
+        const calc = bet * percentage;
 
-        console.log(minimumBetOdds, betSideOdds, (bet * (addOnCapital / 100)))
+        console.log(minimumBetOdds, betSideOdds, (bet * (addOnCapital / 100)), bet + (bet * (addOnCapital / 100)), parseInt((betSideOdds + percentage).toFixed(0)))
 
         return {
-            updatedBet: bet + (bet * (addOnCapital / 100)),
-            addOnCapital
-        }
+            updatedBet: bet + (calc > 1 ? calc : 0),
+            addOnCapital: calc > 1 ? addOnCapital : 0,
+            percentage: calc > 1 ? parseInt((betSideOdds + percentage).toFixed(0)) : 0,
+        };
     }
 
     return {
         updatedBet: bet,
-        addOnCapital: 0
+        addOnCapital: 0,
+        percentage: 0
     };
 }
 
