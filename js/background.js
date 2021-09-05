@@ -145,6 +145,7 @@ let presentShift = '';
 
 let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
+let finalAddOnCapital = 0;
 
 let raceSchedules = [
     [],                                 // 0
@@ -449,7 +450,15 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
 
-                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        let percentage = 0;
+
+                        if (finalAddOnCapital > 0) {
+                            percentage = finalAddOnCapital;
+                        } else {
+                            percentage = ((odds * 100) - 100).toFixed(0);
+                        }
+
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${finalAddOnCapital > 0 ? `+` + (finalBetside - odds).toFixed(0)` => ` : ''} ${percentage}%`);
                     } else {
                         lossStreak += 1;
 
@@ -476,6 +485,7 @@ const websocketConnect = (crfToken) => {
                         }
                     }
 
+                    finalAddOnCapital = 0;
                     isBetFromTakenProfit = false;
 
                     if (isBettingWithAccumulatedAmount === true) {
@@ -556,13 +566,21 @@ const websocketConnect = (crfToken) => {
                 bet = betLevel[0];
             }
 
+            const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
+
+            bet = updatedBet;
+
+            if (addOnCapital > 0) {
+                finalAddOnCapital = addOnCapital;
+            }
+
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
             }
 
             betAmountPlaced = parseInt(bet);
 
-            chrome.tabs.sendMessage(tab.id, { text: "inputBet", bet });
+            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
 
             if (isDemoOnly === false) {
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -593,7 +611,7 @@ const websocketConnect = (crfToken) => {
             //     livesRemaining += 1;
             // }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''}${addOnCapital > 0 ? '(O)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
@@ -1040,7 +1058,36 @@ function millisecondsConverter(millis) {
         return mins + ' minutes';
     }
 
-    return hrs + ` hour${hrs > 0 ? 's' : ''} and ` + mins + ' minutes';
+    return hrs + ` hour${hrs > 1 ? 's' : ''} and ` + mins + ' minutes';
+}
+
+function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
+    const { meron_odds, wala_odds } = clonedDataBetOdds.value;
+    let betSideOdds = 0;
+    const minimumBetOdds = 190;
+
+    if (finalBetside === meron) {
+        betSideOdds = meron_odds;
+    }
+    if (finalBetside === wala) {
+        betSideOdds = wala_odds;
+    }
+
+    if (isShuffleBetSide === true && presentLevel >= 3 && betSideOdds < minimumBetOdds) {
+        const addOnCapital = (minimumBetOdds - betSideOdds);
+
+        console.log(minimumBetOdds, betSideOdds, (bet * (addOnCapital / 100)))
+
+        return {
+            updatedBet: bet + (bet * (addOnCapital / 100)),
+            addOnCapital
+        }
+    }
+
+    return {
+        updatedBet: bet,
+        addOnCapital: 0
+    };
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
