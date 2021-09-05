@@ -559,7 +559,15 @@ const websocketConnect = (crfToken) => {
 
             betAmountPlaced = parseInt(bet);
 
-            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
+            if (presentLevel === betLevel.length - 1) {
+                chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
+                    function (remainingPoints) {
+                        chrome.tabs.sendMessage(tab.id, { text: "inputBet", remainingPoints });
+                    }
+                );
+            } else {
+                chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
+            }
 
             if (isDemoOnly === false) {
                 await new Promise(resolve => setTimeout(resolve, 500));

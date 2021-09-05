@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.text === "getCrfTokenRequest") {
         sendResponse(document.getElementsByName("csrf-token")[0].content);
         return;
@@ -23,6 +23,9 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         if ($confirm.length > 0) {
             $confirm[0].click();
         }
+    }
+    if (msg.text === "remainingPoints") {
+        sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')));
     }
 
     function inputBet() {
