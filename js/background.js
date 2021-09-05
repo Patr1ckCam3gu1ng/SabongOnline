@@ -123,7 +123,7 @@ let timerIndex = 0;
 const oddsMinimum = 175;
 const oddsMaximum = 220;
 
-const maxWaitTimesDefault = 84;
+const maxWaitTimesDefault = 82;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = maxWaitTimesDefault;
@@ -1059,8 +1059,6 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
         const addOnCapital = (minimumTargetedBetOdds - betSideOdds);
         const percentage = (addOnCapital / 100);
         const calc = bet * percentage;
-
-        console.log(minimumTargetedBetOdds, betSideOdds, (bet * (addOnCapital / 100)), bet + (bet * (addOnCapital / 100)))
 
         return {
             updatedBet: bet + (calc > 1 ? calc : 0),
