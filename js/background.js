@@ -120,8 +120,8 @@ let printRaceTime = '';
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 170;
-const oddsMaximum = 220;
+const oddsMinimum = 150;
+const oddsMaximum = 260;
 
 const maxWaitTimesDefault = 82;
 
