@@ -123,9 +123,9 @@ let timerIndex = 0;
 const oddsMinimum = 150;
 const oddsMaximum = 260;
 
-const maxWaitTimesDefault = 82;
 
 //should remain 'let' so we can change it in the console:
+let maxWaitTimesDefault = 84;
 let maxWaitTimes = maxWaitTimesDefault;
 
 let isDemoOnly = false;
