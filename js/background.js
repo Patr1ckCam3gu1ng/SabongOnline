@@ -120,7 +120,7 @@ let printRaceTime = '';
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 175;
+const oddsMinimum = 170;
 const oddsMaximum = 220;
 
 const maxWaitTimesDefault = 82;
@@ -560,19 +560,19 @@ const websocketConnect = (crfToken) => {
             betAmountPlaced = parseInt(bet);
 
             if (presentLevel === betLevel.length - 1) {
-                chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
-                    async function (remainingPoints) {
-                        if (remainingPoints < betAmountPlaced) {
-                            betAmountPlaced = remainingPoints.toFixed(0);
-
+                // chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
+                //     async function (remainingPoints) {
+                //         if (remainingPoints < betAmountPlaced) {
+                //             betAmountPlaced = remainingPoints.toFixed(0);
+                //
+                //             chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                //             await chromeSendMessage(chrome.tabs);
+                //         } else {
                             chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
                             await chromeSendMessage(chrome.tabs);
-                        } else {
-                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                            await chromeSendMessage(chrome.tabs);
-                        }
-                    }
-                );
+                //         }
+                //     }
+                // );
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
                 await chromeSendMessage(chrome.tabs);
