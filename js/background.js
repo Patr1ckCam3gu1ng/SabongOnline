@@ -561,23 +561,25 @@ const websocketConnect = (crfToken) => {
 
             if (presentLevel === betLevel.length - 1) {
                 chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
-                    function (remainingPoints) {
+                    async function (remainingPoints) {
                         if (remainingPoints < betAmountPlaced) {
-                            betAmountPlaced = remainingPoints;
+                            betAmountPlaced = remainingPoints.toFixed(0);
 
-                            chrome.tabs.sendMessage(tab.id, { text: "inputBet", remainingPoints });
+                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                            await chromeSendMessage(chrome.tabs);
                         } else {
-                            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
+                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                            await chromeSendMessage(chrome.tabs);
                         }
                     }
                 );
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
+                await chromeSendMessage(chrome.tabs);
             }
 
-            if (isDemoOnly === false) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                chrome.tabs.sendMessage(tab.id, { text: "placeBet", betSide: finalBetside });
+            if (presentLevel === betLevel.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
 
             if (isBetSubmitted === true) {
@@ -1084,6 +1086,11 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
         updatedBet: bet,
         addOnCapital: 0
     };
+}
+
+async function chromeSendMessage(chromeTabs) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {

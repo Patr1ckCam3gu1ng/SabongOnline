@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         }
     }
     if (msg.text === "remainingPoints") {
-        sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')));
+        sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
     }
 
     function inputBet() {
