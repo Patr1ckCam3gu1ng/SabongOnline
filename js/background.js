@@ -523,11 +523,14 @@ const websocketConnect = (crfToken) => {
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
-            chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
-                async function (submittedBetValue) {
-                    isBetSubmitted = submittedBetValue > 0;
-                }
-            );
+            try {
+                chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
+                    async function (submittedBetValue) {
+                        isBetSubmitted = submittedBetValue > 0;
+                    }
+                );
+            } catch (e) {
+            }
         }
 
         function toggledVariablesWhenCommencedShift() {

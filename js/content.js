@@ -29,7 +29,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
     if (msg.text === "submittedBetValue") {
         const betSide = msg.betSide === 'meron' ? 0 : 1;
-        sendResponse(parseInt(document.getElementsByClassName("my-bets")[betSide].innerText.replace(',', '')));
+        try {
+            sendResponse(parseInt(document.getElementsByClassName("my-bets")[betSide].innerText.replace(',', '')));
+        } catch (e) {
+        }
     }
 
     function inputBet() {
