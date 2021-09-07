@@ -192,8 +192,6 @@ const websocketConnect = (crfToken) => {
                 }
             }, 15000);
 
-            setLocalVariablesFromCache();
-
             return;
         }
         if (event.data.substr(0, 2) === '0{') {
