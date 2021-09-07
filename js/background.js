@@ -115,7 +115,6 @@ let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
 let ignoreRaceTime = false;
-let printRaceTime = '';
 
 let timer;
 let timerIndex = 0;
@@ -125,35 +124,16 @@ const oddsMaximum = 260;
 
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimesDefault = 84;
-let maxWaitTimes = maxWaitTimesDefault;
+let maxWaitTimes = 84;
 
 let isDemoOnly = false;
 
 let matchLogs = [];
 
-const pending = 'Pending';
-const completed = 'Completed';
-
-let shiftOneStatus = pending;
-let shiftTwoStatus = pending;
-let shiftThreeStatus = pending;
-let shiftFourStatus = pending;
-let shiftFiveStatus = pending;
-
-let presentShift = '';
-
 let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
 
-let raceSchedules = [
-    [],                                 // 0
-    ['09:00:00 AM', '12:59:59 PM'],     // 1
-    ['01:00:00 PM', '04:59:59 PM'],     // 2
-    ['05:00:00 PM', '08:59:59 PM'],     // 3
-    [['09:00:00 PM', '11:59:59 PM'], ['12:00:00 AM', '12:59:59 AM']],   // 4
-    ['01:00:00 AM', '07:30:00 AM']      // 5
-];
+let nextRaceTimeStarts = 0;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -191,7 +171,7 @@ const websocketConnect = (crfToken) => {
                 }
             }
         ];
-        websocket.send(`42${JSON.stringify(subscriptionBody)}`);
+        websocket.send(`42${ JSON.stringify(subscriptionBody) }`);
     };
 
     websocket.onmessage = async function (event) {
@@ -227,30 +207,8 @@ const websocketConnect = (crfToken) => {
 
         let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime(raceSchedules[1][0], raceSchedules[1][1]) && shiftOneStatus === pending) {
-            maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift('five');
-            toggledVariablesWhenCommencedShift('one');
-
-        } else if (isWithinAllottedRacetime(raceSchedules[2][0], raceSchedules[2][1]) && shiftTwoStatus === pending) {
-            maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift('one');
-            toggledVariablesWhenCommencedShift('two');
-
-        } else if (isWithinAllottedRacetime(raceSchedules[3][0], raceSchedules[3][1]) && shiftThreeStatus === pending) {
-            maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift('two');
-            toggledVariablesWhenCommencedShift('three');
-
-        } else if ((isWithinAllottedRacetime(raceSchedules[4][0][0], raceSchedules[4][0][1]) || isWithinAllottedRacetime(raceSchedules[4][1][0], raceSchedules[4][1][1])) && shiftFourStatus === pending) {
-            maxWaitTimes = maxWaitTimesDefault;
-            setCompletedPreviousShift('three');
-            toggledVariablesWhenCommencedShift('four');
-
-        } else if (isWithinAllottedRacetime(raceSchedules[5][0], raceSchedules[5][1]) && shiftFiveStatus === pending) {
-            maxWaitTimes = 62;
-            setCompletedPreviousShift('four');
-            toggledVariablesWhenCommencedShift('five');
+        if (isWithinAllottedRacetime()) {
+            toggledVariablesWhenCommencedShift();
         }
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
@@ -272,10 +230,10 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapse: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapse: ${ totalTimelapse } )`, 'font-weight: bold; color: yellow');
 
                 printLine();
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -284,31 +242,11 @@ const websocketConnect = (crfToken) => {
 
                 stopTimer();
 
-                switch (presentShift) {
-                    case 'one':
-                        shiftOneStatus = completed;
-                        shiftFiveStatus = pending;
-                        break;
-                    case 'two':
-                        shiftTwoStatus = completed;
-                        break;
-                    case 'three':
-                        shiftThreeStatus = completed;
-                        break;
-                    case 'four':
-                        shiftFourStatus = completed;
-                        break;
-                    case 'five':
-                        shiftFiveStatus = completed;
+                // Next match at the next hour
+                nextRaceTimeStarts = new Date(new Date().getTime() + (60 * 60 * 1000));
 
-                        // reset all
-                        shiftOneStatus = pending;
-                        shiftTwoStatus = pending;
-                        shiftThreeStatus = pending;
-                        shiftFourStatus = pending;
-
-                        break;
-                }
+                printLine();
+                console.log(`%cNext race time slated on ${ nextRaceTimeStarts.toLocaleString() }`, 'font-weight: bold; color: #FF00FF');
             }
 
             return;
@@ -319,9 +257,7 @@ const websocketConnect = (crfToken) => {
         if (presentLevel > betLevel.length - 1) {
             printLine();
 
-            console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
-            console.log('%cxxxxxxxxxxxxxxxxxxxxxxxx', 'font-weight: bold; color: #f00; font-size: 19px;');
 
             clearInterval(pinger);
             websocket.close();
@@ -329,12 +265,6 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        if (fightEvent === 'App\\Events\\ArenaUpdate') {
-            const fightData = data[2].data;
-            const event = fightData.event;
-
-            return;
-        }
         if (fightEvent === 'App\\Events\\FightUpdate') {
             const fightData = data[2].data;
             const fightStatus = fightData.status;
@@ -348,7 +278,7 @@ const websocketConnect = (crfToken) => {
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
-                console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -360,11 +290,11 @@ const websocketConnect = (crfToken) => {
             isShuffleBetSideHasPicked = false;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too low: ${ finalBetside } => ${ matchOdds } ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
-                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too high: ${ finalBetside } => ${ matchOdds } ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
 
@@ -382,7 +312,6 @@ const websocketConnect = (crfToken) => {
                 isWinner = winner === finalBetside;
 
                 const isDraw = winner === 'draw';
-                let isBetFromProfitUsedAlready = false;
 
                 if (isBetSubmitted === true) {
                     chrome.storage.local.set({ matchIndex });
@@ -401,10 +330,10 @@ const websocketConnect = (crfToken) => {
                     } else {
                         if (isWinner) {
                             winCount += 1;
-                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
+                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${ winner } wins`);
                         } else {
                             lossCount += 1;
-                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
+                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${ winner } wins`);
                         }
 
                         chrome.storage.local.set({ winCount });
@@ -412,7 +341,7 @@ const websocketConnect = (crfToken) => {
                     }
                 } else {
                     if (isBelowMinimumOdds === true || isAboveMaximumOdds === true) {
-                        console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                        console.log(`%c${ winner === 'draw' ? 'It\'s a draw!' : `${ winner } wins` }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
@@ -449,7 +378,7 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
 
-                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
                     } else {
                         lossStreak += 1;
 
@@ -472,7 +401,6 @@ const websocketConnect = (crfToken) => {
                             presentLevel -= 1;
                         } else if (isBetFromTakenProfit === true) {
                             // presentLevel -= 1;
-                            isBetFromProfitUsedAlready = true;
                         }
                     }
 
@@ -481,8 +409,6 @@ const websocketConnect = (crfToken) => {
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
-
-                    isBetFromProfitUsedAlready = false;
 
                     chrome.storage.local.set({ presentLevel });
                 }
@@ -568,8 +494,8 @@ const websocketConnect = (crfToken) => {
                 //             chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
                 //             await chromeSendMessage(chrome.tabs);
                 //         } else {
-                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                            await chromeSendMessage(chrome.tabs);
+                chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                await chromeSendMessage(chrome.tabs);
                 //         }
                 //     }
                 // );
@@ -606,17 +532,16 @@ const websocketConnect = (crfToken) => {
             //     livesRemaining += 1;
             // }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(A)' : ''}${isBetFromTakenProfit ? '(P)' : ''}${addOnCapital > 0 ? '(O)' : ''} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`,
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isBetFromTakenProfit ? '(P)' : '' }${ addOnCapital > 0 ? '(O)' : '' } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
                 'font-weight: bold; color: pink');
 
             isBetSubmitted = true;
         }
 
-        function toggledVariablesWhenCommencedShift(value) {
+        function toggledVariablesWhenCommencedShift() {
             isWithinAllottedRaceTime = true;
             isQuotaReachedPrinted = false;
-            presentShift = value;
-            printCommencedShift(presentShift);
+            printCommencedShift();
 
             if (isPrintedNowCommencingScheduled === true) {
                 return;
@@ -637,7 +562,7 @@ const websocketConnect = (crfToken) => {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
                     const localTime = new Date().toLocaleTimeString();
-                    console.log(`%c- Terminated on ${localTime} -`, 'font-weight: bold; color: red; font-size: 12px;');
+                    console.log(`%c- Terminated on ${ localTime } -`, 'font-weight: bold; color: red; font-size: 12px;');
 
                     websocket.close();
                     websocket = undefined;
@@ -836,12 +761,12 @@ function printProfit() {
 
     printLine();
 
-    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
-    console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin: ${ wonMatches } | Loss: ${ lossMatches } | Total Matches: ${ totalMatches.length }`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin Streak: ${ highestWinStreak } | Loss Streak: ${ highestLossStreak }`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()} | Today's Average Profit: Php ${parseInt(todaysAverageProfit).toLocaleString()} ${`(${todaysAverageProfitPercentage}%)`}`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${ todaysTotalNetProfit.toLocaleString() } | Today's Average Profit: Php ${ parseInt(todaysAverageProfit).toLocaleString() } ${ `(${ todaysAverageProfitPercentage }%)` }`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+    console.log(`%cTotal Profit: Php ${ grossProfit.toLocaleString() }`, 'font-weight: bold; color: yellow');
 }
 
 function shuffleBetSide() {
@@ -883,32 +808,28 @@ function printLine() {
     console.log('%c-', 'color: black;');
 }
 
-function printCommencedShift(presentShift) {
+function printCommencedShift() {
     if (isPrintedNowCommencingScheduled === true) {
         return;
     }
 
     printLine();
 
-    console.log(`%c- ----------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
-    console.log(`%c- Now commencing scheduled shift number ${presentShift}. Good luck! -`, 'font-weight: bold; color: #ff9400;');
-    console.log(`%c- ----------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
 
     isPrintedNowCommencingScheduled = true;
 
     startTimelapse = window.performance.now();
 }
 
-function isWithinAllottedRacetime(startTime, endTime) {
-    const now = new Date();
-    const result = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + " " + startTime).getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + " " + endTime).getTime());
-
-    if (result === false) {
-        printRaceTime = startTime;
+function isWithinAllottedRacetime() {
+    if (nextRaceTimeStarts === 0) {
+        return true;
+    } else {
+        return new Date(new Date().getTime()) > nextRaceTimeStarts
     }
-
-    return result;
 }
 
 function calculateProfit() {
@@ -982,66 +903,6 @@ function flushPreviousVariance() {
     isBetOnHigherRoi = true;
 }
 
-function setCompletedPreviousShift(shiftFrom) {
-    switch (shiftFrom) {
-        case 'one':
-            if (shiftOneStatus === completed) {
-                return;
-            }
-            isPrintedNowCommencingScheduled = false;
-            shiftOneStatus = completed;
-            break;
-        case 'two':
-            if (shiftTwoStatus === completed) {
-                return;
-            }
-            isPrintedNowCommencingScheduled = false;
-            shiftTwoStatus = completed;
-            break;
-        case 'three':
-            if (shiftThreeStatus === completed) {
-                return;
-            }
-            isPrintedNowCommencingScheduled = false;
-            shiftThreeStatus = completed;
-            break;
-        case 'four':
-            if (shiftFourStatus === completed) {
-                return;
-            }
-            isPrintedNowCommencingScheduled = false;
-            shiftFourStatus = completed;
-            break;
-        case 'five':
-            if (shiftFiveStatus === completed) {
-                return;
-            }
-            isPrintedNowCommencingScheduled = false;
-            shiftFiveStatus = completed;
-            break;
-    }
-
-    if (isPrintedNowCommencingScheduled === true) {
-        return;
-    }
-
-    printLine();
-
-    const { todaysTotalNetProfit } = calculateProfit();
-
-    if (todaysTotalNetProfit > 0) {
-        console.log(`%c- Quota not reached: Php ${todaysTotalNetProfit} -`, 'font-weight: bold; color: #FF00F3;');
-
-        // Carry over today's profit:
-        matchLogs[0].sum = matchLogs[0].sum + todaysTotalNetProfit;
-
-        flushPreviousVariance();
-        stopTimer();
-
-        console.log(`%c- Continuing to next shift... -`, 'font-weight: bold; color: #FF00F3;');
-    }
-}
-
 function millisecondsConverter(millis) {
     const ms = millis % 1000;
     millis = (millis - ms) / 1000;
@@ -1056,7 +917,7 @@ function millisecondsConverter(millis) {
         return mins + ' minutes';
     }
 
-    return hrs + ` hour${hrs > 1 ? 's' : ''} and ` + mins + ' minutes';
+    return hrs + ` hour${ hrs > 1 ? 's' : '' } and ` + mins + ' minutes';
 }
 
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
@@ -1099,7 +960,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
     }
 });
 chrome.extension.onConnect.addListener(function (port) {
-    port.onMessage.addListener(function (message) {
+    port.onMessage.addListener(function () {
         if (port.name === 'getCrfToken') {
             chrome.tabs.sendMessage(tab.id, { text: "getCrfTokenRequest" },
                 function (crfToken) {
