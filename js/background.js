@@ -490,13 +490,10 @@ const websocketConnect = (crfToken) => {
                     async function (remainingPoints) {
                         if (remainingPoints < betAmountPlaced) {
                             betAmountPlaced = remainingPoints.toFixed(0);
-
-                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                            await chromeSendMessage(chrome.tabs);
-                        } else {
-                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                            await chromeSendMessage(chrome.tabs);
                         }
+
+                        chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                        await chromeSendMessage(chrome.tabs);
                     }
                 );
             } else {
