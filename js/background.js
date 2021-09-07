@@ -243,7 +243,7 @@ const websocketConnect = (crfToken) => {
                 stopTimer();
 
                 // Next match at the next hour
-                nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + 45));
+                nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
 
                 printLine();
                 console.log(`%cNext race time slated on ${ nextRaceTimeStarts.toLocaleString() }`, 'font-weight: bold; color: #FF00FF');
@@ -719,6 +719,21 @@ function shuffleBetSide() {
     }
 
     return shuffledTrueFalseBuckets[indexPicked];
+}
+
+function randomInt() {
+    let index = 0;
+    let indexPicked = 0;
+
+    while (index < 3) {
+        indexPicked = Math.floor(Math.random() * 60);
+
+        if (indexPicked >= 25 && indexPicked <= 60) {
+            index++;
+        }
+    }
+
+    return indexPicked;
 }
 
 function printLine() {
