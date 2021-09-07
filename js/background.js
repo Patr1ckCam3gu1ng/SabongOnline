@@ -18,15 +18,15 @@ let dailyProfitQuotaLimitExtension = 0;
 //     17877      // 7
 // ];
 
-let dailyProfitQuotaLimit = 3000;
+let dailyProfitQuotaLimit = 1400;
 let betLevel = [
     710,        // 1
     710,        // 2
     900,        // 3
     1900,       // 4
     4011,       // 5
-    8468,       // 6
-    17877,      // 7
+    // 8468,       // 6
+    // 17877,      // 7
 ];
 
 // let dailyProfitQuotaLimit = 3000;
@@ -486,19 +486,19 @@ const websocketConnect = (crfToken) => {
             betAmountPlaced = parseInt(bet);
 
             if (presentLevel === betLevel.length - 1) {
-                // chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
-                //     async function (remainingPoints) {
-                //         if (remainingPoints < betAmountPlaced) {
-                //             betAmountPlaced = remainingPoints.toFixed(0);
-                //
-                //             chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                //             await chromeSendMessage(chrome.tabs);
-                //         } else {
-                chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                await chromeSendMessage(chrome.tabs);
-                //         }
-                //     }
-                // );
+                chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
+                    async function (remainingPoints) {
+                        if (remainingPoints < betAmountPlaced) {
+                            betAmountPlaced = remainingPoints.toFixed(0);
+
+                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                            await chromeSendMessage(chrome.tabs);
+                        } else {
+                            chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
+                            await chromeSendMessage(chrome.tabs);
+                        }
+                    }
+                );
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
                 await chromeSendMessage(chrome.tabs);
@@ -517,25 +517,22 @@ const websocketConnect = (crfToken) => {
                 chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
             }
 
-            const { grossProfit } = calculateProfit();
-            const hasProfitForBetting = (grossProfit - (isBettingWithAccumulatedAmount ? betLevel[0] : 0)) > betLevel[0];
-
             let livesRemaining = betLevel.length - presentLevel
 
             if (isBettingWithAccumulatedAmount === true) {
                 livesRemaining += 1;
             }
-            if (presentLevel < 2 && hasProfitForBetting === true) {
-                // livesRemaining += 1;
-            }
-            // if (presentLevel === 2 && isBetFromTakenProfit === true) {
-            //     livesRemaining += 1;
-            // }
 
             console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isBetFromTakenProfit ? '(P)' : '' }${ addOnCapital > 0 ? '(O)' : '' } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
                 'font-weight: bold; color: pink');
 
-            isBetSubmitted = true;
+            await new Promise(resolve => setTimeout(resolve, 700));
+
+            chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
+                async function (submittedBetValue) {
+                    isBetSubmitted = submittedBetValue > 0;
+                }
+            );
         }
 
         function toggledVariablesWhenCommencedShift() {

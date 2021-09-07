@@ -27,6 +27,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.text === "remainingPoints") {
         sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
     }
+    if (msg.text === "submittedBetValue") {
+        const betSide = msg.betSide === 'meron' ? 0 : 1;
+        sendResponse(parseInt(document.getElementsByClassName("my-bets")[betSide].innerText.replace(',', '')));
+    }
 
     function inputBet() {
         document.getElementsByClassName("betAmount")[0].focus();
