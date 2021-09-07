@@ -243,7 +243,7 @@ const websocketConnect = (crfToken) => {
                 stopTimer();
 
                 // Next match at the next hour
-                nextRaceTimeStarts = new Date(new Date().getTime() + (60 * 60 * 1000));
+                nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + 45));
 
                 printLine();
                 console.log(`%cNext race time slated on ${ nextRaceTimeStarts.toLocaleString() }`, 'font-weight: bold; color: #FF00FF');
