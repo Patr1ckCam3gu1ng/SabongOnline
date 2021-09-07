@@ -720,13 +720,15 @@ function shuffleBetSide() {
 }
 
 function randomInt() {
+    const maxMinutes = 50;
+
     let index = 0;
     let indexPicked = 0;
 
     while (index < 3) {
-        indexPicked = Math.floor(Math.random() * 60);
+        indexPicked = Math.floor(Math.random() * maxMinutes);
 
-        if (indexPicked >= 25 && indexPicked <= 60) {
+        if (indexPicked >= 25 && indexPicked <= maxMinutes) {
             index++;
         }
     }
