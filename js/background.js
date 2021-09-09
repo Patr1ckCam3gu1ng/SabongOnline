@@ -312,8 +312,6 @@ const websocketConnect = (crfToken) => {
                 const isDraw = winner === 'draw';
 
                 if (isBetSubmitted === true) {
-                    chrome.storage.local.set({ matchIndex });
-
                     if (isDraw) {
                         paymentSafe(isDraw);
                         reverseBet();
@@ -322,8 +320,6 @@ const websocketConnect = (crfToken) => {
                         isAboveMaximumOdds = false;
 
                         drawCount += 1;
-
-                        chrome.storage.local.set({ drawCount });
                         return;
                     } else {
                         if (isWinner) {
@@ -333,9 +329,6 @@ const websocketConnect = (crfToken) => {
                             lossCount += 1;
                             console.log('%cYou lose!', 'font-weight: bold; color: red', `${ winner } wins`);
                         }
-
-                        chrome.storage.local.set({ winCount });
-                        chrome.storage.local.set({ lossCount });
                     }
                 } else {
                     if (isBelowMinimumOdds === true || isAboveMaximumOdds === true) {
@@ -362,16 +355,11 @@ const websocketConnect = (crfToken) => {
                         lossStreak = 0;
                         isShuffleBetSide = false;
 
-                        chrome.storage.local.set({ isShuffleBetSide });
-
                         setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
 
                         if (winStreak > highestWinStreak) {
                             highestWinStreak = winStreak;
-                            chrome.storage.local.set({ highestWinStreak });
                         }
-                        chrome.storage.local.set({ winStreak });
-                        chrome.storage.local.set({ lossStreak });
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
@@ -387,11 +375,8 @@ const websocketConnect = (crfToken) => {
                         if (lossStreak > highestLossStreak) {
                             if (isBettingWithAccumulatedAmount === false && isBetFromTakenProfit === false) {
                                 highestLossStreak = lossStreak;
-                                chrome.storage.local.set({ highestLossStreak });
                             }
                         }
-                        chrome.storage.local.set({ winStreak });
-                        chrome.storage.local.set({ lossStreak });
 
                         presentLevel += 1;
 
@@ -407,8 +392,6 @@ const websocketConnect = (crfToken) => {
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
-
-                    chrome.storage.local.set({ presentLevel });
                 }
 
                 isBetSubmitted = false;
@@ -579,7 +562,6 @@ const websocketConnect = (crfToken) => {
 
 function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
     matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced, odds });
-    chrome.storage.local.set({ matchLogs });
 }
 
 function startTimer() {
@@ -592,10 +574,6 @@ function resetIndexCounter() {
     lossCount = 0;
     winCount = 0;
     drawCount = 0;
-
-    chrome.storage.local.set({ lossCount });
-    chrome.storage.local.set({ winCount });
-    chrome.storage.local.set({ drawCount });
 }
 
 function stopTimer() {
@@ -650,9 +628,6 @@ function setFinalBet(fightData) {
             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
             ? meron : wala;
     }
-
-    chrome.storage.local.set({ finalBetside });
-    chrome.storage.local.set({ isBetOnHigherRoi });
 }
 
 function reverseBet() {
