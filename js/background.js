@@ -6,28 +6,26 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let dailyProfitQuotaLimitExtension = 0;
-// let dailyProfitQuotaLimit = 1800;
-// let betLevel = [
-//     312,        // 1
-//     312,        // 2
-//     900,        // 3
-//     1900,       // 4
-//     4011,       // 5
-//     8468,       // 6
-//     17877      // 7
-// ];
-
-let dailyProfitQuotaLimit = 1400;
+let dailyProfitQuotaLimit = 250;
 let betLevel = [
-    710,        // 1
-    710,        // 2
-    900,        // 3
-    1900,       // 4
-    4011,       // 5
+    100,        // 1
+    100,        // 2
+    240,        // 3
+    540,        // 4
+    1220,       // 5
+    2738        // 6
+];
+
+// let dailyProfitQuotaLimit = 1400;
+// let betLevel = [
+    // 710,        // 1
+    // 710,        // 2
+    // 900,        // 3
+    // 1900,       // 4
+    // 4011,       // 5
     // 8468,       // 6
     // 17877,      // 7
-];
+// ];
 
 // let dailyProfitQuotaLimit = 3000;
 // let betLevel = [
@@ -435,9 +433,9 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-                isShuffleBetSide = true;
-            }
+            // if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+            //     isShuffleBetSide = true;
+            // }
 
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
@@ -603,31 +601,33 @@ function setFinalBet(fightData) {
         return;
     }
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-        reverseBet();
+        if (matchIndex % 2 === 0) {
+            reverseBet();
+        }
     }
     if (finalBetside === '') {
         isBetOnHigherRoi = false;
     }
-    if (isShuffleBetSide === true) {
-        const shuffleBetSideResult = shuffleBetSide();
-
-        finalBetside = (shuffleBetSideResult
-            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-            ? meron : wala;
-
-        if (finalBetside === meron) {
-            isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
-        }
-        if (finalBetside === wala) {
-            isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-        }
-
-        isShuffleBetSideHasPicked = true;
-    } else {
+    // if (isShuffleBetSide === true) {
+    //     const shuffleBetSideResult = shuffleBetSide();
+    //
+    //     finalBetside = (shuffleBetSideResult
+    //         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+    //         ? meron : wala;
+    //
+    //     if (finalBetside === meron) {
+    //         isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
+    //     }
+    //     if (finalBetside === wala) {
+    //         isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
+    //     }
+    //
+    //     isShuffleBetSideHasPicked = true;
+    // } else {
         finalBetside = (isBetOnHigherRoi
             ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
             ? meron : wala;
-    }
+    // }
 }
 
 function reverseBet() {
@@ -698,15 +698,15 @@ function shuffleBetSide() {
 }
 
 function randomInt() {
-    const maxMinutes = 50;
+    const maxMinutes = 40;
 
     let index = 0;
     let indexPicked = 0;
 
-    while (index < 3) {
+    while (index < 7) {
         indexPicked = Math.floor(Math.random() * maxMinutes);
 
-        if (indexPicked >= 25 && indexPicked <= maxMinutes) {
+        if (indexPicked >= 15 && indexPicked <= maxMinutes) {
             index++;
         }
     }
@@ -785,7 +785,7 @@ function calculateTodaysProfit() {
 function isDailyQuotaReached() {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    return totalNetProfit >= (dailyProfitQuotaLimit + dailyProfitQuotaLimitExtension);
+    return totalNetProfit >= dailyProfitQuotaLimit;
 }
 
 function flushPreviousVariance() {
@@ -806,7 +806,6 @@ function flushPreviousVariance() {
     winStreak = 0;
     isBettingWithAccumulatedAmount = false;
     matchIndex = 1;
-    dailyProfitQuotaLimitExtension = 0;
     isPendingPrintProfit = false;
 
     // will be reverse once it re-commence:
