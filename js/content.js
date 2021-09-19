@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.text === "getCrfTokenRequest") {
         sendResponse(document.getElementsByName("csrf-token")[0].content);
         return;
@@ -24,6 +24,16 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
             $confirm[0].click();
         }
     }
+    if (msg.text === "remainingPoints") {
+        sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
+    }
+    if (msg.text === "submittedBetValue") {
+        const betSide = msg.betSide === 'meron' ? 0 : 1;
+        try {
+            sendResponse(parseInt(document.getElementsByClassName("my-bets")[betSide].innerText.replace(',', '')));
+        } catch (e) {
+        }
+    }
 
     function inputBet() {
         document.getElementsByClassName("betAmount")[0].focus();
@@ -33,6 +43,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         document.execCommand('delete', false);
         document.execCommand('delete', false);
         document.execCommand('delete', false);
-        document.execCommand('insertText', false, msg.bet);
+        document.execCommand('insertText', false, msg.betAmountPlaced);
     }
 });
