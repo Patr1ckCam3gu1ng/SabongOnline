@@ -492,10 +492,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            if (isDemoOnly === false) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
-            }
+            await new Promise(resolve => setTimeout(resolve, 500));
+            chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -508,13 +506,14 @@ const websocketConnect = (crfToken) => {
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
-            try {
+            if (isDemoOnly === true) {
+                isBetSubmitted = true;
+            } else {
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
                         isBetSubmitted = submittedBetValue > 0;
                     }
                 );
-            } catch (e) {
             }
         }
 
