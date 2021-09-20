@@ -257,7 +257,6 @@ const websocketConnect = (crfToken) => {
                 if (isBetSubmitted === true) {
                     if (isDraw) {
                         paymentSafe(isDraw);
-                        reverseBet();
                         isBetSubmitted = false;
                         isBelowMinimumOdds = false;
                         isAboveMaximumOdds = false;

@@ -6,8 +6,6 @@
     "activeTab",
     "storage",
     "tabs",
-    "webRequest",
-    "webRequestBlocking",
     "ws://*/*",
     "wss://*/*"
   ],
