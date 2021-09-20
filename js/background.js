@@ -439,8 +439,9 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isExtendedBet ? '(E)' : `${ addOnCapital > 0 ? '(O)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`,
-                'font-weight: bold; color: pink');
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => 
+            ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isExtendedBet ? '(E)' : `${ addOnCapital > 0 ? '(O)' : '' }` } pesos => 
+            %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -598,7 +599,7 @@ function printProfit() {
     console.log(`%cWin: ${ wonMatches } | Loss: ${ lossMatches } | Total Matches: ${ totalMatches.length }`, 'font-weight: bold; color: yellow');
     console.log(`%cWin Streak: ${ highestWinStreak } | Loss Streak: ${ highestLossStreak }`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${ todaysTotalNetProfit.toLocaleString() } | Today's Average Profit: Php ${ parseInt(todaysAverageProfit).toLocaleString() } ${ `(${ todaysAverageProfitPercentage }%)` }`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${ todaysTotalNetProfit.toLocaleString() }`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${ grossProfit.toLocaleString() }`, 'font-weight: bold; color: yellow');
 }
