@@ -6,7 +6,6 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let dailyProfitQuotaLimit = 999999;
 let betLevel = [
     135,
     135,
@@ -18,6 +17,8 @@ let betLevel = [
     21781,
     50822
 ];
+
+let dailyProfitQuotaLimit = betLevel[0] * 8;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -59,7 +60,7 @@ const oddsMinimum = 170
 const oddsMaximum = 260;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 84;
+let maxWaitTimes = 72;
 
 let isDemoOnly = false;
 
@@ -617,7 +618,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    const maxLoop = 3;
+    const maxLoop = 2;
 
     let shuffledTrueFalse = [true, false];
     let shuffledTrueFalseBuckets = [];
@@ -648,15 +649,14 @@ function shuffleBetSide() {
 }
 
 function randomInt() {
-    const maxMinutes = 40;
-
+    const minMinutes = 10;
+    const maxMinutes = 25;
     let index = 0;
     let indexPicked = 0;
 
-    while (index < 7) {
+    while (index < 3) {
         indexPicked = Math.floor(Math.random() * maxMinutes);
-
-        if (indexPicked >= 15 && indexPicked <= maxMinutes) {
+        if (indexPicked >= minMinutes && indexPicked <= maxMinutes) {
             index++;
         }
     }
@@ -688,7 +688,12 @@ function isWithinAllottedRacetime() {
     if (nextRaceTimeStarts === 0) {
         return true;
     } else {
-        return new Date(new Date().getTime()) > nextRaceTimeStarts
+        const now = new Date();
+
+        const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
+            new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:00:00 PM').getTime());
+
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
     }
 }
 
