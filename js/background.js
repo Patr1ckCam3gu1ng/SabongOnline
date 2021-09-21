@@ -685,13 +685,14 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
+    const now = new Date();
     const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:00:00 PM').getTime());
 
     if (nextRaceTimeStarts === 0) {
         return true && dailyTimeShifts;
     } else {
-        const now = new Date();
+
         return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
     }
 }
