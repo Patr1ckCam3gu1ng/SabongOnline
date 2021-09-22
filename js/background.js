@@ -62,7 +62,7 @@ const oddsMaximum = 260;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 72;
 
-let isDemoOnly = false;
+let isDemoOnly = true;
 
 let matchLogs = [{
     betAmountPlaced: 0,
