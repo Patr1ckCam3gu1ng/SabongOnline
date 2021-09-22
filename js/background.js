@@ -309,6 +309,8 @@ const websocketConnect = (crfToken) => {
                         presentLevel = 0;
 
                         console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
+
+                        reverseBetIfNeeded();
                     } else {
                         lossStreak += 1;
 
@@ -328,7 +330,7 @@ const websocketConnect = (crfToken) => {
                             presentLevel -= 1;
                         }
 
-                        reverseBetIfNeeded();
+                        totalLossCountByFar += 1;
                     }
 
                     if (isBettingWithAccumulatedAmount === true) {
@@ -415,7 +417,7 @@ const websocketConnect = (crfToken) => {
                 chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
                     async function (remainingPoints) {
                         if (remainingPoints < betAmountPlaced) {
-                            betAmountPlaced = remainingPoints.toFixed(0);
+                            betAmountPlaced = parseInt(remainingPoints.toFixed(0))
                         }
 
                         chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
@@ -591,9 +593,7 @@ function printProfit() {
         grossProfit,
         wonMatches,
         lossMatches,
-        todaysTotalNetProfit,
-        todaysAverageProfit,
-        todaysAverageProfitPercentage
+        todaysTotalNetProfit
     } = calculateProfit();
     const totalMatches = [...matchLogs].slice(1);
 
@@ -689,13 +689,12 @@ function printCommencedShift() {
 function isWithinAllottedRacetime() {
     const now = new Date();
     const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:00:00 PM').getTime());
+        new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (nextRaceTimeStarts === 0) {
         return true && dailyTimeShifts;
     } else {
-
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts && isWinner === true;
     }
 }
 
@@ -705,9 +704,7 @@ function calculateProfit() {
 
     const grossProfit = parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
     const {
-        totalNetProfit: todaysTotalNetProfit,
-        averageProfit: todaysAverageProfit,
-        averageProfitPercentage: todaysAverageProfitPercentage
+        totalNetProfit: todaysTotalNetProfit
     } = calculateTodaysProfit();
 
     return {
@@ -716,9 +713,7 @@ function calculateProfit() {
         //
         grossProfit: grossProfit,
         //
-        todaysTotalNetProfit,
-        todaysAverageProfit,
-        todaysAverageProfitPercentage
+        todaysTotalNetProfit
     }
 }
 
@@ -834,8 +829,6 @@ function extendBetAmount(bet) {
 }
 
 function reverseBetIfNeeded() {
-    totalLossCountByFar += 1;
-
     // Reverse bet if needed
     if (totalLossCountByFar >= 4) {
         reverseBet();
