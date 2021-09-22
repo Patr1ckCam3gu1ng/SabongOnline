@@ -33,6 +33,7 @@ let isMatchWin = false;
 let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
 let isExtendedBet = false;
+let totalLossCountByFar = 0;
 
 let matchIndex = 1;
 let winCount = 0;
@@ -326,6 +327,8 @@ const websocketConnect = (crfToken) => {
                         if (isBettingWithAccumulatedAmount === true) {
                             presentLevel -= 1;
                         }
+
+                        reverseBetIfNeeded();
                     }
 
                     if (isBettingWithAccumulatedAmount === true) {
@@ -408,7 +411,7 @@ const websocketConnect = (crfToken) => {
 
             betAmountPlaced = parseInt(bet);
 
-            if (presentLevel === betLevel.length - 1) {
+            if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
                 chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
                     async function (remainingPoints) {
                         if (remainingPoints < betAmountPlaced) {
@@ -617,7 +620,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    const maxLoop = 2;
+    const maxLoop = 4;
 
     let shuffledTrueFalse = [true, false];
     let shuffledTrueFalseBuckets = [];
@@ -649,7 +652,7 @@ function shuffleBetSide() {
 
 function randomInt() {
     const minMinutes = 10;
-    const maxMinutes = 25;
+    const maxMinutes = 20;
     let index = 0;
     let indexPicked = 0;
 
@@ -828,6 +831,19 @@ function extendBetAmount(bet) {
     }
 
     return bet;
+}
+
+function reverseBetIfNeeded() {
+    totalLossCountByFar += 1;
+
+    // Reverse bet if needed
+    if (totalLossCountByFar >= 4) {
+        reverseBet();
+        totalLossCountByFar = 0;
+
+        printLine();
+        console.log(`%c- Betside Reversed -`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+    }
 }
 
 async function chromeSendMessage(chromeTabs) {
