@@ -397,6 +397,7 @@ const websocketConnect = (crfToken) => {
 
             if (extendedBetAmount !== bet) {
                 isExtendedBet = true;
+                bet = extendedBetAmount;
             } else {
                 bet = updatedBet;
             }
