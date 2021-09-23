@@ -380,9 +380,9 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-                isShuffleBetSide = true;
-            }
+            // if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+            //     isShuffleBetSide = true;
+            // }
 
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
