@@ -310,8 +310,6 @@ const websocketConnect = (crfToken) => {
                         presentLevel = 0;
 
                         console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
-
-                        // reverseBetIfNeeded();
                     } else {
                         lossStreak += 1;
 
@@ -381,9 +379,9 @@ const websocketConnect = (crfToken) => {
                 }
             }
 
-            // if (lossStreak >= 3 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-            //     isShuffleBetSide = true;
-            // }
+            if (lossStreak >= 5 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+                isShuffleBetSide = true;
+            }
 
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
@@ -550,9 +548,7 @@ function setFinalBet(fightData) {
         return;
     }
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-        // if (matchIndex % 2 === 0) {
         reverseBet();
-        // }
     }
     if (finalBetside === '') {
         isBetOnHigherRoi = false;
@@ -622,7 +618,7 @@ function shuffleBetSide() {
         return array;
     }
 
-    const maxLoop = 4;
+    const maxLoop = 3;
 
     let shuffledTrueFalse = [true, false];
     let shuffledTrueFalseBuckets = [];
@@ -631,7 +627,7 @@ function shuffleBetSide() {
     while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
         shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
         shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
-        shuffledTrueFalseBuckets = [...shuffleArrays(shuffledTrueFalseBuckets)]
+        // shuffledTrueFalseBuckets = [...shuffleArrays(shuffledTrueFalseBuckets)]
         index++;
     }
 
@@ -653,8 +649,8 @@ function shuffleBetSide() {
 }
 
 function randomInt() {
-    const minMinutes = 10;
-    const maxMinutes = 20;
+    const minMinutes = 5;
+    const maxMinutes = 15;
     let index = 0;
     let indexPicked = 0;
 
@@ -696,7 +692,10 @@ function isWithinAllottedRacetime() {
     if (nextRaceTimeStarts === 0) {
         return dailyTimeShifts;
     } else {
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts && isWinner === true;
+        if (isWinner === false) {
+            return true;
+        }
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
     }
 }
 
@@ -829,17 +828,6 @@ function extendBetAmount(bet) {
 
     return bet;
 }
-
-// function reverseBetIfNeeded() {
-//     // Reverse bet if needed
-//     if (totalLossCountByFar >= 4) {
-//         reverseBet();
-//         totalLossCountByFar = 0;
-//
-//         printLine();
-//         console.log(`%c- Betside Reversed -`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-//     }
-// }
 
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
