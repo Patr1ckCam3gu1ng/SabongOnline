@@ -222,6 +222,7 @@ const websocketConnect = (crfToken) => {
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
                 console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                reverseBet();
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -310,7 +311,7 @@ const websocketConnect = (crfToken) => {
 
                         console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
 
-                        reverseBetIfNeeded();
+                        // reverseBetIfNeeded();
                     } else {
                         lossStreak += 1;
 
@@ -464,6 +465,7 @@ const websocketConnect = (crfToken) => {
         function toggledVariablesWhenCommencedShift() {
             isWithinAllottedRaceTime = true;
             isQuotaReachedPrinted = false;
+            nextRaceTimeStarts = 0;
             printCommencedShift();
 
             if (isPrintedNowCommencingScheduled === true) {
@@ -692,7 +694,7 @@ function isWithinAllottedRacetime() {
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (nextRaceTimeStarts === 0) {
-        return true && dailyTimeShifts;
+        return dailyTimeShifts;
     } else {
         return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts && isWinner === true;
     }
@@ -828,16 +830,16 @@ function extendBetAmount(bet) {
     return bet;
 }
 
-function reverseBetIfNeeded() {
-    // Reverse bet if needed
-    if (totalLossCountByFar >= 4) {
-        reverseBet();
-        totalLossCountByFar = 0;
-
-        printLine();
-        console.log(`%c- Betside Reversed -`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-    }
-}
+// function reverseBetIfNeeded() {
+//     // Reverse bet if needed
+//     if (totalLossCountByFar >= 4) {
+//         reverseBet();
+//         totalLossCountByFar = 0;
+//
+//         printLine();
+//         console.log(`%c- Betside Reversed -`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+//     }
+// }
 
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
