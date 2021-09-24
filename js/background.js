@@ -816,14 +816,7 @@ function extendBetAmount(bet) {
 
     if (presentLevel === 0 && isWinner === true && winStreak >= 2
         && matchLogs[matchLogs.length - 1].isExtendedBet === false && matchLogs[matchLogs.length - 2].isExtendedBet === false) {
-        const proposedDoubleBet = betLevel[presentLevel] * 3;
-        const proposedQuadBet = betLevel[presentLevel] * 4;
-
-        if (totalNetProfit > proposedQuadBet) {
-            return proposedQuadBet;
-        } else if (totalNetProfit > proposedDoubleBet) {
-            return proposedDoubleBet;
-        }
+        return betLevel[presentLevel] * 3;
     }
 
     return bet;
