@@ -52,6 +52,7 @@ let isAboveMaximumOdds = false;
 let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
+let isLastMatchDraw = false;
 let ignoreRaceTime = false;
 
 let timer;
@@ -233,7 +234,7 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true ) {
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${ finalBetside } => ${ matchOdds } ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
@@ -255,11 +256,11 @@ const websocketConnect = (crfToken) => {
 
                 isWinner = winner === finalBetside;
 
-                const isDraw = winner === 'draw';
+                isLastMatchDraw = winner === 'draw';
 
                 if (isBetSubmitted === true) {
-                    if (isDraw) {
-                        paymentSafe(isDraw);
+                    if (isLastMatchDraw) {
+                        paymentSafe(isLastMatchDraw);
                         isBetSubmitted = false;
                         isBelowMinimumOdds = false;
                         isAboveMaximumOdds = false;
@@ -814,16 +815,9 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
 function extendBetAmount(bet) {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    if (presentLevel === 0 && isWinner === true && winStreak >= 2
+    if (presentLevel === 0 && (isWinner === true && isLastMatchDraw === true) && winStreak >= 2
         && matchLogs[matchLogs.length - 1].isExtendedBet === false && matchLogs[matchLogs.length - 2].isExtendedBet === false) {
-        const proposedDoubleBet = betLevel[presentLevel] * 3;
-        const proposedQuadBet = betLevel[presentLevel] * 4;
-
-        if (totalNetProfit > proposedQuadBet) {
-            return proposedQuadBet;
-        } else if (totalNetProfit > proposedDoubleBet) {
-            return proposedDoubleBet;
-        }
+        return betLevel[presentLevel] * 3;
     }
 
     return bet;
