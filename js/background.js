@@ -815,7 +815,7 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
 function extendBetAmount(bet) {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    if (presentLevel === 0 && (isWinner === true && isLastMatchDraw === true) && winStreak >= 2
+    if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
         && matchLogs[matchLogs.length - 1].isExtendedBet === false && matchLogs[matchLogs.length - 2].isExtendedBet === false) {
         return betLevel[presentLevel] * 3;
     }
