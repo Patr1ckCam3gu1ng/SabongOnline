@@ -648,8 +648,8 @@ function shuffleBetSide() {
 }
 
 function randomInt() {
-    const minMinutes = 5;
-    const maxMinutes = 15;
+    const minMinutes = 8;
+    const maxMinutes = 16;
     let index = 0;
     let indexPicked = 0;
 
