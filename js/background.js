@@ -18,7 +18,7 @@ let betLevel = [
     50822
 ];
 
-let dailyProfitQuotaLimit = betLevel[0] * 8;
+let dailyProfitQuotaLimit = betLevel[0] * 16;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -62,7 +62,7 @@ const oddsMinimum = 170
 const oddsMaximum = 260;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 72;
+let maxWaitTimes = 70;
 
 let isDemoOnly = true;
 
