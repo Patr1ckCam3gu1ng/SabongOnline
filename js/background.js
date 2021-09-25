@@ -446,7 +446,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isExtendedBet ? '(E)' : `${ addOnCapital > 0 ? '(O)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(Ac)' : '' }${ isExtendedBet ? '(Ex)' : `${ addOnCapital > 0 ? '(Ad)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -816,7 +816,10 @@ function extendBetAmount(bet) {
     const { totalNetProfit } = calculateTodaysProfit();
 
     if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
-        && matchLogs[matchLogs.length - 1].isExtendedBet === false && matchLogs[matchLogs.length - 2].isExtendedBet === false) {
+        && matchLogs[matchLogs.length - 1].isExtendedBet === false
+        && matchLogs[matchLogs.length - 2].isExtendedBet === false
+        && matchLogs[matchLogs.length - 3].isWin === true) {
+
         return betLevel[presentLevel] * 3;
     }
 
