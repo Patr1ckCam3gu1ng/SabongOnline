@@ -117,7 +117,7 @@ const websocketConnect = (crfToken) => {
                 }
             }
         ];
-        websocket.send(`42${ JSON.stringify(subscriptionBody) }`);
+        websocket.send(`42${JSON.stringify(subscriptionBody)}`);
     };
 
     websocket.onmessage = async function (event) {
@@ -174,10 +174,10 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapse: ${ totalTimelapse } )`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapse: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
                 printLine();
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -190,7 +190,7 @@ const websocketConnect = (crfToken) => {
                 nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
 
                 printLine();
-                console.log(`%cNext race time slated on ${ nextRaceTimeStarts.toLocaleString() }`, 'font-weight: bold; color: #FF00FF');
+                console.log(`%cNext race time slated on ${nextRaceTimeStarts.toLocaleString()}`, 'font-weight: bold; color: #FF00FF');
             }
 
             return;
@@ -222,7 +222,7 @@ const websocketConnect = (crfToken) => {
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
-                console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 reverseBet();
             }
 
@@ -235,11 +235,11 @@ const websocketConnect = (crfToken) => {
             isShuffleBetSideHasPicked = false;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
-                console.log(`%cSkipping Match! Odds too low: ${ finalBetside } => ${ matchOdds } ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isAboveMaximumOdds === true) {
-                console.log(`%cSkipping Match! Odds too high: ${ finalBetside } => ${ matchOdds } ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
 
@@ -269,15 +269,15 @@ const websocketConnect = (crfToken) => {
                     } else {
                         if (isWinner) {
                             winCount += 1;
-                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${ winner } wins`);
+                            console.log('%cCongratulations!', 'font-weight: bold; color: green', `${winner} wins`);
                         } else {
                             lossCount += 1;
-                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${ winner } wins`);
+                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
                         }
                     }
                 } else {
                     if (isBelowMinimumOdds === true || isAboveMaximumOdds === true) {
-                        console.log(`%c${ winner === 'draw' ? 'It\'s a draw!' : `${ winner } wins` }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                        console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
@@ -309,7 +309,7 @@ const websocketConnect = (crfToken) => {
                         isMatchWin = isWinner;
                         presentLevel = 0;
 
-                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${ winningSum.toFixed(2) } => ${ ((odds * 100) - 100).toFixed(0) }%`);
+                        console.log('%cProfit:', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
                     } else {
                         lossStreak += 1;
 
@@ -396,15 +396,15 @@ const websocketConnect = (crfToken) => {
 
             let bet = betLevel[presentLevel];
 
-            const extendedBetAmount = extendBetAmount(bet);
+            // const extendedBetAmount = extendBetAmount(bet);
             const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
 
-            if (extendedBetAmount !== bet) {
-                isExtendedBet = true;
-                bet = extendedBetAmount;
-            } else {
-                bet = updatedBet;
-            }
+            // if (extendedBetAmount !== bet) {
+            //     isExtendedBet = true;
+            //     bet = extendedBetAmount;
+            // } else {
+            bet = updatedBet;
+            // }
 
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
@@ -445,7 +445,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(Ac)' : '' }${ isExtendedBet ? '(Ex)' : `${ addOnCapital > 0 ? '(Ad)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -485,7 +485,7 @@ const websocketConnect = (crfToken) => {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
                     const localTime = new Date().toLocaleTimeString();
-                    console.log(`%c- Terminated on ${ localTime } -`, 'font-weight: bold; color: red; font-size: 12px;');
+                    console.log(`%c- Terminated on ${localTime} -`, 'font-weight: bold; color: red; font-size: 12px;');
 
                     websocket.close();
                     websocket = undefined;
@@ -597,12 +597,12 @@ function printProfit() {
 
     printLine();
 
-    console.log(`%cWin: ${ wonMatches } | Loss: ${ lossMatches } | Total Matches: ${ totalMatches.length }`, 'font-weight: bold; color: yellow');
-    console.log(`%cWin Streak: ${ highestWinStreak } | Loss Streak: ${ highestLossStreak }`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
+    console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cToday's Profit: Php ${ todaysTotalNetProfit.toLocaleString() }`, 'font-weight: bold; color: yellow');
+    console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cTotal Profit: Php ${ grossProfit.toLocaleString() }`, 'font-weight: bold; color: yellow');
+    console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
 function shuffleBetSide() {
@@ -779,7 +779,7 @@ function millisecondsConverter(millis) {
         return mins + ' minutes';
     }
 
-    return hrs + ` hour${ hrs > 1 ? 's' : '' } and ` + mins + ' minutes';
+    return hrs + ` hour${hrs > 1 ? 's' : ''} and ` + mins + ' minutes';
 }
 
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
@@ -811,19 +811,17 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
     };
 }
 
-function extendBetAmount(bet) {
-    const { totalNetProfit } = calculateTodaysProfit();
-
-    if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
-        && matchLogs[matchLogs.length - 1].isExtendedBet === false
-        && matchLogs[matchLogs.length - 2].isExtendedBet === false
-        && matchLogs[matchLogs.length - 3].isWin === true) {
-
-        return betLevel[presentLevel] * 3;
-    }
-
-    return bet;
-}
+// function extendBetAmount(bet) {
+//     if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
+//         && matchLogs[matchLogs.length - 1].isExtendedBet === false
+//         && matchLogs[matchLogs.length - 2].isExtendedBet === false
+//         && matchLogs[matchLogs.length - 3].isWin === true) {
+//
+//         return betLevel[presentLevel] * 3;
+//     }
+//
+//     return bet;
+// }
 
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
