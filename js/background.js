@@ -245,7 +245,8 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
-                
+                printLine();
+
                 isBetSubmitted = false
                 return;
             }
