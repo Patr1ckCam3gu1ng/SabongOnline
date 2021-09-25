@@ -690,12 +690,12 @@ function isWithinAllottedRacetime() {
     const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
+    if (isWinner === false || finalBetside === '') {
+        return true;
+    }
     if (nextRaceTimeStarts === 0) {
         return dailyTimeShifts;
     } else {
-        if (isWinner === false) {
-            return true;
-        }
         return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
     }
 }
