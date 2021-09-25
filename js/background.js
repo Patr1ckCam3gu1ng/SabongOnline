@@ -52,6 +52,7 @@ let isAboveMaximumOdds = false;
 let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
+let isLastMatchDraw = false;
 let ignoreRaceTime = false;
 
 let timer;
@@ -233,7 +234,7 @@ const websocketConnect = (crfToken) => {
 
             isShuffleBetSideHasPicked = false;
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true ) {
+            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${ finalBetside } => ${ matchOdds } ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
             }
@@ -253,11 +254,11 @@ const websocketConnect = (crfToken) => {
 
                 isWinner = winner === finalBetside;
 
-                const isDraw = winner === 'draw';
+                isLastMatchDraw = winner === 'draw';
 
                 if (isBetSubmitted === true) {
-                    if (isDraw) {
-                        paymentSafe(isDraw);
+                    if (isLastMatchDraw) {
+                        paymentSafe(isLastMatchDraw);
                         isBetSubmitted = false;
                         isBelowMinimumOdds = false;
                         isAboveMaximumOdds = false;
@@ -443,7 +444,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(A)' : '' }${ isExtendedBet ? '(E)' : `${ addOnCapital > 0 ? '(O)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
+            console.log(`${ livesRemaining } ${ livesRemaining > 1 ? 'lives' : 'life' } remaining => ${ betAmountPlaced }${ isBettingWithAccumulatedAmount ? '(Ac)' : '' }${ isExtendedBet ? '(Ex)' : `${ addOnCapital > 0 ? '(Ad)' : '' }` } pesos => %c${ finalBetside }${ isShuffleBetSide ? ' (shuffled)' : '' } at ${ isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵` }`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -687,12 +688,12 @@ function isWithinAllottedRacetime() {
     const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
+    if (isWinner === false && matchLogs.length > 1) {
+        return true;
+    }
     if (nextRaceTimeStarts === 0) {
         return dailyTimeShifts;
     } else {
-        if (isWinner === false) {
-            return true;
-        }
         return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
     }
 }
@@ -812,16 +813,12 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
 function extendBetAmount(bet) {
     const { totalNetProfit } = calculateTodaysProfit();
 
-    if (presentLevel === 0 && isWinner === true && winStreak >= 2
-        && matchLogs[matchLogs.length - 1].isExtendedBet === false && matchLogs[matchLogs.length - 2].isExtendedBet === false) {
-        const proposedDoubleBet = betLevel[presentLevel] * 3;
-        const proposedQuadBet = betLevel[presentLevel] * 4;
+    if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
+        && matchLogs[matchLogs.length - 1].isExtendedBet === false
+        && matchLogs[matchLogs.length - 2].isExtendedBet === false
+        && matchLogs[matchLogs.length - 3].isWin === true) {
 
-        if (totalNetProfit > proposedQuadBet) {
-            return proposedQuadBet;
-        } else if (totalNetProfit > proposedDoubleBet) {
-            return proposedDoubleBet;
-        }
+        return betLevel[presentLevel] * 3;
     }
 
     return bet;
