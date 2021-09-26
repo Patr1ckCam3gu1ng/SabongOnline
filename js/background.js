@@ -18,7 +18,7 @@ let betLevel = [
     50822
 ];
 
-let dailyProfitQuotaLimit = betLevel[0] * 16;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.75) - betLevel[0]) * 15;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -650,7 +650,7 @@ function shuffleBetSide() {
 
 function randomInt() {
     const minMinutes = 8;
-    const maxMinutes = 16;
+    const maxMinutes = 12;
     let index = 0;
     let indexPicked = 0;
 
