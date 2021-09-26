@@ -18,7 +18,7 @@ let betLevel = [
     50822
 ];
 
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.75) - betLevel[0]) * 15;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 11;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -168,7 +168,7 @@ const websocketConnect = (crfToken) => {
         const fightEvent = data[0];
         const isBetting = data[1] === 'betting';
 
-        if (isDailyQuotaReached() === true) {
+        if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
             if (isQuotaReachedPrinted === false) {
                 printProfit();
                 printLine();
