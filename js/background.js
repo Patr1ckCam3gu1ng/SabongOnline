@@ -416,7 +416,7 @@ const websocketConnect = (crfToken) => {
             if (isBettingWithAccumulatedAmount === true) {
                 bet = betLevel[2];
                 presentLevel = 3;
-                lossStreak = 3;
+                lossStreak = 2;
             }
 
             betAmountPlaced = parseInt(bet);
