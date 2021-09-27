@@ -20,6 +20,8 @@ let betLevel = [
 
 // Daily Quota for 14 days / 6,500
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6;
+// 10449.000000000002
+const dailyProfitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 11;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -187,11 +189,25 @@ const websocketConnect = (crfToken) => {
 
                 stopTimer();
 
-                // Next match at the next hour
-                nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
+                const { grossProfit } = calculateProfit();
 
-                printLine();
-                console.log(`%cNext race time slated on ${nextRaceTimeStarts.toLocaleString()}`, 'font-weight: bold; color: #FF00FF');
+                if (grossProfit > dailyProfitStopLimit) {
+                    let todaysDate = new Date();
+                    todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
+                    todaysDate.setHours(8, 59, 0);
+
+                    nextRaceTimeStarts = todaysDate;
+
+                    printLine();
+                    console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
+                    console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
+                } else {
+                    // Next match at the next hour
+                    nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
+
+                    printLine();
+                    console.log(`%cNext race time slated on ${nextRaceTimeStarts.toLocaleString()}`, 'font-weight: bold; color: #FF00FF');
+                }
             }
 
             return;
