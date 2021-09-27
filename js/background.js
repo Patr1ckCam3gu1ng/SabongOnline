@@ -21,7 +21,7 @@ let betLevel = [
 // Daily Quota for 14 days / 6,500
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6;
 // 10449.000000000002
-const dailyProfitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 11;
+const dailyProfitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 9.5;
 
 const meron = 'meron';
 const wala = 'wala';
