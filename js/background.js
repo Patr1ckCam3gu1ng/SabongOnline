@@ -200,7 +200,11 @@ const websocketConnect = (crfToken) => {
 
                     printLine();
                     console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
+                    printLine();
+
+                    console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
+                    console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                 } else {
                     // Next match at the next hour
                     nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
