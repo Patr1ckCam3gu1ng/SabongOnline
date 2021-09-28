@@ -44,8 +44,6 @@ let lossCount = 0;
 let drawCount = 0;
 let lossStreak = 0;
 let winStreak = 0;
-let isShuffleBetSide = false;
-let isShuffleBetSideHasPicked = false;
 let highestLossStreak = 0;
 let highestWinStreak = 0;
 let betAmountPlaced = 0;
@@ -257,8 +255,6 @@ const websocketConnect = (crfToken) => {
                 timerIndex = 0;
             }
 
-            isShuffleBetSideHasPicked = false;
-
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && isBelowMinimumOdds === true) {
                 console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 return;
@@ -325,7 +321,6 @@ const websocketConnect = (crfToken) => {
                         }
 
                         lossStreak = 0;
-                        isShuffleBetSide = false;
 
                         setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
 
@@ -397,17 +392,13 @@ const websocketConnect = (crfToken) => {
                 printProfit();
             }
 
-            if ([0, 1].includes(matchIndex / 8 % 2) && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
+            if ([0, 1].includes(matchIndex / 8 % 2) && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                 printLine();
                 resetIndexCounter();
             } else {
                 if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
                     printLine();
                 }
-            }
-
-            if (lossStreak >= 5 && isShuffleBetSide === false && isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
-                isShuffleBetSide = true;
             }
 
             const dataBetOdds = { value: data[2] };
@@ -471,7 +462,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside}${isShuffleBetSide ? ' (shuffled)' : ''} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -570,35 +561,16 @@ function isBetOddsIrregular(clonedDataBetOdds) {
 }
 
 function setFinalBet(fightData) {
-    if (isShuffleBetSide === true && isShuffleBetSideHasPicked === true) {
-        return;
-    }
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
         reverseBet();
     }
     if (finalBetside === '') {
         isBetOnHigherRoi = false;
     }
-    if (isShuffleBetSide === true) {
-        const shuffleBetSideResult = shuffleBetSide();
 
-        finalBetside = (shuffleBetSideResult
-            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-            ? meron : wala;
-
-        if (finalBetside === meron) {
-            isBetOnHigherRoi = fightData.meron_odds > fightData.wala_odds;
-        }
-        if (finalBetside === wala) {
-            isBetOnHigherRoi = fightData.wala_odds > fightData.meron_odds;
-        }
-
-        isShuffleBetSideHasPicked = true;
-    } else {
-        finalBetside = (isBetOnHigherRoi
-            ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-            ? meron : wala;
-    }
+    finalBetside = (isBetOnHigherRoi
+        ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
+        ? meron : wala;
 }
 
 function reverseBet() {
@@ -629,34 +601,6 @@ function printProfit() {
     console.log(`%cToday's Profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
     console.log(`%c---`, 'font-weight: bold; color: yellow');
     console.log(`%cTotal Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-}
-
-function shuffleBetSide() {
-    const shuffleArrays = (array) => {
-        let oldElement;
-        for (let i = array.length - 1; i > 0; i--) {
-            let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
-        }
-
-        return array;
-    }
-
-    const maxLoop = 3;
-
-    let shuffledTrueFalse = [true, false];
-    let shuffledTrueFalseBuckets = [];
-    let index = 0;
-
-    while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
-        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
-        index++;
-    }
-
-    return shuffledTrueFalseBuckets[0];
 }
 
 function randomInt() {
@@ -805,7 +749,7 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
         betSideOdds = wala_odds;
     }
 
-    if (/*isShuffleBetSide === true && presentLevel >= 3 &&*/ betSideOdds < minimumTargetedBetOdds) {
+    if (betSideOdds < minimumTargetedBetOdds) {
         const addOnCapital = (minimumTargetedBetOdds - betSideOdds);
         const percentage = (addOnCapital / 100);
         const calc = bet * percentage;
