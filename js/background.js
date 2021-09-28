@@ -161,7 +161,7 @@ const websocketConnect = (crfToken) => {
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
                 printLine();
-                console.log(`%c- Race not allowed yet. Be back later! -`, 'font-weight: bold; color: #f00;');
+                console.log(`%c- Race not allowed yet. Be back later! -`, 'font-weight: bold; color: #009be5;');
                 isReminded = true;
             }
 
@@ -206,11 +206,13 @@ const websocketConnect = (crfToken) => {
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                 } else {
+                    const minutes = randomInt();
                     // Next match at the next hour
-                    nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + randomInt()));
+                    nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + minutes));
 
                     printLine();
-                    console.log(`%cNext race time slated on ${nextRaceTimeStarts.toLocaleString()}`, 'font-weight: bold; color: #FF00FF');
+
+                    console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours() + ":" + nextRaceTimeStarts.getMinutes() + ":" + nextRaceTimeStarts.getSeconds() + ' ' + (nextRaceTimeStarts.getHours() < 12 ? 'AM' : 'PM')}`, 'font-weight: bold; color: #FF00FF');
                 }
             }
 
