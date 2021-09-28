@@ -65,7 +65,7 @@ const oddsMinimum = 170
 const oddsMaximum = 260;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 70;
+let maxWaitTimes = 82;
 
 let isDemoOnly = true;
 
@@ -657,25 +657,10 @@ function shuffleBetSide() {
     while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
         shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
         shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
-        // shuffledTrueFalseBuckets = [...shuffleArrays(shuffledTrueFalseBuckets)]
         index++;
     }
 
-    let indexPicked = 0;
-    let indexPickedHistory = [];
-    index = 0;
-
-    while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        const picked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
-        if (indexPickedHistory.filter(c => c === picked).length === 0) {
-            indexPicked = picked;
-            indexPickedHistory.push(picked);
-        }
-
-        index++;
-    }
-
-    return shuffledTrueFalseBuckets[indexPicked];
+    return shuffledTrueFalseBuckets[0];
 }
 
 function randomInt() {
