@@ -207,12 +207,12 @@ const websocketConnect = (crfToken) => {
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                 } else {
                     const minutes = randomInt();
+
                     // Next match at the next hour
                     nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + minutes));
 
                     printLine();
-
-                    console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours() + ":" + nextRaceTimeStarts.getMinutes() + ":" + nextRaceTimeStarts.getSeconds() + ' ' + (nextRaceTimeStarts.getHours() < 12 ? 'AM' : 'PM')}`, 'font-weight: bold; color: #FF00FF');
+                    console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours().toString().padStart(2, '0')}:${nextRaceTimeStarts.getMinutes().toString().padStart(2, '0')}:${nextRaceTimeStarts.getSeconds().toString().padStart(2, '0')}`, 'font-weight: bold; color: #FF00FF');
                 }
             }
 
