@@ -420,24 +420,13 @@ const websocketConnect = (crfToken) => {
             stopTimer();
 
             let bet = betLevel[presentLevel];
-
-            // const extendedBetAmount = extendBetAmount(bet);
+            
             const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
 
-            // if (extendedBetAmount !== bet) {
-            //     isExtendedBet = true;
-            //     bet = extendedBetAmount;
-            // } else {
             bet = updatedBet;
-            // }
 
             if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
                 isBettingWithAccumulatedAmount = true;
-            }
-            if (isBettingWithAccumulatedAmount === true) {
-                bet = betLevel[2];
-                presentLevel = 3;
-                lossStreak = 2;
             }
 
             betAmountPlaced = parseInt(bet);
