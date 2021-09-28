@@ -194,7 +194,7 @@ const websocketConnect = (crfToken) => {
                 if (grossProfit > dailyProfitStopLimit) {
                     let todaysDate = new Date();
                     todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                    todaysDate.setHours(8, 59, 0);
+                    todaysDate.setHours(9, 59, 0);
 
                     nextRaceTimeStarts = todaysDate;
 
@@ -420,7 +420,7 @@ const websocketConnect = (crfToken) => {
             stopTimer();
 
             let bet = betLevel[presentLevel];
-            
+
             const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
 
             bet = updatedBet;
@@ -690,7 +690,7 @@ function printCommencedShift() {
 
 function isWithinAllottedRacetime() {
     const now = new Date();
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '08:59:00 AM').getTime() &&
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '09:59:00 AM').getTime() &&
         new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
