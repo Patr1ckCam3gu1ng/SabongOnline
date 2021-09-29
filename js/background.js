@@ -7,21 +7,21 @@ let reconnectRetries = 0;
 let retryPinger;
 
 let betLevel = [
-    135,
-    135,
-    315,
-    735,
-    1715,
-    4001,
-    9335,
-    21781,
-    50822
+    135,        // 1
+    135,        // 2
+    308,        // 3
+    668,        // 4
+    1443,       // 5
+    3123,       // 6
+    6759,       // 7
+    14620,      // 8
+    31624       // 9
 ];
 
-// Daily Quota for 14 days / 6,500
+// Daily Quota for 10 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6;
-// 10449.000000000002
-const dailyProfitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 9.5;
+// 5,900
+const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 7;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -189,7 +189,7 @@ const websocketConnect = (crfToken) => {
 
                 const { grossProfit } = calculateProfit();
 
-                if (grossProfit > dailyProfitStopLimit) {
+                if (grossProfit > profitStopLimit) {
                     let todaysDate = new Date();
                     todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
                     todaysDate.setHours(12, 59, 0);
