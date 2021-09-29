@@ -7,21 +7,20 @@ let reconnectRetries = 0;
 let retryPinger;
 
 let betLevel = [
-    135,        // 1
-    135,        // 2
-    308,        // 3
-    668,        // 4
-    1443,       // 5
-    3123,       // 6
-    6759,       // 7
-    14620,      // 8
-    31624       // 9
+    135,       // 1
+    135,       // 2
+    308,       // 3
+    702,       // 4
+    1600,      // 5
+    3648,      // 6
+    8318,      // 7
+    18965      // 8
 ];
 
-// Daily Quota for 10 days
+// Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6;
-// 5,900
-const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 7;
+
+const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 4.5;
 
 const meron = 'meron';
 const wala = 'wala';
