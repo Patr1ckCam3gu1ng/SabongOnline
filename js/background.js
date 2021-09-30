@@ -18,9 +18,9 @@ let betLevel = [
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6.5;
 
-const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6 * 4.5;
+const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 6.5 * 5;
 
 const meron = 'meron';
 const wala = 'wala';
