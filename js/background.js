@@ -434,7 +434,9 @@ const websocketConnect = (crfToken) => {
             if (timerIndex < defaultMaxWaitTime) {
                 betNotSubmittedList.push(timerIndexUponSubmit);
             } else {
-                succeedingDefaultMaxTimeCount += 1;
+                if (betNotSubmittedList.length > 0) {
+                    succeedingDefaultMaxTimeCount += 1;
+                }
             }
 
             stopTimer();
