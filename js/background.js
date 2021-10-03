@@ -83,7 +83,6 @@ let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
 
-let betNotSubmittedCount = 0;
 let timerIndexUponSubmit = 0;
 let betNotSubmittedList = [];
 
@@ -253,18 +252,17 @@ const websocketConnect = (crfToken) => {
                     reverseBet();
                 }
 
-                betNotSubmittedCount += 1;
                 betNotSubmittedList.push(timerIndex);
                 timerIndexUponSubmit = 0;
 
                 return;
             }
 
-            if (betNotSubmittedCount >= 2 && maxWaitTimes < defaultMaxWaitTime) {
+            if (betNotSubmittedList.length >= 2 && maxWaitTimes < defaultMaxWaitTime) {
                 printLine();
                 console.log(`%c- Max wait time has been decreased -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 maxWaitTimes = betNotSubmittedList.map((c) => c).reduce((a, b) => a + b, 0) / betNotSubmittedList.length;
-            } else if (betNotSubmittedCount === 0 && maxWaitTimes !== defaultMaxWaitTime) {
+            } else if (betNotSubmittedList.length === 0 && maxWaitTimes !== defaultMaxWaitTime) {
                 printLine();
                 console.log(`%c- Max wait time was set to normal -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 maxWaitTimes = defaultMaxWaitTime;
@@ -377,8 +375,8 @@ const websocketConnect = (crfToken) => {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
 
-                    if (betNotSubmittedCount > 0 && timerIndexUponSubmit > defaultMaxWaitTime) {
-                        betNotSubmittedCount -= 1;
+                    if (betNotSubmittedList.length > 0 && timerIndexUponSubmit > defaultMaxWaitTime) {
+                        betNotSubmittedList.pop();
                     }
                 }
 
@@ -673,7 +671,6 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
-    return true;
     const now = new Date();
     const weekdayIndex = now.getDay();
 
