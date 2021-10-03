@@ -259,8 +259,12 @@ const websocketConnect = (crfToken) => {
             }
 
             if (betNotSubmittedCount >= 2) {
+                printLine();
+                console.log(`%c- Max wait time has been decreased -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 maxWaitTimes = 68;
             } else if (betNotSubmittedCount === 0) {
+                printLine();
+                console.log(`%c- Max wait time was set to normal -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 maxWaitTimes = defaultMaxWaitTime;
             }
 
