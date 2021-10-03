@@ -85,6 +85,7 @@ let nextRaceTimeStarts = 0;
 
 let timerIndexUponSubmit = 0;
 let betNotSubmittedList = [];
+let succeedingDefaultMaxTimeCount = 0;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -260,9 +261,6 @@ const websocketConnect = (crfToken) => {
 
             if (betNotSubmittedList.length >= 2) {
                 maxWaitTimes = betNotSubmittedList.map((c) => c).reduce((a, b) => a + b, 0) / betNotSubmittedList.length;
-            } else if (betNotSubmittedList.length === 0 && maxWaitTimes !== defaultMaxWaitTime) {
-                maxWaitTimes = defaultMaxWaitTime;
-                betNotSubmittedList = [];
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -371,8 +369,10 @@ const websocketConnect = (crfToken) => {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
 
-                    if (betNotSubmittedList.length > 0 && timerIndexUponSubmit > defaultMaxWaitTime) {
-                        betNotSubmittedList.pop();
+                    if (betNotSubmittedList.length > 0 && succeedingDefaultMaxTimeCount >= 3) {
+                        maxWaitTimes = defaultMaxWaitTime;
+                        betNotSubmittedList = [];
+                        succeedingDefaultMaxTimeCount = 0;
                     }
                 }
 
@@ -428,7 +428,13 @@ const websocketConnect = (crfToken) => {
             }
 
             timerIndexUponSubmit = timerIndex;
-            
+
+            if (timerIndex < defaultMaxWaitTime) {
+                betNotSubmittedList.push(timerIndexUponSubmit);
+            } else {
+                succeedingDefaultMaxTimeCount += 1;
+            }
+
             stopTimer();
 
             let bet = betLevel[presentLevel];
@@ -665,6 +671,7 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
+    return true;
     const now = new Date();
     const weekdayIndex = now.getDay();
 
