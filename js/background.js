@@ -577,7 +577,7 @@ function reverseBet() {
 }
 
 function paymentSafe(isDraw) {
-    if (isDraw === false && isBetSubmitted === false) {
+    if (isDraw === false && isBetSubmitted === false && timerIndex > 1) {
         printLine();
     }
     console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
