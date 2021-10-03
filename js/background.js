@@ -645,8 +645,11 @@ function printCommencedShift() {
 
 function isWithinAllottedRacetime() {
     const now = new Date();
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '12:59:00 PM').getTime() &&
-        new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
+    const weekdayIndex = now.getDay();
+
+    // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
+    // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
         return true;
