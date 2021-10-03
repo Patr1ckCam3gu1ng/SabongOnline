@@ -671,7 +671,6 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
-    return true;
     const now = new Date();
     const weekdayIndex = now.getDay();
 
