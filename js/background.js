@@ -87,6 +87,8 @@ let timerIndexUponSubmit = 0;
 let betNotSubmittedList = [];
 let succeedingDefaultMaxTimeCount = 0;
 
+let isIgnoreAllottedRaceTime = false;
+
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
         crfTokenValue = crfToken;
@@ -671,6 +673,10 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
+    if (isIgnoreAllottedRaceTime === true) {
+        return isIgnoreAllottedRaceTime;
+    }
+
     const now = new Date();
     const weekdayIndex = now.getDay();
 
