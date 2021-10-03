@@ -85,6 +85,7 @@ let nextRaceTimeStarts = 0;
 
 let betNotSubmittedCount = 0;
 let timerIndexUponSubmit = 0;
+let betNotSubmittedList = [];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -253,19 +254,21 @@ const websocketConnect = (crfToken) => {
                 }
 
                 betNotSubmittedCount += 1;
+                betNotSubmittedList.push(timerIndex);
                 timerIndexUponSubmit = 0;
 
                 return;
             }
 
-            if (betNotSubmittedCount >= 2) {
+            if (betNotSubmittedCount >= 2 && maxWaitTimes < defaultMaxWaitTime) {
                 printLine();
                 console.log(`%c- Max wait time has been decreased -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-                maxWaitTimes = 68;
-            } else if (betNotSubmittedCount === 0) {
+                maxWaitTimes = betNotSubmittedList.map((c) => c).reduce((a, b) => a + b, 0) / betNotSubmittedList.length;
+            } else if (betNotSubmittedCount === 0 && maxWaitTimes !== defaultMaxWaitTime) {
                 printLine();
                 console.log(`%c- Max wait time was set to normal -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
                 maxWaitTimes = defaultMaxWaitTime;
+                betNotSubmittedList = [];
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -670,6 +673,7 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
+    return true;
     const now = new Date();
     const weekdayIndex = now.getDay();
 
