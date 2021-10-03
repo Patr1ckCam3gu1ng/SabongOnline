@@ -427,6 +427,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
+            timerIndexUponSubmit = timerIndex;
+            
             stopTimer();
 
             let bet = betLevel[presentLevel];
@@ -481,8 +483,6 @@ const websocketConnect = (crfToken) => {
 
             console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
-            timerIndexUponSubmit = timerIndex;
-            
             await new Promise(resolve => setTimeout(resolve, 700));
 
             if (isDemoOnly === true) {
