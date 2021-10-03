@@ -174,7 +174,7 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapse: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
                 printLine();
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
@@ -607,10 +607,16 @@ function randomInt() {
     const maxMinutes = 12;
     let index = 0;
     let indexPicked = 0;
+    let pickList = [];
 
-    while (index < 3) {
+    while (index < 5) {
         indexPicked = Math.floor(Math.random() * maxMinutes);
+
         if (indexPicked >= minMinutes && indexPicked <= maxMinutes) {
+            if (pickList.length > 0 && pickList.filter(c => c === indexPicked).length > 1) {
+                continue
+            }
+            pickList.push(indexPicked);
             index++;
         }
     }
