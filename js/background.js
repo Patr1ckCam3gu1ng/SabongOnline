@@ -83,7 +83,6 @@ let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
 
-let timerIndexUponSubmit = 0;
 let betNotSubmittedList = [];
 let succeedingDefaultMaxTimeCount = 0;
 
@@ -254,9 +253,6 @@ const websocketConnect = (crfToken) => {
                 if (matchLogs.length > 1) {
                     reverseBet();
                 }
-
-                betNotSubmittedList.push(timerIndex);
-                timerIndexUponSubmit = 0;
 
                 return;
             }
@@ -429,10 +425,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            timerIndexUponSubmit = timerIndex;
-
-            if (timerIndex < defaultMaxWaitTime) {
-                betNotSubmittedList.push(timerIndexUponSubmit);
+            if (timerIndex > 45 && timerIndex < defaultMaxWaitTime) {
+                betNotSubmittedList.push(timerIndex);
             } else {
                 if (betNotSubmittedList.length > 0) {
                     succeedingDefaultMaxTimeCount += 1;
