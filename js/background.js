@@ -246,6 +246,7 @@ const websocketConnect = (crfToken) => {
                 if (matchLogs.length > 1) {
                     reverseBet();
                 }
+                return;
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -265,9 +266,6 @@ const websocketConnect = (crfToken) => {
 
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
-                // if (isBetSubmitted === false) {
-                //     reverseBet();
-                // }
 
                 isBetSubmitted = false
                 return;
@@ -745,7 +743,7 @@ function millisecondsConverter(millis) {
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
     const { meron_odds, wala_odds } = clonedDataBetOdds.value;
     let betSideOdds = 0;
-    const minimumTargetedBetOdds = 185;
+    const minimumTargetedBetOdds = 190;
 
     if (finalBetside === meron) {
         betSideOdds = meron_odds;
