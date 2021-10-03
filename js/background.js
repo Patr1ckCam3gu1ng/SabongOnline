@@ -481,18 +481,16 @@ const websocketConnect = (crfToken) => {
 
             console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
+            timerIndexUponSubmit = timerIndex;
+            
             await new Promise(resolve => setTimeout(resolve, 700));
 
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
-                timerIndexUponSubmit = timerIndex;
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
                         isBetSubmitted = submittedBetValue > 0;
-                        if (isBetSubmitted === true) {
-                            timerIndexUponSubmit = timerIndex;
-                        }
                     }
                 );
             }
