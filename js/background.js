@@ -62,8 +62,9 @@ let timerIndex = 0;
 const oddsMinimum = 170
 const oddsMaximum = 260;
 
+const defaultMaxWaitTime = 82;
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 82;
+let maxWaitTimes = defaultMaxWaitTime;
 
 let isDemoOnly = true;
 
@@ -81,6 +82,9 @@ let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
+
+let betNotSubmittedCount = 0;
+let timerIndexUponSubmit = 0;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -247,7 +251,17 @@ const websocketConnect = (crfToken) => {
                 if (matchLogs.length > 1) {
                     reverseBet();
                 }
+
+                betNotSubmittedCount += 1;
+                timerIndexUponSubmit = 0;
+
                 return;
+            }
+
+            if (betNotSubmittedCount >= 2) {
+                maxWaitTimes = 68;
+            } else if (betNotSubmittedCount === 0) {
+                maxWaitTimes = defaultMaxWaitTime;
             }
 
             // Fix issue whereas the betting is closed but bet is not yet submitted
@@ -354,6 +368,10 @@ const websocketConnect = (crfToken) => {
 
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
+                    }
+
+                    if (betNotSubmittedCount > 0 && timerIndexUponSubmit > defaultMaxWaitTime) {
+                        betNotSubmittedCount -= 1;
                     }
                 }
 
@@ -466,10 +484,14 @@ const websocketConnect = (crfToken) => {
 
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
+                timerIndexUponSubmit = timerIndex;
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
                         isBetSubmitted = submittedBetValue > 0;
+                        if (isBetSubmitted === true) {
+                            timerIndexUponSubmit = timerIndex;
+                        }
                     }
                 );
             }
