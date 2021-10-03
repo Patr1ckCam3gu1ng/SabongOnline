@@ -683,13 +683,8 @@ function calculateTodaysProfit() {
     const wonMatchesTotalGrossProfit = parseInt(wonMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
     const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
 
-    const averageProfit = (wonMatchesTotalGrossProfit / wonMatches.length).toFixed(0).toLocaleString();
-    const averageProfitPercentage = (parseInt(wonMatches.map(({ odds }) => odds).reduce((a, b) => a + b, 0)) / wonMatches.length) * 100;
-
     return {
-        totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit,
-        averageProfit: averageProfit,
-        averageProfitPercentage: averageProfitPercentage.toFixed(0)
+        totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit
     }
 }
 
