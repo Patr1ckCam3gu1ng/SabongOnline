@@ -249,7 +249,8 @@ const websocketConnect = (crfToken) => {
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
                 console.log(`%cBet not submitted. Timer was only ${ timerIndex } whilst max wait time is ${ maxWaitTimes }`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                if (matchLogs.length > 1) {
+
+                if (matchLogs.length > 1 && timerIndex > 0) {
                     reverseBet();
                 }
 
