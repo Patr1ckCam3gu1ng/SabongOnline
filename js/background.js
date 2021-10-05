@@ -6,15 +6,11 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-let betLevel = [
-    135,       // 1
-    135,       // 2
-    308,       // 3
-    702,       // 4
-    1600,      // 5
-    3648,      // 6
-    8318,      // 7
-    18965      // 8
+betLevel = [1200,
+    1200,
+    2736,
+    6238,
+    14223,
 ];
 
 // Daily Quota for 12 days
@@ -597,7 +593,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = !isBetOnHigherRoi;
+    isBetOnHigherRoi = true;
 }
 
 function paymentSafe(isDraw) {
