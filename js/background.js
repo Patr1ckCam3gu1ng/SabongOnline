@@ -6,17 +6,20 @@ const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 let reconnectRetries = 0;
 let retryPinger;
 
-betLevel = [1200,
-    1200,
-    2736,
-    6238,
-    14223,
+betLevel = [
+    300,
+    300,
+    684,
+    1560,
+    3556,
+    8107,
+    18484
 ];
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 4.5 * 4.8;
+// const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 4.5 * 4.8;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -190,7 +193,7 @@ const websocketConnect = (crfToken) => {
 
                 const { grossProfit } = calculateProfit();
 
-                if (grossProfit > profitStopLimit) {
+                if (/*grossProfit > profitStopLimit*/ false) {
                     let todaysDate = new Date();
                     todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
                     todaysDate.setHours(12, 59, 0);
@@ -623,8 +626,8 @@ function printProfit() {
 }
 
 function randomInt() {
-    const minMinutes = 12;
-    const maxMinutes = 25;
+    const minMinutes = 15;
+    const maxMinutes = 20;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
@@ -674,7 +677,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '12:00:00 AM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '09:58:00 AM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
