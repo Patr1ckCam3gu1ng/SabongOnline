@@ -7,17 +7,16 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1600,
-    1600,
-    3648,
-    8317,
-    18964
+    4400,
+    4400,
+    10032,
+    22873
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 2;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3 * 1.45;
+let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3 * 2.01;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -194,7 +193,7 @@ const websocketConnect = (crfToken) => {
                 if (grossProfit > profitStopLimit) {
                     let todaysDate = new Date();
                     todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                    todaysDate.setHours(12, 59, 0);
+                    todaysDate.setHours(3, 46, 0);
 
                     nextRaceTimeStarts = todaysDate;
 
@@ -585,7 +584,8 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        isBetOnHigherRoi = false;
+        // isBetOnHigherRoi = false;
+        isBetOnHigherRoi = true;
     }
 
     finalBetside = (isBetOnHigherRoi
