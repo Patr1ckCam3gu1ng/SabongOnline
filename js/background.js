@@ -17,7 +17,7 @@ betLevel = [
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3;
 
-const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3 * 2;
+const profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3 * 1.45;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -624,8 +624,8 @@ function printProfit() {
 }
 
 function randomInt() {
-    const minMinutes = 15;
-    const maxMinutes = 20;
+    const minMinutes = 12;
+    const maxMinutes = 26;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
