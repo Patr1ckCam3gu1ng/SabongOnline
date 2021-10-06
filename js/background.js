@@ -7,13 +7,11 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    300,
-    300,
-    684,
-    1560,
-    3556,
-    8107,
-    18484
+    1600,
+    1600,
+    3648,
+    8317,
+    18964
 ];
 
 // Daily Quota for 12 days
@@ -677,7 +675,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '12:58:00 PM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:46:00 PM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
