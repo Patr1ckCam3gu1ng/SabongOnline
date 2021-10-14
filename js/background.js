@@ -1,23 +1,24 @@
 let websocket;
 let tab = { id: 0 };
 let crfTokenValue = '';
-const wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
+const wssUrl = 'wss://echo.wpc2028.live/socket.io/?EIO=3&transport=websocket';
 
 let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    8000,
-    8000,
-    8000,
-    18240,
-    41587
+    500,
+    500,
+    1100,
+    2420,
+    5324,
+    11713
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 2;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 3 * 2.01;
+let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 5;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -676,7 +677,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:46:00 PM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '00:00:00 AM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
