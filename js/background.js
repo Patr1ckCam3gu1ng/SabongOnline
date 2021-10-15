@@ -11,14 +11,15 @@ betLevel = [
     500,
     1100,
     2420,
-    5324,
-    11713
+    5679,
+    5679,
+    5679
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 7;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 7 * 3;
+let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 3;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -627,7 +628,7 @@ function printProfit() {
 
 function randomInt() {
     const minMinutes = 15;
-    const maxMinutes = 22;
+    const maxMinutes = 25;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
@@ -677,7 +678,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '00:00:00 AM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:46:00 PM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
