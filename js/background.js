@@ -626,8 +626,8 @@ function printProfit() {
 }
 
 function randomInt() {
-    const minMinutes = 12;
-    const maxMinutes = 18;
+    const minMinutes = 15;
+    const maxMinutes = 22;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
