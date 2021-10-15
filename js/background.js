@@ -12,14 +12,13 @@ betLevel = [
     1100,
     2420,
     5679,
-    5679,
-    5679
+    11713
 ];
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 3;
+let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 2.8;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -60,7 +59,7 @@ let timerIndex = 0;
 const oddsMinimum = 170
 const oddsMaximum = 260;
 
-let defaultMaxWaitTime = 58;
+let defaultMaxWaitTime = 52;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
