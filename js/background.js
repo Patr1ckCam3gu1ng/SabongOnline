@@ -587,8 +587,7 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        // isBetOnHigherRoi = false;
-        isBetOnHigherRoi = true;
+        isBetOnHigherRoi = false;
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -597,7 +596,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = true;
+    isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
