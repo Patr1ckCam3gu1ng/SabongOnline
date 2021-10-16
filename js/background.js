@@ -625,8 +625,8 @@ function printProfit() {
 }
 
 function randomInt() {
-    const minMinutes = 15;
-    const maxMinutes = 25;
+    const minMinutes = 8;
+    const maxMinutes = 22;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
@@ -676,7 +676,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:46:00 PM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '12:00:00 AM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
