@@ -7,18 +7,19 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    500,
-    500,
-    1100,
-    2420,
-    5679,
-    11713
+    130,
+    130,
+    130,
+    286,
+    629,
+    1384,
+    3045
 ];
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 2.8;
+let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 5;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -84,6 +85,8 @@ let betNotSubmittedList = [];
 let succeedingDefaultMaxTimeCount = 0;
 
 let isIgnoreAllottedRaceTime = false;
+
+let fightNumber = 1;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -242,7 +245,7 @@ const websocketConnect = (crfToken) => {
             const isWaitingDecision = fightData.waiting_decision === 'yes';
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
-            const fightNumber = fightData.fight_number;
+            fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
@@ -595,7 +598,9 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = !isBetOnHigherRoi;
+    if (fightNumber % 2 === 1) {
+        isBetOnHigherRoi = !isBetOnHigherRoi;
+    }
 }
 
 function paymentSafe(isDraw) {
