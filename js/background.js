@@ -57,8 +57,8 @@ let ignoreRaceTime = false;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 168;
-const oddsMaximum = 260;
+const oddsMinimum = 150;
+const oddsMaximum = 280;
 
 let defaultMaxWaitTime = 60;
 //should remain 'let' so we can change it in the console:
