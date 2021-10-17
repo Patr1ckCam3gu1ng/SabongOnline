@@ -19,7 +19,7 @@ betLevel = [
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5;
 
-let profitStopLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 5 * 5;
+let profitStopLimit = dailyProfitQuotaLimit * 5;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -57,10 +57,10 @@ let ignoreRaceTime = false;
 let timer;
 let timerIndex = 0;
 
-const oddsMinimum = 170
+const oddsMinimum = 168;
 const oddsMaximum = 260;
 
-let defaultMaxWaitTime = 52;
+let defaultMaxWaitTime = 60;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
@@ -588,9 +588,9 @@ function setFinalBet(fightData) {
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
         reverseBet();
     }
-    if (finalBetside === '') {
-        isBetOnHigherRoi = false;
-    }
+    // if (finalBetside === '') {
+    //     isBetOnHigherRoi = false;
+    // }
 
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
@@ -775,7 +775,7 @@ function millisecondsConverter(millis) {
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
     const { meron_odds, wala_odds } = clonedDataBetOdds.value;
     let betSideOdds = 0;
-    const minimumTargetedBetOdds = 190;
+    const minimumTargetedBetOdds = 175;
 
     if (finalBetside === meron) {
         betSideOdds = meron_odds;
