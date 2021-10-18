@@ -632,7 +632,7 @@ function printProfit() {
 
 function randomInt() {
     const minMinutes = 8;
-    const maxMinutes = 22;
+    const maxMinutes = 40;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
@@ -754,6 +754,8 @@ function flushPreviousVariance() {
 
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
+
+    finalBetside = '';
 }
 
 function millisecondsConverter(millis) {
