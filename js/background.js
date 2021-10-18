@@ -7,13 +7,14 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    130,
-    130,
-    130,
-    286,
-    629,
-    1384,
-    3045
+    150,
+    150,
+    330,
+    726,
+    1597,
+    3514,
+    7730,
+    17007
 ];
 
 // Daily Quota for 12 days
@@ -598,7 +599,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (fightNumber % 2 === 1) {
+    if (fightNumber % 3 === 1) {
         isBetOnHigherRoi = !isBetOnHigherRoi;
     }
 }
@@ -681,7 +682,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '12:00:00 AM').getTime() && true);
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '01:46:00 PM').getTime() && true);
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
