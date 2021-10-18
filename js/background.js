@@ -1,7 +1,7 @@
 let websocket;
 let tab = { id: 0 };
 let crfTokenValue = '';
-const wssUrl = 'wss://echo.wpc2028.live/socket.io/?EIO=3&transport=websocket';
+let wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
 
 let reconnectRetries = 0;
 let retryPinger;
