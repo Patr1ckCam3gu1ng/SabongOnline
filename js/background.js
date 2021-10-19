@@ -585,9 +585,9 @@ function setFinalBet(fightData) {
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
         reverseBet();
     }
-    if (finalBetside === '') {
-        isBetOnHigherRoi = fightNumber % 2 === 0;
-    }
+    // if (finalBetside === '') {
+    //     isBetOnHigherRoi = fightNumber % 2 === 0;
+    // }
 
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
@@ -595,9 +595,11 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (fightNumber % 2 === 1) {
-        isBetOnHigherRoi = !isBetOnHigherRoi;
-    }
+    // if (fightNumber % 2 === 1) {
+    //     isBetOnHigherRoi = !isBetOnHigherRoi;
+    // }
+
+    isBetOnHigherRoi = true;
 }
 
 function paymentSafe(isDraw) {
