@@ -13,7 +13,7 @@ betLevel = [
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.85) - betLevel[0]) * 1;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
 
 let profitStopLimit = dailyProfitQuotaLimit;
 
@@ -83,6 +83,12 @@ let succeedingDefaultMaxTimeCount = 0;
 let isIgnoreAllottedRaceTime = false;
 
 let fightNumber = 1;
+
+let shifts = [
+    { starts: '10:33:00 AM', ends: '11:30:00 AM' },
+    { starts: '03:48:00 PM', ends: '10:30:00 PM' },
+    { starts: '01:04:00 AM', ends: '03:30:00 AM' },
+];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -677,18 +683,17 @@ function isWithinAllottedRacetime() {
     const now = new Date();
     const weekdayIndex = now.getDay();
 
-    // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
-    // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:48:00 PM').getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime())
-    // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
+    const shiftOne = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[0].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[0].ends).getTime());
+    const shiftTwo = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[1].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[1].ends).getTime());
+    const shiftThree = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[2].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[2].ends).getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
         return true;
     }
     if (nextRaceTimeStarts === 0) {
-        return dailyTimeShifts;
+        return shiftOne || shiftTwo || shiftThree;
     } else {
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && dailyTimeShifts;
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && (shiftOne || shiftTwo || shiftThree);
     }
 }
 
