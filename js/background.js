@@ -16,7 +16,7 @@ betLevel = [
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 2;
 
-let profitStopLimit = dailyProfitQuotaLimit * 2.01;
+let profitStopLimit = dailyProfitQuotaLimit;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -57,7 +57,7 @@ let timerIndex = 0;
 const oddsMinimum = 150;
 const oddsMaximum = 280;
 
-let defaultMaxWaitTime = 66;
+let defaultMaxWaitTime = 88;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
@@ -680,7 +680,7 @@ function isWithinAllottedRacetime() {
 
     // INFO: If Finals --> Wednesday || Sunday Then, Start at 3:46pm
     // const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${weekdayIndex === 0 || weekdayIndex === 3 ? '03:46:00 PM' : '12:59:00 PM'}`).getTime() && true);
-    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:46:00 PM').getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime())
+    const dailyTimeShifts = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + '03:48:00 PM').getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime())
     // new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + '10:30:00 PM').getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
