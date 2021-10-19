@@ -7,14 +7,13 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    3500,
-    3500,
-    7700,
-    16940
+    7000,
+    7000,
+    15400
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.86) - betLevel[0]) * 2;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.85) - betLevel[0]) * 1;
 
 let profitStopLimit = dailyProfitQuotaLimit;
 
