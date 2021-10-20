@@ -87,7 +87,7 @@ let fightNumber = 1;
 let shifts = [
     { starts: '08:34:00 AM', ends: '11:30:00 AM' },
     { starts: '03:48:00 PM', ends: '05:30:00 PM' },
-    { starts: '01:04:00 AM', ends: '03:30:00 AM' },
+    { starts: '01:07:00 AM', ends: '03:30:00 AM' },
 ];
 
 function createWebSocketConnection(crfToken) {
