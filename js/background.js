@@ -56,7 +56,7 @@ let timerIndex = 0;
 const oddsMinimum = 150;
 const oddsMaximum = 280;
 
-let defaultMaxWaitTime = 88;
+let defaultMaxWaitTime = 78;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
@@ -212,11 +212,11 @@ const websocketConnect = (crfToken) => {
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
 
-                    websocket.close();
-                    websocket = undefined;
-
                     clearInterval(retryPinger);
                     clearInterval(pinger);
+
+                    websocket.close();
+                    reconnectRetries = 999;
                 } else {
                     const minutes = randomInt();
 
