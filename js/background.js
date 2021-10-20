@@ -85,8 +85,8 @@ let isIgnoreAllottedRaceTime = false;
 let fightNumber = 1;
 
 let shifts = [
-    { starts: '10:33:00 AM', ends: '11:30:00 AM' },
-    { starts: '03:48:00 PM', ends: '10:30:00 PM' },
+    { starts: '08:34:00 AM', ends: '11:30:00 AM' },
+    { starts: '03:48:00 PM', ends: '05:30:00 PM' },
     { starts: '01:04:00 AM', ends: '03:30:00 AM' },
 ];
 
@@ -198,11 +198,11 @@ const websocketConnect = (crfToken) => {
                 const { grossProfit } = calculateProfit();
 
                 if (grossProfit > profitStopLimit) {
-                    let todaysDate = new Date();
-                    todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                    todaysDate.setHours(3, 46, 0);
+                    // let todaysDate = new Date();
+                    // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
+                    // todaysDate.setHours(3, 46, 0);
 
-                    nextRaceTimeStarts = todaysDate;
+                    // nextRaceTimeStarts = todaysDate;
 
                     printLine();
                     console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
@@ -211,6 +211,12 @@ const websocketConnect = (crfToken) => {
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
+
+                    websocket.close();
+                    websocket = undefined;
+
+                    clearInterval(retryPinger);
+                    clearInterval(pinger);
                 } else {
                     const minutes = randomInt();
 
