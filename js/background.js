@@ -17,8 +17,8 @@ let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
 
 let shifts = [
     { starts: '10:34:00 AM', ends: '11:45:00 AM' },
-    { starts: '03:48:00 PM', ends: '04:30:00 PM' },
-    { starts: '07:03:00 PM', ends: '08:30:00 PM' },
+    // { starts: '03:48:00 PM', ends: '04:30:00 PM' },
+    // { starts: '07:03:00 PM', ends: '08:30:00 PM' },
 ];
 
 let profitStopLimit = dailyProfitQuotaLimit;
@@ -184,10 +184,10 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapsed: ${ totalTimelapse } )`, 'font-weight: bold; color: yellow');
 
                 printLine();
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -196,37 +196,37 @@ const websocketConnect = (crfToken) => {
 
                 stopTimer();
 
-                const { grossProfit } = calculateProfit();
+                // const { grossProfit } = calculateProfit();
 
-                if (grossProfit > profitStopLimit) {
-                    // let todaysDate = new Date();
-                    // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                    // todaysDate.setHours(3, 46, 0);
+                // if (grossProfit > profitStopLimit) {
+                // let todaysDate = new Date();
+                // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
+                // todaysDate.setHours(3, 46, 0);
 
-                    nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
+                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
+                //
+                // printLine();
+                // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
+                // printLine();
+                //
+                // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
+                // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
+                // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
+                //
+                // websocket.close();
+                // websocket = undefined;
+                // clearInterval(retryPinger);
+                // clearInterval(pinger);
+                // isBetSubmitted = false;
+                // } else {
+                //     const minutes = randomInt();
 
-                    printLine();
-                    console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
-                    printLine();
+                // Next match at the next hour
+                nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + 58));
 
-                    console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-                    console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
-                    console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-
-                    websocket.close();
-                    websocket = undefined;
-                    clearInterval(retryPinger);
-                    clearInterval(pinger);
-                    isBetSubmitted = false;
-                } else {
-                    const minutes = randomInt();
-
-                    // Next match at the next hour
-                    nextRaceTimeStarts = new Date(new Date().setMinutes(new Date().getMinutes() + minutes));
-
-                    printLine();
-                    console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours().toString().padStart(2, '0')}:${nextRaceTimeStarts.getMinutes().toString().padStart(2, '0')}:${nextRaceTimeStarts.getSeconds().toString().padStart(2, '0')}`, 'font-weight: bold; color: #FF00FF');
-                }
+                printLine();
+                console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
+                // }
             }
 
             return;
@@ -691,16 +691,18 @@ function isWithinAllottedRacetime() {
     const weekdayIndex = now.getDay();
 
     const shiftOne = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[0].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[0].ends).getTime());
-    const shiftTwo = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[1].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[1].ends).getTime());
-    const shiftThree = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[2].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[2].ends).getTime());
+    // const shiftTwo = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[1].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[1].ends).getTime());
+    // const shiftThree = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[2].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[2].ends).getTime());
 
     if (isWinner === false && matchLogs.length > 1) {
         return true;
     }
     if (nextRaceTimeStarts === 0) {
-        return shiftOne || shiftTwo || shiftThree;
+        // return shiftOne || shiftTwo || shiftThree;
+        return shiftOne;
     } else {
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && (shiftOne || shiftTwo || shiftThree);
+        // return (new Date(new Date().getTime()) > nextRaceTimeStarts) && (shiftOne || shiftTwo || shiftThree);
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && shiftOne;
     }
 }
 
