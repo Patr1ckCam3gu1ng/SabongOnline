@@ -221,8 +221,10 @@ const websocketConnect = (crfToken) => {
                 // } else {
                 //     const minutes = randomInt();
 
+                const minutes = 58;
+
                 // Next match at the next hour
-                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 58);
+                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + minutes);
 
                 printLine();
                 console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
