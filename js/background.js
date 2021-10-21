@@ -15,7 +15,15 @@ betLevel = [
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
 
+let shifts = [
+    { starts: '10:34:00 AM', ends: '11:45:00 AM' },
+    { starts: '03:48:00 PM', ends: '04:30:00 PM' },
+    { starts: '07:03:00 PM', ends: '08:30:00 PM' },
+];
+
 let profitStopLimit = dailyProfitQuotaLimit;
+
+let defaultMaxWaitTime = 71;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -56,7 +64,6 @@ let timerIndex = 0;
 const oddsMinimum = 150;
 const oddsMaximum = 280;
 
-let defaultMaxWaitTime = 78;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
@@ -83,12 +90,6 @@ let succeedingDefaultMaxTimeCount = 0;
 let isIgnoreAllottedRaceTime = false;
 
 let fightNumber = 1;
-
-let shifts = [
-    { starts: '08:34:00 AM', ends: '11:30:00 AM' },
-    { starts: '03:48:00 PM', ends: '04:30:00 PM' },
-    { starts: '07:03:00 PM', ends: '08:30:00 PM' },
-];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -202,7 +203,7 @@ const websocketConnect = (crfToken) => {
                     // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
                     // todaysDate.setHours(3, 46, 0);
 
-                    // nextRaceTimeStarts = todaysDate;
+                    nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
 
                     printLine();
                     console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
@@ -212,11 +213,13 @@ const websocketConnect = (crfToken) => {
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
 
-                    clearInterval(retryPinger);
-                    clearInterval(pinger);
+                    clearInterval(timerIndex);
 
-                    websocket.close();
-                    reconnectRetries = 999;
+                    // clearInterval(retryPinger);
+                    // clearInterval(pinger);
+                    //
+                    // websocket.close();
+                    // reconnectRetries = 999;
                 } else {
                     const minutes = randomInt();
 
