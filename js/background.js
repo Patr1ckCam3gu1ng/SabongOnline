@@ -213,13 +213,11 @@ const websocketConnect = (crfToken) => {
                     console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                     console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
 
-                    clearInterval(timerIndex);
-
-                    // clearInterval(retryPinger);
-                    // clearInterval(pinger);
-                    //
-                    // websocket.close();
-                    // reconnectRetries = 999;
+                    websocket.close();
+                    websocket = undefined;
+                    clearInterval(retryPinger);
+                    clearInterval(pinger);
+                    isBetSubmitted = false;
                 } else {
                     const minutes = randomInt();
 
