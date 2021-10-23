@@ -203,7 +203,7 @@ const websocketConnect = (crfToken) => {
                 // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
                 // todaysDate.setHours(3, 46, 0);
 
-                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
+                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
                 //
                 // printLine();
                 // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
@@ -217,18 +217,16 @@ const websocketConnect = (crfToken) => {
                 websocket = undefined;
                 clearInterval(retryPinger);
                 clearInterval(pinger);
-                retryPinger = 999;
 
                 printLine();
                 console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
+
                 // isBetSubmitted = false;
                 // } else {
                 //     const minutes = randomInt();
 
-                // const minutes = 58;
-
                 // Next match at the next hour
-                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + minutes);
+                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
 
                 // console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
                 // }
