@@ -475,12 +475,12 @@ const websocketConnect = (crfToken) => {
                         }
 
                         chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                        await chromeSendMessage(chrome.tabs);
+                        // await chromeSendMessage(chrome.tabs);
                     }
                 );
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
-                await chromeSendMessage(chrome.tabs);
+                // await chromeSendMessage(chrome.tabs);
             }
 
             if (presentLevel === betLevel.length - 1) {
@@ -491,8 +491,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
+            // await new Promise(resolve => setTimeout(resolve, 500));
+            // chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -504,15 +504,15 @@ const websocketConnect = (crfToken) => {
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
-            if (isDemoOnly === true) {
+            // if (isDemoOnly === true) {
                 isBetSubmitted = true;
-            } else {
-                chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
-                    async function (submittedBetValue) {
-                        isBetSubmitted = submittedBetValue > 0;
-                    }
-                );
-            }
+            // } else {
+            //     chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
+            //         async function (submittedBetValue) {
+            //             isBetSubmitted = submittedBetValue > 0;
+            //         }
+            //     );
+            // }
         }
 
         function toggledVariablesWhenCommencedShift() {
