@@ -7,16 +7,16 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    2500,
-    2500,
-    5500
+    500,
+    500,
+    1100
 ];
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
 
 let shifts = [
-    { starts: '10:34:00 AM', ends: '11:45:00 AM' },
+    { starts: '09:33:00 AM', ends: '10:59:00 AM' },
     // { starts: '03:48:00 PM', ends: '04:30:00 PM' },
     // { starts: '07:03:00 PM', ends: '08:30:00 PM' },
 ];
@@ -213,21 +213,24 @@ const websocketConnect = (crfToken) => {
                 // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                 // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                 //
-                // websocket.close();
-                // websocket = undefined;
-                // clearInterval(retryPinger);
-                // clearInterval(pinger);
+                websocket.close();
+                websocket = undefined;
+                clearInterval(retryPinger);
+                clearInterval(pinger);
+                retryPinger = 999;
+
+                printLine();
+                console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
                 // isBetSubmitted = false;
                 // } else {
                 //     const minutes = randomInt();
 
-                const minutes = 58;
+                // const minutes = 58;
 
                 // Next match at the next hour
-                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + minutes);
+                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + minutes);
 
-                printLine();
-                console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
+                // console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
                 // }
             }
 
