@@ -106,7 +106,7 @@ const tabsOnUpdated = {
 }
 
 const websocketConnect = (crfToken) => {
-    if (websocket === undefined && isDailyQuotaReached() === false) {
+    if (websocket === undefined) {
         console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
         websocket = new WebSocket(wssUrl);
     }
@@ -209,13 +209,13 @@ const websocketConnect = (crfToken) => {
                 // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
                 // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
                 //
-                websocket.close();
-                websocket = undefined;
-                clearInterval(retryPinger);
-                clearInterval(pinger);
-
-                printLine();
-                console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
+                // websocket.close();
+                // websocket = undefined;
+                // clearInterval(retryPinger);
+                // clearInterval(pinger);
+                //
+                // printLine();
+                // console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
 
                 // isBetSubmitted = false;
                 // } else {
@@ -469,12 +469,12 @@ const websocketConnect = (crfToken) => {
                         }
 
                         chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                        // await chromeSendMessage(chrome.tabs);
+                        await chromeSendMessage(chrome.tabs);
                     }
                 );
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
-                // await chromeSendMessage(chrome.tabs);
+                await chromeSendMessage(chrome.tabs);
             }
 
             if (presentLevel === betLevel.length - 1) {
@@ -485,8 +485,8 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            // await new Promise(resolve => setTimeout(resolve, 500));
-            // chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
 
             let livesRemaining = betLevel.length - presentLevel
 
@@ -498,15 +498,15 @@ const websocketConnect = (crfToken) => {
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
-            // if (isDemoOnly === true) {
+            if (isDemoOnly === true) {
                 isBetSubmitted = true;
-            // } else {
-            //     chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
-            //         async function (submittedBetValue) {
-            //             isBetSubmitted = submittedBetValue > 0;
-            //         }
-            //     );
-            // }
+            } else {
+                chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
+                    async function (submittedBetValue) {
+                        isBetSubmitted = submittedBetValue > 0;
+                    }
+                );
+            }
         }
 
         function toggledVariablesWhenCommencedShift() {
@@ -768,6 +768,8 @@ function flushPreviousVariance() {
 
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
+
+    hourHandIndex += 1;
 
     finalBetside = '';
 }
