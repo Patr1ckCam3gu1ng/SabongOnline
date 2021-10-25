@@ -1,7 +1,7 @@
 let websocket;
 let tab = { id: 0 };
 let crfTokenValue = '';
-let wssUrl = 'wss://echo.wpc2022.live/socket.io/?EIO=3&transport=websocket';
+let wssUrl = 'wss://echo.wpc2028.live/socket.io/?EIO=3&transport=websocket';
 
 let reconnectRetries = 0;
 let retryPinger;
@@ -14,12 +14,6 @@ betLevel = [
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
-
-let shifts = [
-    { starts: '09:33:00 AM', ends: '10:59:00 AM' },
-    // { starts: '03:48:00 PM', ends: '04:30:00 PM' },
-    // { starts: '07:03:00 PM', ends: '08:30:00 PM' },
-];
 
 let profitStopLimit = dailyProfitQuotaLimit;
 
@@ -110,7 +104,7 @@ const tabsOnUpdated = {
 }
 
 const websocketConnect = (crfToken) => {
-    if (websocket === undefined) {
+    if (websocket === undefined && isDailyQuotaReached() === false) {
         console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
         websocket = new WebSocket(wssUrl);
     }
@@ -203,7 +197,7 @@ const websocketConnect = (crfToken) => {
                 // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
                 // todaysDate.setHours(3, 46, 0);
 
-                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
+                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
                 //
                 // printLine();
                 // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
@@ -226,7 +220,7 @@ const websocketConnect = (crfToken) => {
                 //     const minutes = randomInt();
 
                 // Next match at the next hour
-                nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
+                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
 
                 // console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
                 // }
@@ -691,21 +685,25 @@ function isWithinAllottedRacetime() {
     }
 
     const now = new Date();
-    const weekdayIndex = now.getDay();
 
-    const shiftOne = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[0].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[0].ends).getTime());
-    // const shiftTwo = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[1].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[1].ends).getTime());
-    // const shiftThree = (new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + shifts[2].starts).getTime() && new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + shifts[2].ends).getTime());
+    let index = 9;
+    let isRaceTime = false;
+
+    while (index < 23) {
+        if (isRaceTime === false) {
+            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${ index.padStart(2, '0') }:33:00`).getTime() &&
+                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${ (index + 1).padStart(2, '0') }:33:00`).getTime();
+        }
+        index += 1;
+    }
 
     if (isWinner === false && matchLogs.length > 1) {
         return true;
     }
     if (nextRaceTimeStarts === 0) {
-        // return shiftOne || shiftTwo || shiftThree;
-        return shiftOne;
+        return isRaceTime;
     } else {
-        // return (new Date(new Date().getTime()) > nextRaceTimeStarts) && (shiftOne || shiftTwo || shiftThree);
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && shiftOne;
+        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && isRaceTime;
     }
 }
 
