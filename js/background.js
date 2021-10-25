@@ -85,6 +85,8 @@ let isIgnoreAllottedRaceTime = false;
 
 let fightNumber = 1;
 
+let hourHandIndex = 9;
+
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
         crfTokenValue = crfToken;
@@ -686,7 +688,7 @@ function isWithinAllottedRacetime() {
 
     const now = new Date();
 
-    let index = 9;
+    let index = hourHandIndex;
     let isRaceTime = false;
 
     while (index < 23) {
