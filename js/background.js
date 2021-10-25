@@ -691,8 +691,8 @@ function isWithinAllottedRacetime() {
 
     while (index < 23) {
         if (isRaceTime === false) {
-            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${ index.padStart(2, '0') }:33:00`).getTime() &&
-                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${ (index + 1).padStart(2, '0') }:33:00`).getTime();
+            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${ index.toString().padStart(2, '0') }:33:00`).getTime() &&
+                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${ (index + 1).toString().padStart(2, '0') }:33:00`).getTime();
         }
         index += 1;
     }
