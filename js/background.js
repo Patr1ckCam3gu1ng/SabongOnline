@@ -86,6 +86,7 @@ let isIgnoreAllottedRaceTime = false;
 let fightNumber = 1;
 
 let hourHandIndex = 9;
+let minutesHandIndex = 33;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -693,8 +694,8 @@ function isWithinAllottedRacetime() {
 
     while (index < 23) {
         if (isRaceTime === false) {
-            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${ index.toString().padStart(2, '0') }:33:00`).getTime() &&
-                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${ (index + 1).toString().padStart(2, '0') }:33:00`).getTime();
+            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:00`).getTime() &&
+                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:00`).getTime();
         }
         index += 1;
     }
