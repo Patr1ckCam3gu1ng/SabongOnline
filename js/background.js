@@ -17,7 +17,7 @@ let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
 
 let profitStopLimit = dailyProfitQuotaLimit;
 
-let defaultMaxWaitTime = 71;
+let defaultMaxWaitTime = 76;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -86,7 +86,8 @@ let isIgnoreAllottedRaceTime = false;
 let fightNumber = 1;
 
 let hourHandIndex = 9;
-let minutesHandIndex = 33;
+let minutesHandIndex = 0;
+let minutesHandIndexList = [ 22, 33, 47 ];
 
 let defaultIsBetOnHigherRoi = true;
 
@@ -194,6 +195,11 @@ const websocketConnect = (crfToken) => {
                 flushPreviousVariance();
 
                 stopTimer();
+
+                minutesHandIndex += 1;
+                if (minutesHandIndex > minutesHandIndexList.length - 1) {
+                    minutesHandIndex = 0;
+                }
 
                 // const { grossProfit } = calculateProfit();
 
@@ -696,8 +702,10 @@ function isWithinAllottedRacetime() {
 
     while (index < 23) {
         if (isRaceTime === false) {
-            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:00`).getTime() &&
-                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:00`).getTime();
+            const handMinute = minutesHandIndexList[minutesHandIndex];
+
+            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:${handMinute}`).getTime() &&
+                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:${handMinute}`).getTime();
         }
         index += 1;
     }
