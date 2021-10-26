@@ -199,6 +199,7 @@ const websocketConnect = (crfToken) => {
                 minutesHandIndex += 1;
                 if (minutesHandIndex > minutesHandIndexList.length - 1) {
                     minutesHandIndex = 0;
+                    hourHandIndex += 1;
                 }
 
                 // const { grossProfit } = calculateProfit();
@@ -779,8 +780,6 @@ function flushPreviousVariance() {
 
     // will be reverse once it re-commence:
     isBetOnHigherRoi = true;
-
-    hourHandIndex += 1;
 
     finalBetside = '';
 }
