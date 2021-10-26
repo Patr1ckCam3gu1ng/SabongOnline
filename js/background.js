@@ -705,8 +705,8 @@ function isWithinAllottedRacetime() {
         if (isRaceTime === false) {
             const handMinute = minutesHandIndexList[minutesHandIndex];
 
-            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:${handMinute}`).getTime() &&
-                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${minutesHandIndex.toString().padStart(2, '0')}:${handMinute}`).getTime();
+            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${handMinute.toString().padStart(2, '0')}:00`).getTime() &&
+                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${handMinute.toString().padStart(2, '0')}:00`).getTime();
         }
         index += 1;
     }
