@@ -88,6 +88,8 @@ let fightNumber = 1;
 let hourHandIndex = 9;
 let minutesHandIndex = 33;
 
+let defaultIsBetOnHigherRoi = true;
+
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
         crfTokenValue = crfToken;
@@ -611,7 +613,7 @@ function reverseBet() {
     //     isBetOnHigherRoi = !isBetOnHigherRoi;
     // }
 
-    isBetOnHigherRoi = true;
+    isBetOnHigherRoi = defaultIsBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
