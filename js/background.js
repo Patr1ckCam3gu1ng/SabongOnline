@@ -7,15 +7,13 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    500,
-    500,
-    1100
+    150,
+    150,
+    300
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.72) - betLevel[0]) * 1;
-
-let profitStopLimit = dailyProfitQuotaLimit;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
 
 let defaultMaxWaitTime = 76;
 
@@ -61,7 +59,7 @@ const oddsMaximum = 280;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = defaultMaxWaitTime;
 
-let isDemoOnly = true;
+let isDemoOnly = false;
 
 let matchLogs = [{
     betAmountPlaced: 0,
@@ -87,9 +85,9 @@ let fightNumber = 1;
 
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [ 22, 33, 47 ];
+let minutesHandIndexList = [ 11, 33, 47 ];
 
-let defaultIsBetOnHigherRoi = true;
+let defaultIsBetOnHigherRoi = false;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
