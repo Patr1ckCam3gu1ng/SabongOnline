@@ -166,10 +166,9 @@ const websocketConnect = (crfToken) => {
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
                 printLine();
-                console.log(`%c- Race not allowed yet. Be back later! -`, 'font-weight: bold; color: #009be5;');
+                console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${minutesHandIndexList[minutesHandIndex]}! -`, 'font-weight: bold; color: #009be5;');
                 isReminded = true;
             }
-
             return;
         }
 
