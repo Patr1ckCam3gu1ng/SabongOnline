@@ -85,7 +85,7 @@ let fightNumber = 1;
 
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [ 11, 33, 47 ];
+let minutesHandIndexList = [ 8, 33, 57 ];
 
 let defaultIsBetOnHigherRoi = false;
 
