@@ -166,7 +166,7 @@ const websocketConnect = (crfToken) => {
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
                 printLine();
-                console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${minutesHandIndexList[minutesHandIndex]}! -`, 'font-weight: bold; color: #009be5;');
+                console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${(minutesHandIndexList[minutesHandIndex]).toString().padStart(2, '0')} -`, 'font-weight: bold; color: #009be5;');
                 isReminded = true;
             }
             return;
@@ -603,9 +603,9 @@ function setFinalBet(fightData) {
     if (isBelowMinimumOdds === false && isAboveMaximumOdds === false) {
         reverseBet();
     }
-    // if (finalBetside === '') {
-    //     isBetOnHigherRoi = fightNumber % 2 === 0;
-    // }
+    if (finalBetside === '') {
+        isBetOnHigherRoi = fightNumber % 2 === 0;
+    }
 
     finalBetside = (isBetOnHigherRoi
         ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
@@ -613,9 +613,9 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    // if (fightNumber % 2 === 1) {
-    //     isBetOnHigherRoi = !isBetOnHigherRoi;
-    // }
+    if (fightNumber % 2 === 1) {
+        isBetOnHigherRoi = !isBetOnHigherRoi;
+    }
 
     isBetOnHigherRoi = defaultIsBetOnHigherRoi;
 }
