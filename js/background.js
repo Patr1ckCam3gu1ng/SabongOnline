@@ -7,15 +7,17 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    150,
-    150,
-    300
+    600,
+    1500,
+    3300,
+    7260,
+    15827
 ];
 
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
 
-let defaultMaxWaitTime = 76;
+let defaultMaxWaitTime = 79;
 
 const meron = 'meron';
 const wala = 'wala';
