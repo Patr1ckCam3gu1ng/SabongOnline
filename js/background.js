@@ -87,7 +87,7 @@ let fightNumber = 1;
 
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [ 8, 33, 57 ];
+let minutesHandIndexList = [8, 33];
 
 let defaultIsBetOnHigherRoi = false;
 
@@ -183,10 +183,10 @@ const websocketConnect = (crfToken) => {
                 printLine();
 
                 const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapsed: ${ totalTimelapse } )`, 'font-weight: bold; color: yellow');
+                console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
                 printLine();
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${ calculateTodaysProfit().totalNetProfit.toLocaleString() } ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
