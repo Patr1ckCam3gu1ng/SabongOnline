@@ -615,11 +615,15 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
+    if (fightNumber % 18 === 0) {
+        isBetOnHigherRoi = shuffleBetSide();
+        return;
+    }
     if (fightNumber % 2 === 1) {
         isBetOnHigherRoi = !isBetOnHigherRoi;
     }
 
-    isBetOnHigherRoi = defaultIsBetOnHigherRoi;
+    // isBetOnHigherRoi = defaultIsBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
@@ -844,6 +848,49 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
     chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
+}
+
+
+function shuffleBetSide() {
+    const shuffleArrays = (array) => {
+        let oldElement;
+        for (let i = array.length - 1; i > 0; i--) {
+            let rand = Math.floor(Math.random() * (i + 1));
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
+        }
+
+        return array;
+    }
+
+    const maxLoop = 3;
+
+    let shuffledTrueFalse = [true, false];
+    let shuffledTrueFalseBuckets = [];
+    let index = 0;
+
+    while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
+        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
+        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
+        index++;
+    }
+
+    let indexPicked = 0;
+    let indexPickedHistory = [];
+    index = 0;
+
+    while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
+        const picked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
+        if (indexPickedHistory.filter(c => c === picked).length === 0) {
+            indexPicked = picked;
+            indexPickedHistory.push(picked);
+        }
+
+        index++;
+    }
+
+    return shuffledTrueFalseBuckets[indexPicked];
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
