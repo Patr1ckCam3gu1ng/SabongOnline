@@ -437,6 +437,8 @@ const websocketConnect = (crfToken) => {
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
 
+            fightNumber = data[2].data.fight_number;
+
             setFinalBet(clonedDataBetOdds.value);
 
             if (isBetOddsIrregular(clonedDataBetOdds)) {
