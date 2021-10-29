@@ -262,7 +262,7 @@ const websocketConnect = (crfToken) => {
             const isWaitingDecision = fightData.waiting_decision === 'yes';
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
-            fightNumber = fightData.fight_number;
+            fightNumber = parseInt(fightData.fight_number) + 1;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
@@ -436,8 +436,6 @@ const websocketConnect = (crfToken) => {
 
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
-
-            fightNumber = data[2].data.fight_number;
 
             setFinalBet(clonedDataBetOdds.value);
 
