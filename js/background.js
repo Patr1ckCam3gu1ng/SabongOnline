@@ -398,7 +398,6 @@ const websocketConnect = (crfToken) => {
             }
 
             if (timerIndex <= maxWaitTimes) {
-                chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
                 return;
             }
 
@@ -548,6 +547,7 @@ function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
+        chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
     }, 1000);
 }
 
