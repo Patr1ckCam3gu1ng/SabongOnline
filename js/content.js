@@ -1,4 +1,5 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    const elementName = 'printRemainingTime';
     if (msg.text === "getCrfTokenRequest") {
         sendResponse(document.getElementsByName("csrf-token")[0].content);
         return;
@@ -34,17 +35,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         } catch (e) {
         }
     }
-    if (msg.text === "printRemainingTime") {
-        const elementName = 'printRemainingTime';
-        const elem = document.getElementById(elementName);
-        if (elem !== null) {
-            elem.parentNode.removeChild(elem);
-        }
-
+    if (msg.text === elementName) {
+        removePrintRemainingTime();
         document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
             `<h5 id="${elementName}" style="text-align: left; position: absolute; margin-left: 40%; margin-top: 15px; color: #ff00eb; text-shadow: 0px 1px #f1f1f1; ">${msg.timerIndex} of ${msg.maxWaitTimes} seconds</h5>`);
     }
-
+    if (msg.text === "deletePrintRemainingTime") {
+        removePrintRemainingTime();
+    }
     function inputBet() {
         document.getElementsByClassName("betAmount")[0].focus();
         document.execCommand('delete', false);
@@ -54,5 +52,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         document.execCommand('delete', false);
         document.execCommand('delete', false);
         document.execCommand('insertText', false, msg.betAmountPlaced);
+    }
+    function removePrintRemainingTime() {
+        const elem = document.getElementById(elementName);
+        if (elem !== null) {
+            elem.parentNode.removeChild(elem);
+        }
     }
 });

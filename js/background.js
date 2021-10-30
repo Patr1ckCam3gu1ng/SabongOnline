@@ -160,6 +160,7 @@ const websocketConnect = (crfToken) => {
 
         if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
             if (isReminded === false) {
+                deletePrintRemainingTime();
                 printLine();
                 console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${(minutesHandIndexList[minutesHandIndex]).toString().padStart(2, '0')} -`, 'font-weight: bold; color: #009be5;');
                 isReminded = true;
@@ -187,6 +188,7 @@ const websocketConnect = (crfToken) => {
                 isPrintedNowCommencingScheduled = false;
 
                 flushPreviousVariance();
+                deletePrintRemainingTime();
 
                 stopTimer();
 
@@ -258,6 +260,8 @@ const websocketConnect = (crfToken) => {
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
             fightNumber = parseInt(fightData.fight_number) + 1;
+
+            deletePrintRemainingTime();
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
@@ -547,7 +551,7 @@ function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
-        if(isBetSubmitted === false) {
+        if(isBetSubmitted === false && timerIndex <= maxWaitTimes) {
             chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
         }
     }, 1000);
@@ -869,6 +873,10 @@ function shuffleBetSide() {
     }
 
     return shuffledTrueFalseBuckets[indexPicked];
+}
+
+function deletePrintRemainingTime() {
+    chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingTime" });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
