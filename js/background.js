@@ -351,7 +351,7 @@ const websocketConnect = (crfToken) => {
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
-                        console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toFixed(2).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
                     } else {
                         lossStreak += 1;
 
@@ -489,7 +489,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
+            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced.toLocaleString()}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : ''} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -556,7 +556,7 @@ function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
-        if(isBetSubmitted === false && timerIndex <= maxWaitTimes) {
+        if (isBetSubmitted === false && timerIndex <= maxWaitTimes) {
             chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
         }
     }, 1000);
