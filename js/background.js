@@ -351,7 +351,7 @@ const websocketConnect = (crfToken) => {
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
-                        console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toFixed(2).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toLocaleString().toFixed(2)} => ${((odds * 100) - 100).toFixed(0)}%`);
                     } else {
                         lossStreak += 1;
 
