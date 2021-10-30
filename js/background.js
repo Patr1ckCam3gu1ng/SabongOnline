@@ -547,7 +547,9 @@ function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
-        chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
+        if(isBetSubmitted === false) {
+            chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
+        }
     }, 1000);
 }
 
