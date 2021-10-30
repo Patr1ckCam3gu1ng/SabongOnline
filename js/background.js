@@ -672,9 +672,9 @@ function printCommencedShift() {
 
     printLine();
 
-    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
     console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
-    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
 
     isPrintedNowCommencingScheduled = true;
 
