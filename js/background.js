@@ -180,13 +180,13 @@ const websocketConnect = (crfToken) => {
         if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
             if (isQuotaReachedPrinted === false) {
                 printProfit();
-                printLine();
+                // printLine();
 
-                const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
+                // const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
+                // console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
                 printLine();
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -647,9 +647,9 @@ function printProfit() {
     // console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
     // console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     // console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-    console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+    // console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+    // console.log(`%c---`, 'font-weight: bold; color: yellow');
+    // console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
 }
 
 function randomInt() {
