@@ -476,7 +476,14 @@ const websocketConnect = (crfToken) => {
             }
 
             await new Promise(resolve => setTimeout(resolve, 500));
-            chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
+
+            chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
+                async function (submittedBetValue) {
+                    if (submittedBetValue === 0) {
+                        chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
+                    }
+                }
+            );
 
             let livesRemaining = betLevel.length - presentLevel
 
