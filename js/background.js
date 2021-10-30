@@ -179,7 +179,7 @@ const websocketConnect = (crfToken) => {
 
         if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
             if (isQuotaReachedPrinted === false) {
-                printProfit();
+                // printProfit();
                 // printLine();
 
                 // const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
@@ -187,6 +187,8 @@ const websocketConnect = (crfToken) => {
 
                 printLine();
                 // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+
+                console.log(`%c\\( ﾟヮﾟ)/ Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
