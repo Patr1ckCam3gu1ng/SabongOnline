@@ -262,6 +262,7 @@ const websocketConnect = (crfToken) => {
             fightNumber = parseInt(fightData.fight_number) + 1;
 
             deletePrintRemainingTime();
+            stopTimer();
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
@@ -270,7 +271,6 @@ const websocketConnect = (crfToken) => {
                 if (matchLogs.length > 1 && timerIndex > 0) {
                     reverseBet();
                 }
-
                 return;
             }
 
