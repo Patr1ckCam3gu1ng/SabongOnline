@@ -17,8 +17,6 @@ betLevel = [
 // Daily Quota for 12 days
 let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
 
-let defaultMaxWaitTime = 79;
-
 const meron = 'meron';
 const wala = 'wala';
 
@@ -59,7 +57,7 @@ const oddsMinimum = 150;
 const oddsMaximum = 400;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = defaultMaxWaitTime;
+let maxWaitTimes = 74;
 
 let isDemoOnly = false;
 
@@ -78,9 +76,6 @@ let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
 
-let betNotSubmittedList = [];
-let succeedingDefaultMaxTimeCount = 0;
-
 let isIgnoreAllottedRaceTime = false;
 
 let fightNumber = 1;
@@ -88,8 +83,6 @@ let fightNumber = 1;
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
 let minutesHandIndexList = [8, 33];
-
-let defaultIsBetOnHigherRoi = false;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -277,10 +270,6 @@ const websocketConnect = (crfToken) => {
                 return;
             }
 
-            if (betNotSubmittedList.length >= 2) {
-                maxWaitTimes = betNotSubmittedList.map((c) => c).reduce((a, b) => a + b, 0) / betNotSubmittedList.length;
-            }
-
             // Fix issue whereas the betting is closed but bet is not yet submitted
             if (timerIndex > 0) {
                 clearTimeout(timer);
@@ -386,12 +375,6 @@ const websocketConnect = (crfToken) => {
                     if (isBettingWithAccumulatedAmount === true) {
                         isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
-
-                    if (betNotSubmittedList.length > 0 && succeedingDefaultMaxTimeCount >= 3) {
-                        maxWaitTimes = defaultMaxWaitTime;
-                        betNotSubmittedList = [];
-                        succeedingDefaultMaxTimeCount = 0;
-                    }
                 }
 
                 isBetSubmitted = false;
@@ -415,6 +398,7 @@ const websocketConnect = (crfToken) => {
             }
 
             if (timerIndex <= maxWaitTimes) {
+                chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
                 return;
             }
 
@@ -443,14 +427,6 @@ const websocketConnect = (crfToken) => {
 
             if (isBetOddsIrregular(clonedDataBetOdds)) {
                 return;
-            }
-
-            if (timerIndex < defaultMaxWaitTime) {
-                betNotSubmittedList.push(timerIndex);
-            } else {
-                if (betNotSubmittedList.length > 0) {
-                    succeedingDefaultMaxTimeCount += 1;
-                }
             }
 
             stopTimer();
@@ -608,7 +584,7 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        isBetOnHigherRoi = fightNumber % 2 === 0;
+        isBetOnHigherRoi = !(fightNumber % 2 === 0);
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -624,8 +600,6 @@ function reverseBet() {
     if (fightNumber % 2 === 1) {
         isBetOnHigherRoi = !isBetOnHigherRoi;
     }
-
-    // isBetOnHigherRoi = defaultIsBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
@@ -687,9 +661,9 @@ function printCommencedShift() {
 
     printLine();
 
-    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
     console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
-    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
 
     isPrintedNowCommencingScheduled = true;
 
@@ -706,7 +680,7 @@ function isWithinAllottedRacetime() {
     let index = hourHandIndex;
     let isRaceTime = false;
 
-    while (index < 23) {
+    while (index < 22) {
         if (isRaceTime === false) {
             const handMinute = minutesHandIndexList[minutesHandIndex];
 

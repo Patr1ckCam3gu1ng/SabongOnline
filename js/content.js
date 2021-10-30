@@ -34,6 +34,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         } catch (e) {
         }
     }
+    if (msg.text === "printRemainingTime") {
+        const elementName = 'printRemainingTime';
+        const elem = document.getElementById(elementName);
+        if (elem !== null) {
+            elem.parentNode.removeChild(elem);
+        }
+
+        document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
+            `<h5 id="${elementName}" style="text-align: left; position: absolute; margin-left: 40%; margin-top: 15px; color: #ff00eb; text-shadow: 0px 1px #f1f1f1; ">${msg.timerIndex} of ${msg.maxWaitTimes} seconds</h5>`);
+    }
 
     function inputBet() {
         document.getElementsByClassName("betAmount")[0].focus();
