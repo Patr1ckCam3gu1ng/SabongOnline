@@ -612,9 +612,7 @@ function reverseBet() {
         return;
     }
     if (fightNumber % 2 === 1) {
-        if (isBetOnHigherRoi === (fightNumber % 2 === 0)) {
-            isBetOnHigherRoi = !isBetOnHigherRoi;
-        }
+        isBetOnHigherRoi = !isBetOnHigherRoi;
     }
 }
 
