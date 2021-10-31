@@ -259,7 +259,7 @@ const websocketConnect = (crfToken) => {
             const isWaitingDecision = fightData.waiting_decision === 'yes';
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
-            fightNumber = parseInt(fightData.fight_number) + 1;
+            fightNumber = fightData.fight_number;
 
             deletePrintRemainingTime();
 
@@ -598,8 +598,7 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        isBetOnHigherRoi = fightNumber % 2 === 0;
-        // isBetOnHigherRoi = true;
+        isBetOnHigherRoi = true;
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -613,6 +612,7 @@ function reverseBet() {
         return;
     }
     if (fightNumber % 2 === 1) {
+        isBetOnHigherRoi = fightNumber % 2 === 0;
         isBetOnHigherRoi = !isBetOnHigherRoi;
     }
 }
