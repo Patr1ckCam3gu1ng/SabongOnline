@@ -82,7 +82,7 @@ let fightNumber = 1;
 
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [8, 33];
+let minutesHandIndexList = [17, 46];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
