@@ -598,8 +598,8 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        // isBetOnHigherRoi = fightNumber % 2 === 0;
-        isBetOnHigherRoi = true;
+        isBetOnHigherRoi = fightNumber % 2 === 0;
+        // isBetOnHigherRoi = true;
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -796,6 +796,11 @@ function millisecondsConverter(millis) {
 }
 
 function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
+    return {
+        updatedBet: bet,
+        addOnCapital: 0
+    };
+
     const { meron_odds, wala_odds } = clonedDataBetOdds.value;
     let betSideOdds = 0;
     const minimumTargetedBetOdds = 175;
