@@ -82,7 +82,7 @@ let fightNumber = 1;
 
 let hourHandIndex = 9;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [17, 46];
+let minutesHandIndexList = [8, 46];
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -598,7 +598,8 @@ function setFinalBet(fightData) {
         reverseBet();
     }
     if (finalBetside === '') {
-        isBetOnHigherRoi = !(fightNumber % 2 === 0);
+        // isBetOnHigherRoi = fightNumber % 2 === 0;
+        isBetOnHigherRoi = true;
     }
 
     finalBetside = (isBetOnHigherRoi
