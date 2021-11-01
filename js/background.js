@@ -7,11 +7,11 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    600,
-    1500,
-    3300,
-    7260,
-    15827
+    5500,
+    5500,
+    12100,
+    26620,
+    58564
 ];
 
 // Daily Quota for 12 days
@@ -607,13 +607,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (fightNumber % 18 === 0) {
-        isBetOnHigherRoi = shuffleBetSide();
-        return;
-    }
-    if (fightNumber % 2 === 1) {
-        isBetOnHigherRoi = !isBetOnHigherRoi;
-    }
+    isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
