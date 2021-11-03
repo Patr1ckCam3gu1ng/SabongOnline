@@ -182,7 +182,7 @@ const websocketConnect = (crfToken) => {
                 printLine();
                 // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
 
-                console.log(`%c\\( ﾟヮﾟ)/ Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+                // console.log(`%c\\( ﾟヮﾟ)/ Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -265,7 +265,7 @@ const websocketConnect = (crfToken) => {
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
-                console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                // console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
 
                 if (matchLogs.length > 1 && timerIndex > 0) {
                     reverseBet();
@@ -319,7 +319,8 @@ const websocketConnect = (crfToken) => {
                             winCount += 1;
                         } else {
                             lossCount += 1;
-                            console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
+                            // console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
+                            console.log('%cYou lose!', 'font-weight: bold; color: red');
                         }
                     }
                 } else {
@@ -492,7 +493,7 @@ const websocketConnect = (crfToken) => {
                 livesRemaining += 1;
             }
 
-            console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
+            // console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -659,7 +660,7 @@ function randomInt() {
 }
 
 function printLine() {
-    console.log('%c-', 'color: black;');
+    // console.log('%c-', 'color: black;');
 }
 
 function printCommencedShift() {
@@ -669,9 +670,9 @@ function printCommencedShift() {
 
     printLine();
 
-    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
-    console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
-    console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
+    // console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
+    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
 
     isPrintedNowCommencingScheduled = true;
 
