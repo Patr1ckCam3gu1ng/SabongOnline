@@ -7,16 +7,16 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    2500,
-    2500,
-    5500,
-    12100,
-    26620,
-    58564
+    1300,
+    1300,
+    2860,
+    6292,
+    13842,
+    30453
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
+let dailyProfitQuotaLimit = ((betLevel[0] * 1.5) - betLevel[0]) * 1;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -49,7 +49,7 @@ let matchOdds = 0;
 let isReminded = false;
 let isWinner = false;
 let isLastMatchDraw = false;
-let ignoreRaceTime = false;
+
 
 let timer;
 let timerIndex = 0;
@@ -60,7 +60,7 @@ const oddsMaximum = 400;
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 82;
 
-let isDemoOnly = false;
+let isDemoOnly = true;
 
 let matchLogs = [{
     betAmountPlaced: 0,
@@ -77,7 +77,7 @@ let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
 
-let isIgnoreAllottedRaceTime = false;
+let isIgnoreAllottedRaceTime = ignoreRaceTime = true;
 
 let fightNumber = 1;
 
@@ -620,7 +620,7 @@ function paymentSafe(isDraw) {
     if (isDraw === false && isBetSubmitted === false && timerIndex > 1) {
         printLine();
     }
-    console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
+    // console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
 }
 
 function printProfit() {
