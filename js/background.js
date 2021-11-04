@@ -7,7 +7,8 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    5500,
+    2500,
+    2500,
     5500,
     12100,
     26620,
@@ -57,7 +58,7 @@ const oddsMinimum = 150;
 const oddsMaximum = 400;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 74;
+let maxWaitTimes = 82;
 
 let isDemoOnly = false;
 
@@ -608,6 +609,10 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
+    if (presentLevel === 1 && matchLogs.length === 2) {
+        isBetOnHigherRoi = true;
+        return;
+    }
     isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
