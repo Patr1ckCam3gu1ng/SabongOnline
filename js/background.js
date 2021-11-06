@@ -15,7 +15,7 @@ betLevel = [
 
 // Daily Quota for 12 days
 // let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
-let dailyProfitQuotaLimit = 25000;
+let dailyProfitQuotaLimit = 18000;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -151,21 +151,21 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        let isWithinAllottedRaceTime = false;
+        // let isWithinAllottedRaceTime = false;
 
-        if (isWithinAllottedRacetime()) {
-            toggledVariablesWhenCommencedShift();
-        }
+        // if (isWithinAllottedRacetime()) {
+        //     toggledVariablesWhenCommencedShift();
+        // }
 
-        if (isWithinAllottedRaceTime === false) {
-            if (isReminded === false) {
-                deletePrintRemainingTime();
-                printLine();
-                console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${(minutesHandIndexList[minutesHandIndex]).toString().padStart(2, '0')} -`, 'font-weight: bold; color: #009be5;');
-                isReminded = true;
-            }
-            return;
-        }
+        // if (isWithinAllottedRaceTime === false) {
+        //     if (isReminded === false) {
+        //         deletePrintRemainingTime();
+        //         printLine();
+        //         console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${(minutesHandIndexList[minutesHandIndex]).toString().padStart(2, '0')} -`, 'font-weight: bold; color: #009be5;');
+        //         isReminded = true;
+        //     }
+        //     return;
+        // }
 
         const fightEvent = data[0];
         const isBetting = data[1] === 'betting';
@@ -178,8 +178,8 @@ const websocketConnect = (crfToken) => {
                 // const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
                 // console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
 
-                printLine();
-                // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF; font-size: 15px;');
+                // console.log('%c-', 'color: black;');
+                // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold;');
 
                 // console.log(`%c\\( ﾟヮﾟ)/ Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
 
@@ -197,39 +197,42 @@ const websocketConnect = (crfToken) => {
                     hourHandIndex += 1;
                 }
 
-                // const { grossProfit } = calculateProfit();
+                const { grossProfit } = calculateProfit();
 
-                // if (grossProfit > profitStopLimit) {
-                // let todaysDate = new Date();
-                // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                // todaysDate.setHours(3, 46, 0);
+                if (grossProfit > dailyProfitQuotaLimit) {
+                    // let todaysDate = new Date();
+                    // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
+                    // todaysDate.setHours(3, 46, 0);
+                    //
+                    // nextRaceTimeStarts = new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
 
-                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
-                //
-                // printLine();
-                // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
-                // printLine();
-                //
-                // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-                // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
-                // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-                //
-                // websocket.close();
-                // websocket = undefined;
-                // clearInterval(retryPinger);
-                // clearInterval(pinger);
-                //
-                // printLine();
-                // console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
+                    console.log('%c-', 'color: black;');
+                    console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold;');
 
-                // isBetSubmitted = false;
-                // } else {
-                //     const minutes = randomInt();
+                    // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
+                    // printLine();
+
+                    // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
+                    // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
+                    // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
+
+                    websocket.close();
+                    websocket = undefined;
+                    clearInterval(retryPinger);
+                    clearInterval(pinger);
+
+                    // printLine();
+                    // console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
+
+                    isBetSubmitted = false;
+                }
+                // else {
+                // const minutes = randomInt();
 
                 // Next match at the next hour
-                // nextRaceTimeStarts =  new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
+                // nextRaceTimeStarts = new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
 
-                // console.log(`%cNext race time after => ${ minutes } minutes => ${ nextRaceTimeStarts.getHours().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getMinutes().toString().padStart(2, '0') }:${ nextRaceTimeStarts.getSeconds().toString().padStart(2, '0') }`, 'font-weight: bold; color: #FF00FF');
+                // console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours().toString().padStart(2, '0')}:${nextRaceTimeStarts.getMinutes().toString().padStart(2, '0')}:${nextRaceTimeStarts.getSeconds().toString().padStart(2, '0')}`, 'font-weight: bold; color: #FF00FF');
                 // }
             }
 
