@@ -172,68 +172,18 @@ const websocketConnect = (crfToken) => {
 
         if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
             if (isQuotaReachedPrinted === false) {
-                // printProfit();
-                // printLine();
-
-                // const totalTimelapse = millisecondsConverter(window.performance.now() - startTimelapse);
-                // console.log(`%c( Timelapsed: ${totalTimelapse} )`, 'font-weight: bold; color: yellow');
-
-                // console.log('%c-', 'color: black;');
-                // console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold;');
-
-                // console.log(`%c\\( ﾟヮﾟ)/ Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+                console.log('%c-', 'color: black;');
+                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
+                isBetSubmitted = false;
 
-                flushPreviousVariance();
-                deletePrintRemainingTime();
-
+                websocket.close();
+                websocket = undefined;
+                clearInterval(retryPinger);
+                clearInterval(pinger);
                 stopTimer();
-
-                minutesHandIndex += 1;
-                if (minutesHandIndex > minutesHandIndexList.length - 1) {
-                    minutesHandIndex = 0;
-                    hourHandIndex += 1;
-                }
-
-                const { grossProfit } = calculateProfit();
-
-                if (grossProfit > dailyProfitQuotaLimit) {
-                    // let todaysDate = new Date();
-                    // todaysDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1));
-                    // todaysDate.setHours(3, 46, 0);
-                    //
-                    // nextRaceTimeStarts = new Date(new Date().toLocaleDateString() + ' ' + shifts[0].ends).getTime();
-
-                    console.log('%c-', 'color: black;');
-                    console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold;');
-
-                    // console.log(`%cThat's all for today. See you again tomorrow!`, 'font-weight: bold; color: #FF00FF');
-                    // printLine();
-
-                    // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-                    // console.log(`%cDon't chase high returns. Strive for consistency`, 'font-weight: bold; color: #FF00FF');
-                    // console.log(`%c- -------------------------------------------- -`, 'font-weight: bold; color: #FF00FF;');
-
-                    websocket.close();
-                    websocket = undefined;
-                    clearInterval(retryPinger);
-                    clearInterval(pinger);
-
-                    // printLine();
-                    // console.log(`%c- Forced terminated -`, 'font-weight: bold; color: red; font-size: 12px;');
-
-                    isBetSubmitted = false;
-                }
-                // else {
-                // const minutes = randomInt();
-
-                // Next match at the next hour
-                // nextRaceTimeStarts = new Date(new Date().toLocaleDateString() + ' ' + shifts[0].starts).setMinutes(new Date().getMinutes() + 60);
-
-                // console.log(`%cNext race time after => ${minutes} minutes => ${nextRaceTimeStarts.getHours().toString().padStart(2, '0')}:${nextRaceTimeStarts.getMinutes().toString().padStart(2, '0')}:${nextRaceTimeStarts.getSeconds().toString().padStart(2, '0')}`, 'font-weight: bold; color: #FF00FF');
-                // }
             }
 
             return;
