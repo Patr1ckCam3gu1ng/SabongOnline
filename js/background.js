@@ -7,16 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1300,
-    1300,
-    2860,
-    6292,
-    13842,
-    30453
+    11000,
+    11000,
+    24200,
+    53240
 ];
 
 // Daily Quota for 12 days
-let dailyProfitQuotaLimit = ((betLevel[0] * 1.5) - betLevel[0]) * 1;
+// let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
+let dailyProfitQuotaLimit = 25000;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -50,7 +49,6 @@ let isReminded = false;
 let isWinner = false;
 let isLastMatchDraw = false;
 
-
 let timer;
 let timerIndex = 0;
 
@@ -77,13 +75,13 @@ let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
 
-let isIgnoreAllottedRaceTime = ignoreRaceTime = true;
 
 let fightNumber = 1;
 
-let hourHandIndex = 9;
+let hourHandIndex = 14;
 let minutesHandIndex = 0;
-let minutesHandIndexList = [8, 33];
+let minutesHandIndexList = [33];
+let isIgnoreHourMinuteHandIndex = false;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -159,7 +157,7 @@ const websocketConnect = (crfToken) => {
             toggledVariablesWhenCommencedShift();
         }
 
-        if (isWithinAllottedRaceTime === false && ignoreRaceTime === false) {
+        if (isWithinAllottedRaceTime === false) {
             if (isReminded === false) {
                 deletePrintRemainingTime();
                 printLine();
@@ -609,11 +607,13 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (presentLevel === 1 && matchLogs.length === 2) {
-        isBetOnHigherRoi = true;
-        return;
-    }
-    isBetOnHigherRoi = !isBetOnHigherRoi;
+    isBetOnHigherRoi = true;
+
+    // if (presentLevel === 1 && matchLogs.length === 2) {
+    //     isBetOnHigherRoi = true;
+    //     return;
+    // }
+    // isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
@@ -685,8 +685,8 @@ function printCommencedShift() {
 }
 
 function isWithinAllottedRacetime() {
-    if (isIgnoreAllottedRaceTime === true) {
-        return isIgnoreAllottedRaceTime;
+    if (isIgnoreHourMinuteHandIndex === true) {
+        return isIgnoreHourMinuteHandIndex;
     }
 
     const now = new Date();
