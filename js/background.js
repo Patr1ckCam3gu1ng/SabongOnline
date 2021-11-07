@@ -7,14 +7,16 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    24000,
-    24000,
-    52800,
+    5000,
+    5000,
+    11000,
+    24200,
+    52272
 ];
 
 // Daily Quota for 12 days
 // let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
-let dailyProfitQuotaLimit = 18000;
+let dailyProfitQuotaLimit = 8000;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -55,7 +57,7 @@ const oddsMinimum = 150;
 const oddsMaximum = 400;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 82;
+let maxWaitTimes = 74;
 
 let isDemoOnly = true;
 
