@@ -7,9 +7,9 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    12000,
-    12000,
-    26400
+    24000,
+    24000,
+    52800,
 ];
 
 // Daily Quota for 12 days
