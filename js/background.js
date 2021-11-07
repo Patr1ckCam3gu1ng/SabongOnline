@@ -184,6 +184,8 @@ const websocketConnect = (crfToken) => {
                 clearInterval(retryPinger);
                 clearInterval(pinger);
                 stopTimer();
+
+                chromeTabs.sendMessage(tab.id, { text: 'logout' });
             }
 
             return;

@@ -39,6 +39,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         } catch (e) {
         }
     }
+    if (msg.text === 'logout') {
+        window.location.href = `${window.location.origin}/logout`;
+    }
     if (msg.text === 'hasAttributes') {
         sendResponse({
             isMinus: document.getElementById(btnInputMinus)?.hasAttribute(isClicked) ?? false,
