@@ -513,7 +513,20 @@ function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
         if (isBetSubmitted === false && timerIndex <= maxWaitTimes) {
-            chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
+            chrome.tabs.sendMessage(tab.id, { text: "hasAttributes" },
+                function (response) {
+                    const addOnSeconds = 10;
+
+                    if (response.isMinus === true) {
+                        timerIndex -= addOnSeconds;
+                    }
+                    if (response.isAdd === true) {
+                        timerIndex += addOnSeconds;
+                    }
+
+                    chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
+                }
+            );
         }
     }, 1000);
 }

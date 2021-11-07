@@ -1,5 +1,9 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     const elementName = 'printRemainingTime';
+    const btnInputMinus = 'btnInputMinus';
+    const btnInputAdd = 'btnInputAdd';
+    const isClicked = 'isClicked';
+
     if (msg.text === "getCrfTokenRequest") {
         sendResponse(document.getElementsByName("csrf-token")[0].content);
         return;
@@ -35,14 +39,26 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         } catch (e) {
         }
     }
+    if (msg.text === 'hasAttributes') {
+        sendResponse({
+            isMinus: document.getElementById(btnInputMinus)?.hasAttribute(isClicked) ?? false,
+            isAdd: document.getElementById(btnInputAdd)?.hasAttribute(isClicked) ?? false
+        });
+    }
     if (msg.text === elementName) {
         removePrintRemainingTime();
+
+        function addFunction(elementId) {
+            return `document.getElementById('${elementId}').setAttribute('${isClicked}','true'); document.getElementById('${elementId}').setAttribute('style','border-color:#1e81f1;border-width:3px;');`
+        }
+
         document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
-            `<h5 id="${elementName}" style="text-align: left; position: absolute; margin-left: 40%; margin-top: 15px; color: #ff00eb; text-shadow: 0px 1px whitesmoke; ">${msg.timerIndex} of ${msg.maxWaitTimes} seconds</h5>`);
+            `<div id="${elementName}" style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <input id="${btnInputMinus}" type="button" onclick="${addFunction(btnInputMinus)}" value="-10"> </td> <td> <h5 id="printRemainingTime" style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #ff00eb;text-shadow: 0px 1px whitesmoke;">${msg.timerIndex.toString().padStart(2, '0')} of ${msg.maxWaitTimes} seconds</h5> </td> <td> <input type="button" id="${btnInputAdd}" onclick="${addFunction(btnInputAdd)}" value="+10"> </td> </tr> </tbody></table> </div>`);
     }
     if (msg.text === "deletePrintRemainingTime") {
         removePrintRemainingTime();
     }
+
     function inputBet() {
         document.getElementsByClassName("betAmount")[0].focus();
         document.execCommand('delete', false);
@@ -53,6 +69,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         document.execCommand('delete', false);
         document.execCommand('insertText', false, msg.betAmountPlaced);
     }
+
     function removePrintRemainingTime() {
         const elem = document.getElementById(elementName);
         if (elem !== null) {
