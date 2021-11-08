@@ -577,7 +577,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = true;
+    isBetOnHigherRoi = false;
 
     // if (presentLevel === 1 && matchLogs.length === 2) {
     //     isBetOnHigherRoi = true;
