@@ -517,13 +517,15 @@ function startTimer() {
         if (isBetSubmitted === false && timerIndex <= maxWaitTimes) {
             chrome.tabs.sendMessage(tab.id, { text: "hasAttributes" },
                 function (response) {
-                    const addOnSeconds = 10;
+                    if (typeof response !== 'undefined') {
+                        const addOnSeconds = 10;
 
-                    if (response.isMinus === true) {
-                        timerIndex -= addOnSeconds;
-                    }
-                    if (response.isAdd === true) {
-                        timerIndex += addOnSeconds;
+                        if (response.isMinus === true) {
+                            timerIndex -= addOnSeconds;
+                        }
+                        if (response.isAdd === true) {
+                            timerIndex += addOnSeconds;
+                        }
                     }
 
                     chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
