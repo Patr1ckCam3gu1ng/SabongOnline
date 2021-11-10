@@ -233,15 +233,6 @@ const websocketConnect = (crfToken) => {
                 timerIndex = 0;
             }
 
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false) {
-                console.log(`%cSkipping Match! Odds too low: ${finalBetside} => ${matchOdds} ⤵`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                return;
-            }
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false) {
-                console.log(`%cSkipping Match! Odds too high: ${finalBetside} => ${matchOdds} ⤴`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-                return;
-            }
-
             if (fightStatus === 'cancelled' && isOpenBet === false) {
                 paymentSafe(false);
 
@@ -272,7 +263,7 @@ const websocketConnect = (crfToken) => {
                         }
                     }
                 } else {
-                    console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
+                    // console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
