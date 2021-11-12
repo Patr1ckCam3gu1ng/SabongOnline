@@ -168,8 +168,8 @@ const websocketConnect = (crfToken) => {
 
         if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
             if (isQuotaReachedPrinted === false) {
-                console.log('%c-', 'color: black;');
                 console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+                console.log('%c-', 'color: black;');
 
                 isQuotaReachedPrinted = true;
                 isPrintedNowCommencingScheduled = false;
@@ -533,7 +533,8 @@ function reverseBet() {
         isBetOnHigherRoi = true;
         return;
     }
-    isBetOnHigherRoi = !isBetOnHigherRoi;
+    // isBetOnHigherRoi = !isBetOnHigherRoi;
+    isBetOnHigherRoi = shuffleBetSide();
 }
 
 function paymentSafe(isDraw) {
