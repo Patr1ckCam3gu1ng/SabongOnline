@@ -99,7 +99,7 @@ const tabsOnUpdated = {
 
 const websocketConnect = (crfToken) => {
     if (websocket === undefined) {
-        console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+        // console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
         websocket = new WebSocket(wssUrl);
     }
     websocket.onopen = function () {
@@ -127,7 +127,7 @@ const websocketConnect = (crfToken) => {
             clearInterval(pinger);
 
             reconnectRetries = 0;
-            console.log(`%c- Connected -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+            // console.log(`%c- Connected -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
             pinger = setInterval(function () {
                 try {
@@ -167,21 +167,18 @@ const websocketConnect = (crfToken) => {
         const isBetting = data[1] === 'betting';
 
         if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
-            if (isQuotaReachedPrinted === false) {
-                console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
-                console.log('%c-', 'color: black;');
+            console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+            console.log('%c-', 'color: black;');
 
-                isQuotaReachedPrinted = true;
-                isPrintedNowCommencingScheduled = false;
-                isBetSubmitted = false;
+            isQuotaReachedPrinted = true;
+            isPrintedNowCommencingScheduled = false;
+            isBetSubmitted = false;
 
-                flushPreviousVariance();
-                deletePrintRemainingTime();
+            flushPreviousVariance();
 
-                stopTimer();
+            stopTimer();
 
-                // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
-            }
+            // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
 
             return;
         }
@@ -209,8 +206,6 @@ const websocketConnect = (crfToken) => {
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
             fightNumber = fightData.fight_number;
-
-            deletePrintRemainingTime();
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
                 printLine();
@@ -453,7 +448,7 @@ const websocketConnect = (crfToken) => {
         }
 
         clearInterval(pinger);
-        console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
+        // console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
         if (!(presentLevel > betLevel.length - 1) && isDailyQuotaReached() === false) {
             retryPinger = setInterval(function () {
@@ -469,7 +464,7 @@ const websocketConnect = (crfToken) => {
                     return;
                 }
                 if (crfTokenValue !== '') {
-                    console.log('%c- Reconnecting -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
+                    // console.log('%c- Reconnecting -', 'font-weight: bold; color: #00ff00; font-size: 12px;');
                     websocket = new WebSocket(wssUrl);
                     createWebSocketConnection(crfTokenValue);
                 }
@@ -529,18 +524,22 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (presentLevel === 1 && matchLogs.length === 2) {
-        isBetOnHigherRoi = true;
-        return;
+    // if (presentLevel === 1 && matchLogs.length === 2) {
+    //     isBetOnHigherRoi = true;
+    //     return;
+    // }
+    if (fightNumber % 2 === 1) {
+        isBetOnHigherRoi = !isBetOnHigherRoi;
     }
     // isBetOnHigherRoi = !isBetOnHigherRoi;
-    isBetOnHigherRoi = shuffleBetSide();
+    // isBetOnHigherRoi = shuffleBetSide();
 }
 
 function paymentSafe(isDraw) {
     if (isDraw === false && isBetSubmitted === false && timerIndex > 1) {
         printLine();
     }
+
     // console.log('%cPayment is safe!', 'font-weight: bold; color: yellow', isDraw ? 'It\'s a draw' : 'Game cancelled');
 }
 
@@ -807,10 +806,6 @@ function shuffleBetSide() {
     }
 
     return shuffledTrueFalseBuckets[indexPicked];
-}
-
-function deletePrintRemainingTime() {
-    chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingTime" });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
