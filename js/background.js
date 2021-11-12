@@ -53,7 +53,7 @@ let timer;
 let timerIndex = 0;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 74;
+let maxWaitTimes = 68;
 
 let isDemoOnly = true;
 
@@ -175,10 +175,9 @@ const websocketConnect = (crfToken) => {
                 isPrintedNowCommencingScheduled = false;
                 isBetSubmitted = false;
 
-                websocket.close();
-                websocket = undefined;
-                clearInterval(retryPinger);
-                clearInterval(pinger);
+                flushPreviousVariance();
+                deletePrintRemainingTime();
+
                 stopTimer();
 
                 // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
