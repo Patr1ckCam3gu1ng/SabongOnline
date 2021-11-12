@@ -7,16 +7,17 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    2600,
-    2600,
-    5720,
-    12584,
-    27181
+    1200,
+    1200,
+    2640,
+    5808,
+    12661,
+    27602
 ];
 
 // Daily Quota for 12 days
 // let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
-let dailyProfitQuotaLimit = 7000;
+let dailyProfitQuotaLimit = 800;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -70,7 +71,6 @@ let isPrintedNowCommencingScheduled = false;
 let startTimelapse = 0;
 
 let nextRaceTimeStarts = 0;
-
 
 let fightNumber = 1;
 
@@ -181,7 +181,7 @@ const websocketConnect = (crfToken) => {
                 clearInterval(pinger);
                 stopTimer();
 
-                chrome.tabs.sendMessage(tab.id, { text: 'logout' });
+                // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
             }
 
             return;
@@ -530,13 +530,11 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = true;
-
-    // if (presentLevel === 1 && matchLogs.length === 2) {
-    //     isBetOnHigherRoi = true;
-    //     return;
-    // }
-    // isBetOnHigherRoi = !isBetOnHigherRoi;
+    if (presentLevel === 1 && matchLogs.length === 2) {
+        isBetOnHigherRoi = true;
+        return;
+    }
+    isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
