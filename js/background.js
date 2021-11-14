@@ -7,17 +7,19 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1200,
-    1200,
-    2640,
-    5808,
-    12661,
-    27602
+    330,
+    330,
+    726,
+    1597,
+    3482,
+    7591,
+    16509
 ];
 
-// Daily Quota for 12 days
-// let dailyProfitQuotaLimit = ((betLevel[0] * 1.6) - betLevel[0]) * 1;
-let dailyProfitQuotaLimit = 800;
+let dailyProfitQuotaLimit = 160;
+
+//should remain 'let' so we can change it in the console:
+let maxWaitTimes = 68;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -38,22 +40,14 @@ let matchIndex = 1;
 let winCount = 0;
 let lossCount = 0;
 let drawCount = 0;
-let lossStreak = 0;
 let winStreak = 0;
 let highestLossStreak = 0;
-let highestWinStreak = 0;
 let betAmountPlaced = 0;
-let isBettingWithAccumulatedAmount = false;
-let matchOdds = 0;
-let isReminded = false;
 let isWinner = false;
 let isLastMatchDraw = false;
 
 let timer;
 let timerIndex = 0;
-
-//should remain 'let' so we can change it in the console:
-let maxWaitTimes = 68;
 
 let isDemoOnly = true;
 
@@ -67,17 +61,7 @@ let matchLogs = [{
     isExtendedBet: false
 }];
 
-let isPrintedNowCommencingScheduled = false;
-let startTimelapse = 0;
-
-let nextRaceTimeStarts = 0;
-
 let fightNumber = 1;
-
-let hourHandIndex = 14;
-let minutesHandIndex = 0;
-let minutesHandIndexList = [33];
-let isIgnoreHourMinuteHandIndex = false;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -147,31 +131,14 @@ const websocketConnect = (crfToken) => {
             return;
         }
 
-        // let isWithinAllottedRaceTime = false;
-
-        // if (isWithinAllottedRacetime()) {
-        //     toggledVariablesWhenCommencedShift();
-        // }
-
-        // if (isWithinAllottedRaceTime === false) {
-        //     if (isReminded === false) {
-        //         deletePrintRemainingTime();
-        //         printLine();
-        //         console.log(`%c- Race not allowed yet. Be back later at ${hourHandIndex}:${(minutesHandIndexList[minutesHandIndex]).toString().padStart(2, '0')} -`, 'font-weight: bold; color: #009be5;');
-        //         isReminded = true;
-        //     }
-        //     return;
-        // }
-
         const fightEvent = data[0];
         const isBetting = data[1] === 'betting';
 
-        if (isDailyQuotaReached() === true && isBettingWithAccumulatedAmount === false) {
+        if (isDailyQuotaReached() === true) {
             console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
             console.log('%c-', 'color: black;');
 
             isQuotaReachedPrinted = true;
-            isPrintedNowCommencingScheduled = false;
             isBetSubmitted = false;
 
             flushPreviousVariance();
@@ -182,8 +149,6 @@ const websocketConnect = (crfToken) => {
 
             return;
         }
-
-        isReminded = false;
 
         if (presentLevel > betLevel.length - 1) {
             printLine();
@@ -208,9 +173,6 @@ const websocketConnect = (crfToken) => {
             fightNumber = fightData.fight_number;
 
             if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
-                printLine();
-                // console.log(`%cBet not submitted. Timer was only ${timerIndex} whilst max wait time is ${maxWaitTimes}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
-
                 if (matchLogs.length > 1 && timerIndex > 0) {
                     reverseBet();
                 }
@@ -252,12 +214,9 @@ const websocketConnect = (crfToken) => {
                             winCount += 1;
                         } else {
                             lossCount += 1;
-                            // console.log('%cYou lose!', 'font-weight: bold; color: red', `${winner} wins`);
                             console.log('%cYou lose!', 'font-weight: bold; color: red');
                         }
                     }
-                } else {
-                    // console.log(`%c${winner === 'draw' ? 'It\'s a draw!' : `${winner} wins`}`, 'font-weight: bold; color: #3395ff; font-size: 12px;');
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
@@ -274,41 +233,19 @@ const websocketConnect = (crfToken) => {
                             winStreak += 1;
                         }
 
-                        lossStreak = 0;
-
                         setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
-
-                        if (winStreak > highestWinStreak) {
-                            highestWinStreak = winStreak;
-                        }
 
                         isMatchWin = isWinner;
                         presentLevel = 0;
                         console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
                     } else {
-                        lossStreak += 1;
-
                         winStreak = 0;
 
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
-                        if (lossStreak > highestLossStreak) {
-                            if (isBettingWithAccumulatedAmount === false) {
-                                highestLossStreak = lossStreak;
-                            }
-                        }
-
                         presentLevel += 1;
 
-                        if (isBettingWithAccumulatedAmount === true) {
-                            presentLevel -= 1;
-                        }
-
                         totalLossCountByFar += 1;
-                    }
-
-                    if (isBettingWithAccumulatedAmount === true) {
-                        isBettingWithAccumulatedAmount = !isBettingWithAccumulatedAmount;
                     }
                 }
 
@@ -340,7 +277,7 @@ const websocketConnect = (crfToken) => {
             if (isMatchWin === true && isPendingPrintProfit === true) {
                 isPendingPrintProfit = false;
 
-                printProfit();
+                // printProfit();
             }
 
             if ([0, 1].includes(matchIndex / 8 % 2)) {
@@ -362,15 +299,6 @@ const websocketConnect = (crfToken) => {
             const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
 
             bet = updatedBet;
-
-            if (winStreak > 1 && presentLevel === 0 && isMatchWin === true) {
-                isBettingWithAccumulatedAmount = true;
-            }
-            // if (isBettingWithAccumulatedAmount === true) {
-            //     bet = betLevel[2];
-            //     presentLevel = 3;
-            //     lossStreak = 0;
-            // }
 
             betAmountPlaced = parseInt(bet);
 
@@ -408,14 +336,6 @@ const websocketConnect = (crfToken) => {
                 }
             );
 
-            let livesRemaining = betLevel.length - presentLevel
-
-            if (isBettingWithAccumulatedAmount === true) {
-                livesRemaining += 1;
-            }
-
-            // console.log(`${livesRemaining} ${livesRemaining > 1 ? 'lives' : 'life'} remaining => ${betAmountPlaced}${isBettingWithAccumulatedAmount ? '(Ac)' : ''}${isExtendedBet ? '(Ex)' : `${addOnCapital > 0 ? '(Ad)' : ''}`} pesos => %c${finalBetside} at ${isBetOnHigherRoi ? `higher ROI ⤴` : `lower ROI ⤵`}`, 'font-weight: bold; color: pink');
-
             await new Promise(resolve => setTimeout(resolve, 700));
 
             if (isDemoOnly === true) {
@@ -427,19 +347,6 @@ const websocketConnect = (crfToken) => {
                     }
                 );
             }
-        }
-
-        function toggledVariablesWhenCommencedShift() {
-            isWithinAllottedRaceTime = true;
-            isQuotaReachedPrinted = false;
-            nextRaceTimeStarts = 0;
-            printCommencedShift();
-
-            if (isPrintedNowCommencingScheduled === true) {
-                return;
-            }
-
-            timerIndex += 12;
         }
     }
     websocket.onclose = function () {
@@ -482,22 +389,27 @@ function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
         if (isBetSubmitted === false && timerIndex <= maxWaitTimes) {
-            chrome.tabs.sendMessage(tab.id, { text: "hasAttributes" },
-                function (response) {
-                    if (typeof response !== 'undefined') {
-                        const addOnSeconds = 10;
+            try {
+                chrome.tabs.sendMessage(tab.id, { text: "hasAttributes" },
+                    function (response) {
+                        if (typeof response !== 'undefined') {
+                            const addOnSeconds = 10;
 
-                        if (response.isMinus === true) {
-                            timerIndex -= addOnSeconds;
+                            if (response.isMinus === true) {
+                                timerIndex -= addOnSeconds;
+                            }
+                            if (response.isAdd === true) {
+                                timerIndex += addOnSeconds;
+                            }
                         }
-                        if (response.isAdd === true) {
-                            timerIndex += addOnSeconds;
-                        }
+
+                        chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
                     }
-
-                    chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
-                }
-            );
+                );
+            }
+            catch (e) {
+                
+            }
         }
     }, 1000);
 }
@@ -524,15 +436,9 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    // if (presentLevel === 1 && matchLogs.length === 2) {
-    //     isBetOnHigherRoi = true;
-    //     return;
-    // }
     if (fightNumber % 2 === 1) {
         isBetOnHigherRoi = !isBetOnHigherRoi;
     }
-    // isBetOnHigherRoi = !isBetOnHigherRoi;
-    // isBetOnHigherRoi = shuffleBetSide();
 }
 
 function paymentSafe(isDraw) {
@@ -544,22 +450,20 @@ function paymentSafe(isDraw) {
 }
 
 function printProfit() {
-    const {
-        grossProfit,
-        wonMatches,
-        lossMatches,
-        todaysTotalNetProfit
-    } = calculateProfit();
-    const totalMatches = [...matchLogs].slice(1);
+    const { grossProfit } = calculateProfit();
 
-    printLine();
+    return grossProfit.toLocaleString();
+   /*
+    // const totalMatches = [...matchLogs].slice(1);
+
+    console.log('%c-', 'color: black;');
 
     // console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
     // console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
     // console.log(`%c---`, 'font-weight: bold; color: yellow');
     // console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
     // console.log(`%c---`, 'font-weight: bold; color: yellow');
-    // console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+    console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');*/
 }
 
 function randomInt() {
@@ -586,52 +490,6 @@ function randomInt() {
 
 function printLine() {
     // console.log('%c-', 'color: black;');
-}
-
-function printCommencedShift() {
-    if (isPrintedNowCommencingScheduled === true) {
-        return;
-    }
-
-    printLine();
-
-    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
-    // console.log(`%c- Thank you for waiting. Commencing next match. Good luck! -`, 'font-weight: bold; color: #ff9400;');
-    // console.log(`%c- -------------------------------------------------------- -`, 'font-weight: bold; color: #ff9400;');
-
-    isPrintedNowCommencingScheduled = true;
-
-    startTimelapse = window.performance.now();
-}
-
-function isWithinAllottedRacetime() {
-    if (isIgnoreHourMinuteHandIndex === true) {
-        return isIgnoreHourMinuteHandIndex;
-    }
-
-    const now = new Date();
-
-    let index = hourHandIndex;
-    let isRaceTime = false;
-
-    while (index < 22) {
-        if (isRaceTime === false) {
-            const handMinute = minutesHandIndexList[minutesHandIndex];
-
-            isRaceTime = new Date(now.getTime()) > new Date(now.toLocaleDateString() + ' ' + `${index.toString().padStart(2, '0')}:${handMinute.toString().padStart(2, '0')}:00`).getTime() &&
-                new Date(now.getTime()) < new Date(now.toLocaleDateString() + ' ' + `${(index + 1).toString().padStart(2, '0')}:${handMinute.toString().padStart(2, '0')}:00`).getTime();
-        }
-        index += 1;
-    }
-
-    if (isWinner === false && matchLogs.length > 1) {
-        return true;
-    }
-    if (nextRaceTimeStarts === 0) {
-        return isRaceTime;
-    } else {
-        return (new Date(new Date().getTime()) > nextRaceTimeStarts) && isRaceTime;
-    }
 }
 
 function calculateProfit() {
@@ -684,10 +542,7 @@ function flushPreviousVariance() {
     resetIndexCounter();
 
     highestLossStreak = 0;
-    highestWinStreak = 0;
-    lossStreak = 0;
     winStreak = 0;
-    isBettingWithAccumulatedAmount = false;
     matchIndex = 1;
     isPendingPrintProfit = false;
 
@@ -748,64 +603,9 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
     };
 }
 
-// function extendBetAmount(bet) {
-//     if (presentLevel === 0 && (isWinner === true || isLastMatchDraw === true) && winStreak >= 2
-//         && matchLogs[matchLogs.length - 1].isExtendedBet === false
-//         && matchLogs[matchLogs.length - 2].isExtendedBet === false
-//         && matchLogs[matchLogs.length - 3].isWin === true) {
-//
-//         return betLevel[presentLevel] * 3;
-//     }
-//
-//     return bet;
-// }
-
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
     chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
-}
-
-
-function shuffleBetSide() {
-    const shuffleArrays = (array) => {
-        let oldElement;
-        for (let i = array.length - 1; i > 0; i--) {
-            let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
-        }
-
-        return array;
-    }
-
-    const maxLoop = 3;
-
-    let shuffledTrueFalse = [true, false];
-    let shuffledTrueFalseBuckets = [];
-    let index = 0;
-
-    while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
-        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
-        index++;
-    }
-
-    let indexPicked = 0;
-    let indexPickedHistory = [];
-    index = 0;
-
-    while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        const picked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
-        if (indexPickedHistory.filter(c => c === picked).length === 0) {
-            indexPicked = picked;
-            indexPickedHistory.push(picked);
-        }
-
-        index++;
-    }
-
-    return shuffledTrueFalseBuckets[indexPicked];
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
