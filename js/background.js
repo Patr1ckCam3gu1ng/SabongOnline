@@ -7,19 +7,18 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    330,
-    330,
-    726,
-    1597,
-    3482,
-    7591,
-    16509
+    1200,
+    1200,
+    2640,
+    5808,
+    12661,
+    27602
 ];
 
-let dailyProfitQuotaLimit = 160;
+let dailyProfitQuotaLimit = 720;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 68;
+let maxWaitTimes = 74;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -142,7 +141,6 @@ const websocketConnect = (crfToken) => {
             isBetSubmitted = false;
 
             flushPreviousVariance();
-
             stopTimer();
 
             // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
@@ -154,6 +152,11 @@ const websocketConnect = (crfToken) => {
             printLine();
 
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
+
+            flushPreviousVariance();
+            stopTimer();
+
+            chrome.tabs.sendMessage(tab.id, { text: 'logout' });
 
             clearInterval(pinger);
             websocket.close();
@@ -406,9 +409,8 @@ function startTimer() {
                         chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
                     }
                 );
-            }
-            catch (e) {
-                
+            } catch (e) {
+
             }
         }
     }, 1000);
@@ -427,7 +429,7 @@ function stopTimer() {
 
 function setFinalBet(fightData) {
     if (finalBetside === '') {
-        isBetOnHigherRoi = true;
+        isBetOnHigherRoi = shuffleBetSide();
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -453,17 +455,17 @@ function printProfit() {
     const { grossProfit } = calculateProfit();
 
     return grossProfit.toLocaleString();
-   /*
-    // const totalMatches = [...matchLogs].slice(1);
+    /*
+     // const totalMatches = [...matchLogs].slice(1);
 
-    console.log('%c-', 'color: black;');
+     console.log('%c-', 'color: black;');
 
-    // console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
-    // console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
-    // console.log(`%c---`, 'font-weight: bold; color: yellow');
-    // console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-    // console.log(`%c---`, 'font-weight: bold; color: yellow');
-    console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');*/
+     // console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
+     // console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
+     // console.log(`%c---`, 'font-weight: bold; color: yellow');
+     // console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
+     // console.log(`%c---`, 'font-weight: bold; color: yellow');
+     console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');*/
 }
 
 function randomInt() {
@@ -606,6 +608,48 @@ function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
 async function chromeSendMessage(chromeTabs) {
     await new Promise(resolve => setTimeout(resolve, 500));
     chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
+}
+
+function shuffleBetSide() {
+    const shuffleArrays = (array) => {
+        let oldElement;
+        for (let i = array.length - 1; i > 0; i--) {
+            let rand = Math.floor(Math.random() * (i + 1));
+            oldElement = array[i];
+            array[i] = array[rand];
+            array[rand] = oldElement;
+        }
+
+        return array;
+    }
+
+    const maxLoop = 3;
+
+    let shuffledTrueFalse = [true, false];
+    let shuffledTrueFalseBuckets = [];
+    let index = 0;
+
+    while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
+        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
+        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
+        index++;
+    }
+
+    let indexPicked = 0;
+    let indexPickedHistory = [];
+    index = 0;
+
+    while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
+        const picked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
+        if (indexPickedHistory.filter(c => c === picked).length === 0) {
+            indexPicked = picked;
+            indexPickedHistory.push(picked);
+        }
+
+        index++;
+    }
+
+    return shuffledTrueFalseBuckets[indexPicked];
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
