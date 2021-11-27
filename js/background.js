@@ -7,15 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1200,
-    1200,
-    2640,
-    5808,
-    12661,
-    27602
+    150,
+    150,
+    375,
+    810,
+    1766,
+    3849
 ];
 
-let dailyProfitQuotaLimit = 720;
+let dailyProfitQuotaLimit = 80;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 74;
@@ -299,10 +299,6 @@ const websocketConnect = (crfToken) => {
 
             let bet = betLevel[presentLevel];
 
-            const { updatedBet, addOnCapital } = overwriteOddsIfNeeded(bet, clonedDataBetOdds);
-
-            bet = updatedBet;
-
             betAmountPlaced = parseInt(bet);
 
             if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
@@ -438,9 +434,7 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    if (fightNumber % 2 === 1) {
-        isBetOnHigherRoi = !isBetOnHigherRoi;
-    }
+    isBetOnHigherRoi = !isBetOnHigherRoi;
 }
 
 function paymentSafe(isDraw) {
@@ -569,40 +563,6 @@ function millisecondsConverter(millis) {
     }
 
     return hrs + ` hour${hrs > 1 ? 's' : ''} and ` + mins + ' minutes';
-}
-
-function overwriteOddsIfNeeded(bet, clonedDataBetOdds) {
-    return {
-        updatedBet: bet,
-        addOnCapital: 0
-    };
-
-    const { meron_odds, wala_odds } = clonedDataBetOdds.value;
-    let betSideOdds = 0;
-    const minimumTargetedBetOdds = 175;
-
-    if (finalBetside === meron) {
-        betSideOdds = meron_odds;
-    }
-    if (finalBetside === wala) {
-        betSideOdds = wala_odds;
-    }
-
-    if (betSideOdds < minimumTargetedBetOdds) {
-        const addOnCapital = (minimumTargetedBetOdds - betSideOdds);
-        const percentage = (addOnCapital / 100);
-        const calc = bet * percentage;
-
-        return {
-            updatedBet: bet + (calc > 1 ? calc : 0),
-            addOnCapital: calc > 1 ? addOnCapital : 0
-        };
-    }
-
-    return {
-        updatedBet: bet,
-        addOnCapital: 0
-    };
 }
 
 async function chromeSendMessage(chromeTabs) {
