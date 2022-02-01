@@ -7,16 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    130,
-    130,
-    300,
-    680,
-    1530,
-    3440,
-    7750
+    1500,
+    1500,
+    3400,
+    7700,
+    17300,
+    38900
 ];
 
-let dailyProfitQuotaLimit = 80;
+let dailyProfitQuotaLimit = 1000;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 82;
@@ -430,7 +429,7 @@ function setFinalBet(fightData) {
 
 function reverseBet() {
     if (fightNumber % 3 === 1) {
-        isBetOnHigherRoi = !isBetOnHigherRoi;
+        isBetOnHigherRoi = shuffleBetSide();
     }
 }
 
