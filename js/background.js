@@ -7,18 +7,19 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    150,
-    150,
-    375,
-    810,
-    1766,
-    3849
+    130,
+    130,
+    300,
+    680,
+    1530,
+    3440,
+    7750
 ];
 
 let dailyProfitQuotaLimit = 80;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 74;
+let maxWaitTimes = 82;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -170,19 +171,9 @@ const websocketConnect = (crfToken) => {
             const winner = fightData.winner;
             const isOpenBet = fightData.open_bet === 'yes';
             const isNewFight = fightData.newFight === 'yes';
-            const isWaitingDecision = fightData.waiting_decision === 'yes';
             const meronOdds = fightData.meron_equalpoint;
             const walaOdds = fightData.wala_equalpoint;
             fightNumber = fightData.fight_number;
-
-            if (isOpenBet === false && isWaitingDecision === true && fightStatus === 'on-going' && isBetSubmitted === false && (timerIndex - 1) < maxWaitTimes && fightStatus !== 'cancelled') {
-                if (matchLogs.length > 1 && timerIndex > 0) {
-                    reverseBet();
-                }
-
-                stopTimer();
-                return;
-            }
 
             stopTimer();
 
@@ -292,6 +283,10 @@ const websocketConnect = (crfToken) => {
 
             const dataBetOdds = { value: data[2] };
             const clonedDataBetOdds = { ...dataBetOdds };
+
+            if (matchLogs.length > 1) {
+                reverseBet();
+            }
 
             setFinalBet(clonedDataBetOdds.value);
 
@@ -434,7 +429,9 @@ function setFinalBet(fightData) {
 }
 
 function reverseBet() {
-    isBetOnHigherRoi = !isBetOnHigherRoi;
+    if (fightNumber % 3 === 1) {
+        isBetOnHigherRoi = !isBetOnHigherRoi;
+    }
 }
 
 function paymentSafe(isDraw) {
