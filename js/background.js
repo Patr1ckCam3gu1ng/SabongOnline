@@ -7,18 +7,18 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1500,
-    1500,
-    3400,
-    7700,
-    17300,
-    38900
+    1300,
+    1300,
+    2900,
+    6500,
+    14700,
+    33000
 ];
 
-let dailyProfitQuotaLimit = 1000;
+let dailyProfitQuotaLimit = 700;
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 82;
+let maxWaitTimes = 84;
 
 const meron = 'meron';
 const wala = 'wala';
