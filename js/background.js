@@ -7,15 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    1300,
-    1300,
-    2900,
-    6500,
-    14700,
-    33000
+    2500,
+    2500,
+    3500,
+    7900,
+    17800,
+    40000
 ];
 
-let dailyProfitQuotaLimit = 700;
+let dailyProfitQuotaLimit = 1100;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
