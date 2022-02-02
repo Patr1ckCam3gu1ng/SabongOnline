@@ -143,7 +143,17 @@ const websocketConnect = (crfToken) => {
             flushPreviousVariance();
             stopTimer();
 
-            // chrome.tabs.sendMessage(tab.id, { text: 'logout' });
+            const { grossProfit } = calculateProfit();
+
+            if (grossProfit >= (dailyProfitQuotaLimit * 11)) {
+                console.log(`%cCongratulations! Net Profit: ${ printProfit() }`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
+
+                disconnect();
+            }
+
+            if (fightNumber % 7 === 1) {
+                chrome.tabs.sendMessage(tab.id, { text: "reload" });
+            }
 
             return;
         }
@@ -153,13 +163,7 @@ const websocketConnect = (crfToken) => {
 
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
 
-            flushPreviousVariance();
-            stopTimer();
-
-            chrome.tabs.sendMessage(tab.id, { text: 'logout' });
-
-            clearInterval(pinger);
-            websocket.close();
+            disconnect();
 
             return;
         }
@@ -328,6 +332,10 @@ const websocketConnect = (crfToken) => {
                     }
                 }
             );
+
+            if (isDemoOnly === true) {
+                chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
+            }
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -606,6 +614,16 @@ function shuffleBetSide() {
     }
 
     return shuffledTrueFalseBuckets[indexPicked];
+}
+
+function disconnect() {
+    flushPreviousVariance();
+    stopTimer();
+
+    chrome.tabs.sendMessage(tab.id, { text: 'logout' });
+
+    clearInterval(pinger);
+    websocket.close();
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
