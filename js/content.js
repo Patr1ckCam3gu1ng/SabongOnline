@@ -29,11 +29,20 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             $confirm[0].click();
         }
     }
+    if (msg.text === "setRemainingDummyPoints") {
+        document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML = `x ${parseInt(msg.remainingPoints).toLocaleString(0)} x`;
+    }
     if (msg.text === "remainingPoints") {
         sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
     }
     if (msg.text === "submitDummyBet") {
-        document.getElementsByClassName("my-bets")[msg.betSide === 'meron' ? 0 : 1].innerText = `-- ${ parseInt(msg.betAmountPlaced).toLocaleString(0) } --`
+        if (msg.betAmountPlaced === 0) {
+            document.getElementsByClassName("my-bets")[0].innerText = '0';
+            document.getElementsByClassName("my-bets")[1].innerText = '0';
+            return;
+        }
+
+        document.getElementsByClassName("my-bets")[msg.betSide === 'meron' ? 0 : 1].innerText = `x ${parseInt(msg.betAmountPlaced).toLocaleString(0)} x`
     }
     if (msg.text === "reload") {
         window.location.reload();

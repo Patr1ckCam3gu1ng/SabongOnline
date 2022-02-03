@@ -15,7 +15,7 @@ betLevel = [
     40000
 ];
 
-let dailyProfitQuotaLimit = 1100;
+let dailyProfitQuotaLimit = 100;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -145,13 +145,15 @@ const websocketConnect = (crfToken) => {
 
             const { grossProfit } = calculateProfit();
 
-            if (grossProfit >= (dailyProfitQuotaLimit * 11)) {
-                console.log(`%cCongratulations! Net Profit: ${ printProfit() }`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
+            if (grossProfit >= (betLevel[0] * 5)) {
+                console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
                 disconnect();
+
+                return;
             }
 
-            if (fightNumber % 7 === 1) {
+            if (fightNumber % 4 === 1) {
                 chrome.tabs.sendMessage(tab.id, { text: "reload" });
             }
 
@@ -257,12 +259,17 @@ const websocketConnect = (crfToken) => {
             }
         }
         if (fightEvent === 'App\\Events\\BettingPosted' && isBetting === true) {
+            printCurrentPoints();
+
             if (isBetSubmitted === true) {
+                stopTimer();
                 return;
             }
             if (timerIndex === 0) {
                 startTimer();
             }
+
+            submitDummyBet();
 
             if (timerIndex <= maxWaitTimes) {
                 return;
@@ -320,6 +327,7 @@ const websocketConnect = (crfToken) => {
             }
 
             if (isBetSubmitted === true) {
+                stopTimer();
                 return;
             }
 
@@ -333,9 +341,7 @@ const websocketConnect = (crfToken) => {
                 }
             );
 
-            if (isDemoOnly === true) {
-                chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
-            }
+            submitDummyBet();
 
             await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -624,6 +630,25 @@ function disconnect() {
 
     clearInterval(pinger);
     websocket.close();
+}
+
+function printCurrentPoints() {
+    if (isDemoOnly === false) {
+        return;
+    }
+    const { grossProfit } = calculateProfit();
+
+    if (isBetSubmitted === true) {
+        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: grossProfit - betAmountPlaced });
+    } else {
+        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: grossProfit });
+    }
+}
+
+function submitDummyBet() {
+    if (isDemoOnly === true) {
+        chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
