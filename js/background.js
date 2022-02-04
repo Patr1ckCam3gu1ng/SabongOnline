@@ -7,15 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    2500,
-    2500,
-    3500,
-    7900,
-    17800,
-    40000
+    150,
+    150,
+    350,
+    800,
+    1800,
+    4100
 ];
 
-let dailyProfitQuotaLimit = 100;
+let dailyProfitQuotaLimit = 80;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -132,6 +132,7 @@ const websocketConnect = (crfToken) => {
 
         const fightEvent = data[0];
         const isBetting = data[1] === 'betting';
+        const { grossProfit } = calculateProfit();
 
         if (isDailyQuotaReached() === true) {
             console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
@@ -143,20 +144,6 @@ const websocketConnect = (crfToken) => {
             flushPreviousVariance();
             stopTimer();
 
-            const { grossProfit } = calculateProfit();
-
-            if (grossProfit >= (betLevel[0] * 5)) {
-                console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
-
-                disconnect();
-
-                return;
-            }
-
-            if (fightNumber % 4 === 1) {
-                chrome.tabs.sendMessage(tab.id, { text: "reload" });
-            }
-
             return;
         }
 
@@ -164,6 +151,13 @@ const websocketConnect = (crfToken) => {
             printLine();
 
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
+
+            disconnect();
+
+            return;
+        }
+        else if (grossProfit >= (betLevel[0] * 5)) {
+            console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
             disconnect();
 
@@ -246,11 +240,20 @@ const websocketConnect = (crfToken) => {
 
                         totalLossCountByFar += 1;
                     }
+
+                    betAmountPlaced = 0;
+
+                    printCurrentPoints();
+                    submitDummyBet();
                 }
 
                 isBetSubmitted = false;
                 betAmountPlaced = 0;
                 isExtendedBet = false;
+
+                if (fightNumber % 4 === 1) {
+                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                }
 
                 return;
             }
@@ -343,7 +346,7 @@ const websocketConnect = (crfToken) => {
 
             submitDummyBet();
 
-            await new Promise(resolve => setTimeout(resolve, 700));
+            await new Promise(resolve => setTimeout(resolve, 2500));
 
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
