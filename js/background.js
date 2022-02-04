@@ -8,14 +8,16 @@ let retryPinger;
 
 betLevel = [
     150,
-    150,
-    350,
-    800,
-    1800,
-    4100
+    300,
+    650,
+    1450,
+    3250,
+    7350,
+    16400,
+    36950
 ];
 
-let dailyProfitQuotaLimit = 80;
+let dailyProfitQuotaLimit = 70;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -61,6 +63,8 @@ let matchLogs = [{
 }];
 
 let fightNumber = 1;
+
+let forceDisconnect = false;
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -156,7 +160,7 @@ const websocketConnect = (crfToken) => {
 
             return;
         }
-        else if (grossProfit >= (betLevel[0] * 5)) {
+        else if (grossProfit >= (betLevel[0] * 12)) {
             console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
             disconnect();
@@ -367,7 +371,7 @@ const websocketConnect = (crfToken) => {
         clearInterval(pinger);
         // console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
-        if (!(presentLevel > betLevel.length - 1) && isDailyQuotaReached() === false) {
+        if (!(presentLevel > betLevel.length - 1) && isDailyQuotaReached() === false && forceDisconnect === false) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
                     const localTime = new Date().toLocaleTimeString();
@@ -632,7 +636,11 @@ function disconnect() {
     chrome.tabs.sendMessage(tab.id, { text: 'logout' });
 
     clearInterval(pinger);
+
     websocket.close();
+
+    forceDisconnect = true;
+    reconnectRetries = 999;
 }
 
 function printCurrentPoints() {
