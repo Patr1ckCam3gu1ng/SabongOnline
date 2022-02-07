@@ -17,7 +17,9 @@ betLevel = [
     36950
 ];
 
-let dailyProfitQuotaLimit = 70;
+let dailyProfitQuotaLimit = 100;
+
+let overallQuota = (betLevel[0] * 18);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 84;
@@ -160,7 +162,7 @@ const websocketConnect = (crfToken) => {
 
             return;
         }
-        else if (grossProfit >= (betLevel[0] * 12)) {
+        else if (grossProfit >= overallQuota) {
             console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
             disconnect();
@@ -278,9 +280,11 @@ const websocketConnect = (crfToken) => {
 
             submitDummyBet();
 
-            if (timerIndex <= maxWaitTimes) {
+            if ((timerIndex + 4) <= maxWaitTimes) {
                 return;
             }
+
+            stopTimer();
 
             if ([0, 1].includes((matchIndex / 10) % 2)) {
                 isPendingPrintProfit = true;
@@ -306,8 +310,6 @@ const websocketConnect = (crfToken) => {
             }
 
             setFinalBet(clonedDataBetOdds.value);
-
-            stopTimer();
 
             let bet = betLevel[presentLevel];
 
@@ -344,17 +346,17 @@ const websocketConnect = (crfToken) => {
                 async function (submittedBetValue) {
                     if (submittedBetValue === 0) {
                         chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
+
+                        submitDummyBet();
                     }
                 }
             );
 
-            submitDummyBet();
-
-            await new Promise(resolve => setTimeout(resolve, 2500));
-
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
             } else {
+                await new Promise(resolve => setTimeout(resolve, 3500));
+
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
                         isBetSubmitted = submittedBetValue > 0;
@@ -402,7 +404,7 @@ function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
 function startTimer() {
     timer = setInterval(function () {
         timerIndex += 1;
-        if (isBetSubmitted === false && timerIndex <= maxWaitTimes) {
+        if (isBetSubmitted === false && (timerIndex - 4) <= maxWaitTimes) {
             try {
                 chrome.tabs.sendMessage(tab.id, { text: "hasAttributes" },
                     function (response) {
