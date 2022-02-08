@@ -29,6 +29,15 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             $confirm[0].click();
         }
     }
+    if (msg.text === "isClosed") {
+        const elements = document.getElementsByClassName("label-danger beting-status-label");
+
+        if (elements.length > 0) {
+            sendResponse(elements[0].innerHTML === 'CLOSED');
+            return
+        }
+        return sendResponse(false);
+    }
     if (msg.text === "setRemainingDummyPoints") {
         document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML = `x ${parseInt(msg.remainingPoints).toLocaleString(0)} x`;
     }

@@ -22,7 +22,7 @@ let dailyProfitQuotaLimit = 100;
 let overallQuota = (betLevel[0] * 1000);
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 84;
+let maxWaitTimes = 74;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -280,7 +280,22 @@ const websocketConnect = (crfToken) => {
 
             submitDummyBet();
 
+            if (timerIndex < 10) {
+                chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
+                    async function (isClosed) {
+                        if (isClosed === true) {
+                            stopTimer();
+                        }
+                    }
+                );
+            }
             if ((timerIndex + 4) <= maxWaitTimes) {
+                if (betAmountPlaced > 0) {
+                    betAmountPlaced = 0;
+                    printCurrentPoints();
+                    submitDummyBet();
+                }
+
                 return;
             }
 
