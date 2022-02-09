@@ -435,6 +435,9 @@ function startTimer() {
                         }
 
                         chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
+
+                        // keep refresh
+                        shuffleBetSide();
                     }
                 );
             } catch (e) {
