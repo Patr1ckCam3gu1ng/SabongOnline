@@ -22,7 +22,7 @@ let dailyProfitQuotaLimit = 100;
 let overallQuota = (betLevel[0] * 1000);
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 74;
+let maxWaitTimes = 62;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -257,9 +257,9 @@ const websocketConnect = (crfToken) => {
                 betAmountPlaced = 0;
                 isExtendedBet = false;
 
-                if (fightNumber % 4 === 1) {
-                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                }
+                // if (fightNumber % 4 === 1) {
+                //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                // }
 
                 return;
             }
