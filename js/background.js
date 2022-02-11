@@ -260,6 +260,9 @@ const websocketConnect = (crfToken) => {
                 // if (fightNumber % 4 === 1) {
                 //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 // }
+                if (fightNumber % 6 === 1) {
+                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                }
 
                 return;
             }
@@ -685,6 +688,9 @@ function submitDummyBet() {
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
+
+        printCurrentPoints();
+        submitDummyBet();
     }
 });
 chrome.extension.onConnect.addListener(function (port) {
