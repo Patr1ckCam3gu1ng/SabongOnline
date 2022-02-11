@@ -22,7 +22,7 @@ let dailyProfitQuotaLimit = 100;
 let overallQuota = (betLevel[0] * 1000);
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 72;
+let maxWaitTimes = 78;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -439,8 +439,11 @@ function startTimer() {
 
                         chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
 
-                        // keep refresh
-                        shuffleBetSide();
+                        let shuffleIndex = 0;
+                        while (shuffleIndex < 100) {
+                            shuffleBetSide();
+                            shuffleIndex += 1;
+                        }
                     }
                 );
             } catch (e) {
