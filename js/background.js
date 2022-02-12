@@ -14,15 +14,15 @@ betLevel = [
     3250,
     7350,
     16400,
-    36950
+    // 36950
 ];
 
 let dailyProfitQuotaLimit = 100;
 
-let overallQuota = (betLevel[0] * 40);
+let overallQuota = (betLevel[0] * 20);
 
 //should remain 'let' so we can change it in the console:
-let maxWaitTimes = 72;
+let maxWaitTimes = 62;
 
 const meron = 'meron';
 const wala = 'wala';
@@ -38,7 +38,6 @@ let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
 let isExtendedBet = false;
 let totalLossCountByFar = 0;
-
 let matchIndex = 1;
 let winCount = 0;
 let lossCount = 0;
@@ -48,12 +47,9 @@ let highestLossStreak = 0;
 let betAmountPlaced = 0;
 let isWinner = false;
 let isLastMatchDraw = false;
-
 let timer;
 let timerIndex = 0;
-
 let isDemoOnly = true;
-
 let matchLogs = [{
     betAmountPlaced: 0,
     fightNumber: 1,
@@ -63,10 +59,9 @@ let matchLogs = [{
     presentLevel: 0,
     isExtendedBet: false
 }];
-
 let fightNumber = 1;
-
 let forceDisconnect = false;
+
 
 function createWebSocketConnection(crfToken) {
     if (crfTokenValue === '') {
@@ -250,7 +245,7 @@ const websocketConnect = (crfToken) => {
                     betAmountPlaced = 0;
 
                     printCurrentPoints();
-                    submitDummyBet();
+                    printDummyBet();
                 }
 
                 isBetSubmitted = false;
@@ -260,6 +255,8 @@ const websocketConnect = (crfToken) => {
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
+
+                maxWaitTimes = randomInt();
 
                 return;
             }
@@ -278,7 +275,7 @@ const websocketConnect = (crfToken) => {
                 startTimer();
             }
 
-            submitDummyBet();
+            printDummyBet();
 
             if (timerIndex < 10) {
                 chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
@@ -289,11 +286,15 @@ const websocketConnect = (crfToken) => {
                     }
                 );
             }
+
+            // continuous refresh
+            shuffleBetSide();
+
             if ((timerIndex + 4) <= maxWaitTimes) {
                 if (betAmountPlaced > 0) {
                     betAmountPlaced = 0;
                     printCurrentPoints();
-                    submitDummyBet();
+                    printDummyBet();
                 }
 
                 return;
@@ -362,7 +363,7 @@ const websocketConnect = (crfToken) => {
                     if (submittedBetValue === 0) {
                         chrome.tabs.sendMessage(tab.id, { text: "submitBet" });
 
-                        submitDummyBet();
+                        printDummyBet();
                     }
                 }
             );
@@ -435,9 +436,6 @@ function startTimer() {
                         }
 
                         chrome.tabs.sendMessage(tab.id, { text: "printRemainingTime", timerIndex, maxWaitTimes });
-
-                        // random refresh
-                        shuffleBetSide();
                     }
                 );
             } catch (e) {
@@ -500,8 +498,8 @@ function printProfit() {
 }
 
 function randomInt() {
-    const minMinutes = 8;
-    const maxMinutes = 40;
+    const minMinutes = 52;
+    const maxMinutes = 88;
     let index = 0;
     let indexPicked = 0;
     let pickList = [];
@@ -620,9 +618,8 @@ function shuffleBetSide() {
         return array;
     }
 
+    let shuffledTrueFalse = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false];
     const maxLoop = 3;
-
-    let shuffledTrueFalse = [true, false];
     let shuffledTrueFalseBuckets = [];
     let index = 0;
 
@@ -676,7 +673,7 @@ function printCurrentPoints() {
     }
 }
 
-function submitDummyBet() {
+function printDummyBet() {
     if (isDemoOnly === true) {
         chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
     }
@@ -687,7 +684,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
         tabsOnUpdated.setTabId(tabId);
 
         printCurrentPoints();
-        submitDummyBet();
+        printDummyBet();
+        maxWaitTimes = randomInt();
     }
 });
 chrome.extension.onConnect.addListener(function (port) {
