@@ -1,7 +1,7 @@
 let websocket;
 let tab = { id: 0 };
 let crfTokenValue = '';
-let wssUrl = 'wss://echo.wpc2028.live/socket.io/?EIO=3&transport=websocket';
+let wssUrl = '';
 
 let reconnectRetries = 0;
 let retryPinger;
@@ -61,14 +61,17 @@ let matchLogs = [{
 }];
 let fightNumber = 1;
 let forceDisconnect = false;
+const shuffleValues = [true, false, true, false, true, false, true, false, true, false];
 
-
-function createWebSocketConnection(crfToken) {
+function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
         crfTokenValue = crfToken;
     }
+    if (wssUrl === '') {
+        wssUrl = webserviceUrl;
+    }
     if ('WebSocket' in window) {
-        websocketConnect(crfToken);
+        websocketConnect(crfToken, webserviceUrl);
     }
 }
 
@@ -81,10 +84,10 @@ const tabsOnUpdated = {
     }
 }
 
-const websocketConnect = (crfToken) => {
+const websocketConnect = (crfToken, webserviceUrl) => {
     if (websocket === undefined) {
         // console.log(`%c- Initializing -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
-        websocket = new WebSocket(wssUrl);
+        websocket = new WebSocket(webserviceUrl);
     }
     websocket.onopen = function () {
         const subscriptionBody = [
@@ -256,11 +259,22 @@ const websocketConnect = (crfToken) => {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
 
-                maxWaitTimes = randomInt();
+                maxWaitTimes = generateRandomWaitTime();
 
                 return;
             }
             if (fightStatus === 'on-going' && isOpenBet === false && isNewFight === false) {
+                chrome.tabs.sendMessage(tab.id, { text: "getClosedOdds", betSide: finalBetside },
+                    async function (closedOdds) {
+                        chrome.tabs.sendMessage(tab.id, {
+                            text: "submitDummyBet",
+                            betAmountPlaced,
+                            betSide: finalBetside,
+                            calculatedWinning: betAmountPlaced * (closedOdds / 100)
+                        });
+                    }
+                );
+
                 return;
             }
         }
@@ -288,7 +302,7 @@ const websocketConnect = (crfToken) => {
             }
 
             // continuous refresh
-            shuffleBetSide();
+            shuffleBetSide(shuffleValues);
 
             if ((timerIndex + 4) <= maxWaitTimes) {
                 if (betAmountPlaced > 0) {
@@ -458,7 +472,7 @@ function stopTimer() {
 
 function setFinalBet(fightData) {
     if (finalBetside === '') {
-        isBetOnHigherRoi = shuffleBetSide();
+        isBetOnHigherRoi = shuffleBetSide(shuffleValues);
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -468,7 +482,7 @@ function setFinalBet(fightData) {
 
 function reverseBet() {
     if (fightNumber % 3 === 1) {
-        isBetOnHigherRoi = shuffleBetSide();
+        isBetOnHigherRoi = shuffleBetSide(shuffleValues);
     }
 }
 
@@ -484,39 +498,20 @@ function printProfit() {
     const { grossProfit } = calculateProfit();
 
     return grossProfit.toLocaleString();
-    /*
-     // const totalMatches = [...matchLogs].slice(1);
-
-     console.log('%c-', 'color: black;');
-
-     // console.log(`%cWin: ${wonMatches} | Loss: ${lossMatches} | Total Matches: ${totalMatches.length}`, 'font-weight: bold; color: yellow');
-     // console.log(`%cWin Streak: ${highestWinStreak} | Loss Streak: ${highestLossStreak}`, 'font-weight: bold; color: yellow');
-     // console.log(`%c---`, 'font-weight: bold; color: yellow');
-     // console.log(`%cThis match's profit: Php ${todaysTotalNetProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');
-     // console.log(`%c---`, 'font-weight: bold; color: yellow');
-     console.log(`%cOverall Matches Profit: Php ${grossProfit.toLocaleString()}`, 'font-weight: bold; color: yellow');*/
 }
 
-function randomInt() {
-    const minMinutes = 52;
+function generateRandomWaitTime() {
+    let minMinutes = 52;
     const maxMinutes = 88;
-    let index = 0;
-    let indexPicked = 0;
     let pickList = [];
 
-    while (index < 5) {
-        indexPicked = Math.floor(Math.random() * maxMinutes);
+    while (minMinutes <= maxMinutes) {
+        pickList.push(minMinutes)
 
-        if (indexPicked >= minMinutes && indexPicked <= maxMinutes) {
-            if (pickList.length > 0 && pickList.filter(c => c === indexPicked).length > 1) {
-                continue
-            }
-            pickList.push(indexPicked);
-            index++;
-        }
+        minMinutes += 1;
     }
 
-    return indexPicked;
+    return shuffleBetSide(pickList);
 }
 
 function printLine() {
@@ -605,7 +600,7 @@ async function chromeSendMessage(chromeTabs) {
     chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
 }
 
-function shuffleBetSide() {
+function shuffleBetSide(value) {
     const shuffleArrays = (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
@@ -618,14 +613,14 @@ function shuffleBetSide() {
         return array;
     }
 
-    let shuffledTrueFalse = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false];
+    let shuffledValues = [...value];
     const maxLoop = 3;
-    let shuffledTrueFalseBuckets = [];
+    let shuffledBuckets = [];
     let index = 0;
 
     while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        shuffledTrueFalse = shuffleArrays(shuffledTrueFalse);
-        shuffledTrueFalseBuckets.push(...shuffledTrueFalse);
+        shuffledValues = shuffleArrays(shuffledValues);
+        shuffledBuckets.push(...shuffledValues);
         index++;
     }
 
@@ -634,7 +629,7 @@ function shuffleBetSide() {
     index = 0;
 
     while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        const picked = Math.floor(Math.random() * shuffledTrueFalseBuckets.length);
+        const picked = Math.floor(Math.random() * shuffledBuckets.length);
         if (indexPickedHistory.filter(c => c === picked).length === 0) {
             indexPicked = picked;
             indexPickedHistory.push(picked);
@@ -643,7 +638,7 @@ function shuffleBetSide() {
         index++;
     }
 
-    return shuffledTrueFalseBuckets[indexPicked];
+    return shuffledBuckets[indexPicked];
 }
 
 function disconnect() {
@@ -685,15 +680,20 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
 
         printCurrentPoints();
         printDummyBet();
-        maxWaitTimes = randomInt();
+        maxWaitTimes = generateRandomWaitTime();
     }
 });
+
 chrome.extension.onConnect.addListener(function (port) {
     port.onMessage.addListener(function () {
         if (port.name === 'getCrfToken') {
             chrome.tabs.sendMessage(tab.id, { text: "getCrfTokenRequest" },
                 function (crfToken) {
-                    createWebSocketConnection(crfToken);
+                    chrome.tabs.sendMessage(tab.id, { text: "ancestorOrigins" },
+                        function (wssUrl) {
+                            createWebSocketConnection(crfToken, wssUrl);
+                        }
+                    );
                 }
             );
         }

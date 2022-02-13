@@ -8,6 +8,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         sendResponse(document.getElementsByName("csrf-token")[0].content);
         return;
     }
+    if (msg.text === "ancestorOrigins") {
+        sendResponse(`wss://echo.${window.location.host}/socket.io/?EIO=3&transport=websocket`);
+        return ;
+    }
     if (msg.text === "inputBet") {
         inputBet();
         return;
@@ -44,6 +48,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.text === "remainingPoints") {
         sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
     }
+    if (msg.text === "getClosedOdds") {
+        sendResponse(parseFloat(document.getElementsByClassName("payoutDisplay")[msg.betSide === 'meron' ? 0 : 1].innerText.toString().replace('PAYOUT = ', '')))
+    }
     if (msg.text === "submitDummyBet") {
         if (msg.betAmountPlaced === 0) {
             document.getElementsByClassName("my-bets")[0].innerText = '0';
@@ -51,7 +58,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             return;
         }
 
-        document.getElementsByClassName("my-bets")[msg.betSide === 'meron' ? 0 : 1].innerText = `x ${parseInt(msg.betAmountPlaced).toLocaleString(0)} x`
+        const submittedBetText = `<span>${parseInt(msg.betAmountPlaced).toLocaleString(0)}</span>`;
+
+        document.getElementsByClassName("my-bets")[msg.betSide === 'meron' ? 0 : 1].innerHTML =
+            typeof msg.calculatedWinning === 'undefined'
+                ? submittedBetText
+                : `${submittedBetText} = <span style=\"color:white\">P ${parseInt(msg.calculatedWinning).toLocaleString(0)}<span/>`;
     }
     if (msg.text === "reload") {
         window.location.reload();
