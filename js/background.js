@@ -7,19 +7,19 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    150,
-    300,
-    650,
-    1450,
-    3250,
-    7350,
-    16400,
-    // 36950
+    200,
+    200,
+    450,
+    750,
+    1700,
+    3850,
+    8650,
+    19500
 ];
 
-let dailyProfitQuotaLimit = 100;
+let dailyProfitQuotaLimit = 80;
 
-let overallQuota = (betLevel[0] * 20);
+let overallQuota = (betLevel[0] * 1000);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -61,7 +61,7 @@ let matchLogs = [{
 }];
 let fightNumber = 1;
 let forceDisconnect = false;
-const shuffleValues = [true, false, true, false, true, false, true, false, true, false];
+const shuffleValues = [true, false];
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -264,16 +264,18 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 return;
             }
             if (fightStatus === 'on-going' && isOpenBet === false && isNewFight === false) {
-                chrome.tabs.sendMessage(tab.id, { text: "getClosedOdds", betSide: finalBetside },
-                    async function (closedOdds) {
-                        chrome.tabs.sendMessage(tab.id, {
-                            text: "submitDummyBet",
-                            betAmountPlaced,
-                            betSide: finalBetside,
-                            calculatedWinning: betAmountPlaced * (closedOdds / 100)
-                        });
-                    }
-                );
+                if (isDemoOnly === true) {
+                    chrome.tabs.sendMessage(tab.id, { text: "getClosedOdds", betSide: finalBetside },
+                        async function (closedOdds) {
+                            chrome.tabs.sendMessage(tab.id, {
+                                text: "submitDummyBet",
+                                betAmountPlaced,
+                                betSide: finalBetside,
+                                calculatedWinning: betAmountPlaced * (closedOdds / 100)
+                            });
+                        }
+                    );
+                }
 
                 return;
             }
@@ -302,7 +304,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             }
 
             // continuous refresh
-            shuffleBetSide(shuffleValues);
+            shuffleBetSide([...shuffleValues]);
 
             if ((timerIndex + 4) <= maxWaitTimes) {
                 if (betAmountPlaced > 0) {
@@ -370,7 +372,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 return;
             }
 
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                 async function (submittedBetValue) {
@@ -385,7 +387,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
             } else {
-                await new Promise(resolve => setTimeout(resolve, 3500));
+                await new Promise(resolve => setTimeout(resolve, 1500));
 
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
@@ -472,7 +474,7 @@ function stopTimer() {
 
 function setFinalBet(fightData) {
     if (finalBetside === '') {
-        isBetOnHigherRoi = shuffleBetSide(shuffleValues);
+        isBetOnHigherRoi = shuffleBetSide([...shuffleValues]);
     }
 
     finalBetside = (isBetOnHigherRoi
@@ -482,7 +484,7 @@ function setFinalBet(fightData) {
 
 function reverseBet() {
     if (fightNumber % 3 === 1) {
-        isBetOnHigherRoi = shuffleBetSide(shuffleValues);
+        isBetOnHigherRoi = shuffleBetSide([...shuffleValues]);
     }
 }
 
@@ -502,7 +504,7 @@ function printProfit() {
 
 function generateRandomWaitTime() {
     let minMinutes = 52;
-    const maxMinutes = 88;
+    const maxMinutes = 82;
     let pickList = [];
 
     while (minMinutes <= maxMinutes) {
@@ -511,7 +513,7 @@ function generateRandomWaitTime() {
         minMinutes += 1;
     }
 
-    return shuffleBetSide(pickList);
+    return shuffleBetSide([...pickList]);
 }
 
 function printLine() {
@@ -656,9 +658,6 @@ function disconnect() {
 }
 
 function printCurrentPoints() {
-    if (isDemoOnly === false) {
-        return;
-    }
     const { grossProfit } = calculateProfit();
 
     if (isBetSubmitted === true) {

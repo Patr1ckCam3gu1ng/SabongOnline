@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         document.getElementsByClassName("my-bets")[msg.betSide === 'meron' ? 0 : 1].innerHTML =
             typeof msg.calculatedWinning === 'undefined'
                 ? submittedBetText
-                : `${submittedBetText} = <span style=\"color:white\">P ${parseInt(msg.calculatedWinning).toLocaleString(0)}<span/>`;
+                : `${submittedBetText} = <span style=\"color:white;background-color: dodgerblue\">P ${parseInt(msg.calculatedWinning).toLocaleString(0)}<span/>`;
     }
     if (msg.text === "reload") {
         window.location.reload();
