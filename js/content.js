@@ -43,10 +43,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         return sendResponse(false);
     }
     if (msg.text === "setRemainingDummyPoints") {
-        document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML = `x ${parseInt(msg.remainingPoints).toLocaleString(0)} x`;
+        if (document.getElementsByClassName("currentPointsDisplay").length > 0) {
+            document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML = `x ${parseInt(msg.remainingPoints).toLocaleString(0)} x`;
+        }
     }
     if (msg.text === "remainingPoints") {
-        sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
+        if (document.getElementsByClassName("currentPointsDisplay").length > 0) {
+            sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
+        }
     }
     if (msg.text === "getClosedOdds") {
         sendResponse(parseFloat(document.getElementsByClassName("payoutDisplay")[msg.betSide === 'meron' ? 0 : 1].innerText.toString().replace('PAYOUT = ', '')))
