@@ -307,7 +307,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             shuffleBetSide([...shuffleValues]);
 
             if ((timerIndex + 4) <= maxWaitTimes) {
-                if (betAmountPlaced > 0) {
+                if (betAmountPlaced > 0 && timerIndex > 5) {
                     betAmountPlaced = 0;
                     printCurrentPoints();
                     printDummyBet();
@@ -503,8 +503,8 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    let minMinutes = 52;
-    const maxMinutes = 82;
+    let minMinutes = 44;
+    const maxMinutes = 77;
     let pickList = [];
 
     while (minMinutes <= maxMinutes) {
