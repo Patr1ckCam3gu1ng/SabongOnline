@@ -10,11 +10,12 @@ betLevel = [
     200,
     200,
     450,
-    750,
-    1700,
-    3850,
-    8650,
-    19500
+    1000,
+    2250,
+    5050,
+    11350,
+    25600,
+    57600
 ];
 
 let dailyProfitQuotaLimit = 80;
@@ -62,6 +63,7 @@ let matchLogs = [{
 let fightNumber = 1;
 let forceDisconnect = false;
 const shuffleValues = [true, false];
+let remainingCurrentPoints = 0;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -258,6 +260,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
+                if ((fightNumber % 6 === 1 || presentLevel === betLevel.length - 1) && isDemoOnly === false) {
+                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                }
 
                 maxWaitTimes = generateRandomWaitTime();
 
@@ -348,16 +353,11 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             betAmountPlaced = parseInt(bet);
 
             if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
-                chrome.tabs.sendMessage(tab.id, { text: "remainingPoints" },
-                    async function (remainingPoints) {
-                        if (remainingPoints < betAmountPlaced) {
-                            betAmountPlaced = parseInt(remainingPoints.toFixed(0))
-                        }
-
-                        chrome.tabs.sendMessage(tab.id, { text: 'inputBet', betAmountPlaced });
-                        await chromeSendMessage(chrome.tabs);
-                    }
-                );
+                chrome.tabs.sendMessage(tab.id, {
+                    text: 'inputBet',
+                    betAmountPlaced: parseInt(remainingCurrentPoints.toFixed(0))
+                });
+                await chromeSendMessage(chrome.tabs);
             } else {
                 chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
                 await chromeSendMessage(chrome.tabs);
@@ -667,6 +667,18 @@ function printCurrentPoints() {
     }
 }
 
+async function getInitialPoints() {
+    chrome.tabs.sendMessage(tab.id, { text: "remainingPoints", withReplace: true },
+        async function (value) {
+            remainingCurrentPoints = value;
+
+            printCurrentPoints();
+            printDummyBet();
+            maxWaitTimes = generateRandomWaitTime();
+        }
+    );
+}
+
 function printDummyBet() {
     if (isDemoOnly === true) {
         chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
@@ -676,10 +688,9 @@ function printDummyBet() {
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
-
-        printCurrentPoints();
-        printDummyBet();
-        maxWaitTimes = generateRandomWaitTime();
+        if (crfTokenValue !== '') {
+            getInitialPoints();
+        }
     }
 });
 
@@ -691,6 +702,7 @@ chrome.extension.onConnect.addListener(function (port) {
                     chrome.tabs.sendMessage(tab.id, { text: "ancestorOrigins" },
                         function (wssUrl) {
                             createWebSocketConnection(crfToken, wssUrl);
+                            getInitialPoints();
                         }
                     );
                 }

@@ -49,7 +49,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
     if (msg.text === "remainingPoints") {
         if (document.getElementsByClassName("currentPointsDisplay").length > 0) {
-            sendResponse(parseInt(document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML.replace(',', '')) - 100);
+            const points = document.getElementsByClassName("currentPointsDisplay")[0].children[0].innerHTML;
+            if (typeof msg.withReplace !== 'undefined') {
+                sendResponse(parseInt(points));
+            } else {
+                sendResponse(parseInt(points.replace(',', '')) - 100);
+            }
         }
     }
     if (msg.text === "getClosedOdds") {
