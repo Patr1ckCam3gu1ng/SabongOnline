@@ -14,8 +14,7 @@ betLevel = [
     2250,
     5050,
     11350,
-    25600,
-    57600
+    25600
 ];
 
 let dailyProfitQuotaLimit = 80;
@@ -678,6 +677,10 @@ async function getInitialPoints() {
     chrome.tabs.sendMessage(tab.id, { text: "remainingPoints", withReplace: true },
         async function (value) {
             remainingCurrentPoints = value;
+
+            if (isMatchWin === true && presentLevel === 0 && matchLogs.length === 1) {
+                matchLogs[0].sum = parseInt(value) - parseInt(betLevel.map(sum => sum).reduce((a, b) => a + b, 0));
+            }
 
             printCurrentPoints();
             printDummyBet();
