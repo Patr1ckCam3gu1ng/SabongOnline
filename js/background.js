@@ -141,7 +141,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
         const { grossProfit } = calculateProfit();
 
         if (isDailyQuotaReached() === true) {
-            console.log(`%c\\( ﾟヮﾟ)/ Job Well Done! Quota reached: Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()} ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+            console.log(`%c\\( ﾟヮﾟ)/   Job Well Done! Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()}   ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
             console.log('%c-', 'color: black;');
 
             isQuotaReachedPrinted = true;
@@ -260,7 +260,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
-                if ((fightNumber % 6 === 1 || presentLevel === betLevel.length - 1) && isDemoOnly === false) {
+                if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
 
@@ -668,6 +668,13 @@ function printCurrentPoints() {
 }
 
 async function getInitialPoints() {
+    if (isDemoOnly === true) {
+        printCurrentPoints();
+        printDummyBet();
+        maxWaitTimes = generateRandomWaitTime();
+
+        return;
+    }
     chrome.tabs.sendMessage(tab.id, { text: "remainingPoints", withReplace: true },
         async function (value) {
             remainingCurrentPoints = value;
