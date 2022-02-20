@@ -19,7 +19,7 @@ betLevel = [
 
 let dailyProfitQuotaLimit = 80;
 
-let overallQuota = (betLevel[0] * 1000);
+let overallQuota = (betLevel[0] * 40);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -568,6 +568,8 @@ function flushPreviousVariance() {
 
     resetIndexCounter();
 
+    remainingCurrentPoints = 0;
+    betAmountPlaced = 0;
     highestLossStreak = 0;
     winStreak = 0;
     matchIndex = 1;
@@ -577,23 +579,6 @@ function flushPreviousVariance() {
     isBetOnHigherRoi = true;
 
     finalBetside = '';
-}
-
-function millisecondsConverter(millis) {
-    const ms = millis % 1000;
-    millis = (millis - ms) / 1000;
-
-    const secs = millis % 60;
-    millis = (millis - secs) / 60;
-
-    const mins = millis % 60;
-    const hrs = (millis - mins) / 60;
-
-    if (hrs === 0) {
-        return mins + ' minutes';
-    }
-
-    return hrs + ` hour${hrs > 1 ? 's' : ''} and ` + mins + ' minutes';
 }
 
 async function chromeSendMessage(chromeTabs) {
