@@ -9,17 +9,17 @@ let retryPinger;
 betLevel = [
     200,
     200,
-    450,
-    1000,
-    2250,
-    5050,
-    11350,
-    25600
+    550,
+    1250,
+    2800,
+    6300,
+    14200,
+    30000
 ];
 
 let dailyProfitQuotaLimit = 80;
 
-let overallQuota = (betLevel[0] * 40);
+let overallQuota = (betLevel[0] * 8);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -268,18 +268,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 return;
             }
             if (fightStatus === 'on-going' && isOpenBet === false && isNewFight === false) {
-                if (isDemoOnly === true) {
-                    chrome.tabs.sendMessage(tab.id, { text: "getClosedOdds", betSide: finalBetside },
-                        async function (closedOdds) {
-                            chrome.tabs.sendMessage(tab.id, {
-                                text: "submitDummyBet",
-                                betAmountPlaced,
-                                betSide: finalBetside,
-                                calculatedWinning: betAmountPlaced * (closedOdds / 100)
-                            });
-                        }
-                    );
-                }
+                printPossibleWinnings();
 
                 return;
             }
@@ -655,6 +644,7 @@ async function getInitialPoints() {
     if (isDemoOnly === true) {
         printCurrentPoints();
         printDummyBet();
+        printPossibleWinningsIfClosed();
         maxWaitTimes = generateRandomWaitTime();
 
         return;
@@ -678,6 +668,31 @@ function printDummyBet() {
     if (isDemoOnly === true) {
         chrome.tabs.sendMessage(tab.id, { text: "submitDummyBet", betAmountPlaced, betSide: finalBetside });
     }
+}
+
+function printPossibleWinnings() {
+    if (isDemoOnly === true) {
+        chrome.tabs.sendMessage(tab.id, { text: "getClosedOdds", betSide: finalBetside },
+            async function (closedOdds) {
+                chrome.tabs.sendMessage(tab.id, {
+                    text: "submitDummyBet",
+                    betAmountPlaced,
+                    betSide: finalBetside,
+                    calculatedWinning: betAmountPlaced * (closedOdds / 100)
+                });
+            }
+        );
+    }
+}
+
+function printPossibleWinningsIfClosed() {
+    chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
+        async function (isClosed) {
+            if (isClosed === true) {
+                printPossibleWinnings();
+            }
+        }
+    );
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
