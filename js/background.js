@@ -686,13 +686,15 @@ function printPossibleWinnings() {
 }
 
 function printPossibleWinningsIfClosed() {
-    chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
-        async function (isClosed) {
-            if (isClosed === true) {
-                printPossibleWinnings();
+    if (isBetSubmitted === true) {
+        chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
+            async function (isClosed) {
+                if (isClosed === true) {
+                    printPossibleWinnings();
+                }
             }
-        }
-    );
+        );
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
