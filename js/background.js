@@ -644,8 +644,10 @@ async function getInitialPoints() {
     if (isDemoOnly === true) {
         printCurrentPoints();
         printDummyBet();
-        printPossibleWinningsIfClosed();
+
         maxWaitTimes = generateRandomWaitTime();
+
+        printPossibleWinningsIfClosed().then(r => r);
 
         return;
     }
@@ -685,8 +687,10 @@ function printPossibleWinnings() {
     }
 }
 
-function printPossibleWinningsIfClosed() {
+async function printPossibleWinningsIfClosed() {
     if (isBetSubmitted === true) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         chrome.tabs.sendMessage(tab.id, { text: 'isClosed' },
             async function (isClosed) {
                 if (isClosed === true) {
