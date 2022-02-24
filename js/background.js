@@ -491,10 +491,10 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    let minMinutes = 44;
-    const maxMinutes = 77;
+    let minMinutes = 20;
+    const maxMinutes = 55;
     let pickList = [];
-
+    
     while (minMinutes <= maxMinutes) {
         pickList.push(minMinutes)
 
