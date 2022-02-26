@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
     if (msg.text === "ancestorOrigins") {
         sendResponse(`wss://echo.${window.location.host}/socket.io/?EIO=3&transport=websocket`);
-        return ;
+        return;
     }
     if (msg.text === "inputBet") {
         inputBet();
@@ -81,9 +81,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
     if (msg.text === "submittedBetValue") {
         const betSide = msg.betSide === 'meron' ? 0 : 1;
-        try {
+        if (document.getElementsByClassName("my-bets").length > 0) {
             sendResponse(parseInt(document.getElementsByClassName("my-bets")[betSide].innerText.replace(',', '')));
-        } catch (e) {
         }
     }
     if (msg.text === 'logout') {
@@ -102,6 +101,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             return `document.getElementById('${elementId}').setAttribute('${isClicked}','true'); document.getElementById('${elementId}').setAttribute('style','border-color:#1e81f1;border-width:3px;');`
         }
 
+        if (document.getElementsByClassName('float-left img-fluid').length > 0) {
+            return;
+        }
+
         document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
             `<div id="${elementName}" style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <input id="${btnInputMinus}" type="button" onclick="${addFunction(btnInputMinus)}" value="-10"> </td> <td> <h5 id="printRemainingTime" style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #ff00eb;text-shadow: 0px 1px whitesmoke;">${msg.timerIndex.toString().padStart(2, '0')} of ${msg.maxWaitTimes} seconds</h5> </td> <td> <input type="button" id="${btnInputAdd}" onclick="${addFunction(btnInputAdd)}" value="+10"> </td> </tr> </tbody></table> </div>`);
     }
@@ -110,14 +113,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
 
     function inputBet() {
-        document.getElementsByClassName("betAmount")[0].focus();
-        document.execCommand('delete', false);
-        document.execCommand('delete', false);
-        document.execCommand('delete', false);
-        document.execCommand('delete', false);
-        document.execCommand('delete', false);
-        document.execCommand('delete', false);
-        document.execCommand('insertText', false, msg.betAmountPlaced);
+        if (document.getElementsByClassName("betAmount").length > 0) {
+            document.getElementsByClassName("betAmount")[0].focus();
+            document.execCommand('delete', false);
+            document.execCommand('delete', false);
+            document.execCommand('delete', false);
+            document.execCommand('delete', false);
+            document.execCommand('delete', false);
+            document.execCommand('delete', false);
+            document.execCommand('insertText', false, msg.betAmountPlaced);
+        }
     }
 
     function removePrintRemainingTime() {
