@@ -33,7 +33,6 @@ let pinger;
 let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = '';
-let betsidePicked = '';
 let isMatchWin = false;
 let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
@@ -325,12 +324,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 printLine();
             }
 
-            const dataBetOdds = { value: data[2] };
-
-            if (matchLogs.length > 1) {
-                reverseBet();
-            }
-
             setFinalBet();
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
@@ -444,15 +437,7 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    if (finalBetside === '') {
-        betsidePicked = shuffleBetSide([...shuffleValues]);
-    }
-
-    finalBetside = betsidePicked;
-}
-
-function reverseBet() {
-    if (fightNumber % 3 === 1) {
+    if (fightNumber % 3 === 1 || finalBetside === '') {
         finalBetside = shuffleBetSide([...shuffleValues]);
     }
 }
