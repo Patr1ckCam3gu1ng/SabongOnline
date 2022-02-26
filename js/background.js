@@ -329,15 +329,16 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             }
 
             const dataBetOdds = { value: data[2] };
-            const clonedDataBetOdds = { ...dataBetOdds };
 
             if (matchLogs.length > 1) {
                 reverseBet();
             }
 
-            setFinalBet(clonedDataBetOdds.value);
+            setFinalBet();
 
-            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced: parseInt(betLevel[presentLevel]) });
+            betAmountPlaced = parseInt(betLevel[presentLevel]);
+
+            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
 
             if (isBetSubmitted === true) {
@@ -445,7 +446,7 @@ function stopTimer() {
     timerIndex = 0;
 }
 
-function setFinalBet(fightData) {
+function setFinalBet() {
     if (finalBetside === '') {
         betsidePicked = shuffleBetSide([...shuffleValues]);
     }
