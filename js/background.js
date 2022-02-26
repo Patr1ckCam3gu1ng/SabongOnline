@@ -7,19 +7,20 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    200,
-    200,
-    550,
-    1250,
-    2800,
-    6300,
-    14200,
-    30000
-];
+    350,
+    350,
+    800,
+    1800,
+    4100,
+    9300,
+    20900,
+    47000,
+    100000
+]; // 184,600
 
-let dailyProfitQuotaLimit = 80;
+let dailyProfitQuotaLimit = 140;
 
-let overallQuota = (betLevel[0] * 8);
+// let overallQuota = (betLevel[0] * 8);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -32,7 +33,7 @@ let pinger;
 let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = '';
-let isBetOnHigherRoi = false;
+let betsidePicked = '';
 let isMatchWin = false;
 let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
@@ -61,7 +62,7 @@ let matchLogs = [{
 }];
 let fightNumber = 1;
 let forceDisconnect = false;
-const shuffleValues = [true, false];
+const shuffleValues = [meron, wala];
 let remainingCurrentPoints = 0;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
@@ -161,13 +162,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             return;
         }
-        else if (grossProfit >= overallQuota) {
-            console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
-
-            disconnect();
-
-            return;
-        }
+        // else if (grossProfit >= overallQuota) {
+        //     console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
+        //
+        //     disconnect();
+        //
+        //     return;
+        // }
 
         if (fightEvent === 'App\\Events\\FightUpdate') {
             const fightData = data[2].data;
@@ -336,24 +337,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             setFinalBet(clonedDataBetOdds.value);
 
-            let bet = betLevel[presentLevel];
-
-            betAmountPlaced = parseInt(bet);
-
-            if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
-                chrome.tabs.sendMessage(tab.id, {
-                    text: 'inputBet',
-                    betAmountPlaced: parseInt(remainingCurrentPoints.toFixed(0))
-                });
-                await chromeSendMessage(chrome.tabs);
-            } else {
-                chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
-                await chromeSendMessage(chrome.tabs);
-            }
-
-            if (presentLevel === betLevel.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 800));
-            }
+            chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced: parseInt(betLevel[presentLevel]) });
+            await chromeSendMessage(chrome.tabs);
 
             if (isBetSubmitted === true) {
                 stopTimer();
@@ -462,17 +447,15 @@ function stopTimer() {
 
 function setFinalBet(fightData) {
     if (finalBetside === '') {
-        isBetOnHigherRoi = shuffleBetSide([...shuffleValues]);
+        betsidePicked = shuffleBetSide([...shuffleValues]);
     }
 
-    finalBetside = (isBetOnHigherRoi
-        ? (fightData.meron_odds > fightData.wala_odds) : (fightData.meron_odds < fightData.wala_odds))
-        ? meron : wala;
+    finalBetside = betsidePicked;
 }
 
 function reverseBet() {
     if (fightNumber % 3 === 1) {
-        isBetOnHigherRoi = shuffleBetSide([...shuffleValues]);
+        betsidePicked = shuffleBetSide([...shuffleValues]);
     }
 }
 
@@ -563,9 +546,6 @@ function flushPreviousVariance() {
     winStreak = 0;
     matchIndex = 1;
     isPendingPrintProfit = false;
-
-    // will be reverse once it re-commence:
-    isBetOnHigherRoi = true;
 
     finalBetside = '';
 }
