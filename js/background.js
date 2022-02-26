@@ -153,7 +153,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
         }
 
         if (presentLevel > betLevel.length - 1) {
-            printLine();
+            console.log('%c-', 'color: black;');
 
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
 
@@ -375,7 +375,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
             } else {
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                await new Promise(resolve => setTimeout(resolve, 2500));
 
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
