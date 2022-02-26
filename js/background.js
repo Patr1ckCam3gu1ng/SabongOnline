@@ -7,18 +7,17 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    350,
-    350,
-    800,
-    1800,
-    4100,
-    9300,
-    20900,
-    47000,
-    100000
-]; // 184,600
+    400,
+    400,
+    1000,
+    2300,
+    5150,
+    11600,
+    24600,
+    53500
+]; // 98,950
 
-let dailyProfitQuotaLimit = 140;
+let dailyProfitQuotaLimit = 160;
 
 // let overallQuota = (betLevel[0] * 8);
 
