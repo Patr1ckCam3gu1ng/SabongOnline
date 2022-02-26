@@ -260,9 +260,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
-                if (presentLevel === betLevel.length - 1 && isDemoOnly === false) {
-                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                }
 
                 maxWaitTimes = generateRandomWaitTime();
 
@@ -456,7 +453,7 @@ function setFinalBet() {
 
 function reverseBet() {
     if (fightNumber % 3 === 1) {
-        betsidePicked = shuffleBetSide([...shuffleValues]);
+        finalBetside = shuffleBetSide([...shuffleValues]);
     }
 }
 

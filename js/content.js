@@ -58,7 +58,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         }
     }
     if (msg.text === "getClosedOdds") {
-        sendResponse(parseFloat(document.getElementsByClassName("payoutDisplay")[msg.betSide === 'meron' ? 0 : 1].innerText.toString().replace('PAYOUT = ', '')))
+        if (document.getElementsByClassName("payoutDisplay").length > 0) {
+            sendResponse(parseFloat(document.getElementsByClassName("payoutDisplay")[msg.betSide === 'meron' ? 0 : 1].innerText.toString().replace('PAYOUT = ', '')))
+        }
     }
     if (msg.text === "submitDummyBet") {
         if (msg.betAmountPlaced === 0) {
