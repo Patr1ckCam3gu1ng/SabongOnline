@@ -101,10 +101,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             return `document.getElementById('${elementId}').setAttribute('${isClicked}','true'); document.getElementById('${elementId}').setAttribute('style','border-color:#1e81f1;border-width:3px;');`
         }
 
-        if (document.getElementsByClassName('float-left img-fluid').length > 0) {
-            return;
-        }
-
         document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
             `<div id="${elementName}" style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <input id="${btnInputMinus}" type="button" onclick="${addFunction(btnInputMinus)}" value="-10"> </td> <td> <h5 id="printRemainingTime" style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #ff00eb;text-shadow: 0px 1px whitesmoke;">${msg.timerIndex.toString().padStart(2, '0')} of ${msg.maxWaitTimes} seconds</h5> </td> <td> <input type="button" id="${btnInputAdd}" onclick="${addFunction(btnInputAdd)}" value="+10"> </td> </tr> </tbody></table> </div>`);
     }
