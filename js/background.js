@@ -7,21 +7,19 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    100,
-    100,
-    250,
-    600,
-    1350,
-    3000,
-    6400,
-    13900,
-    30300,
-    66000
-]; // 122,000
+    200,
+    200,
+    500,
+    1150,
+    2600,
+    5850,
+    12400,
+    27000
+]; // 49,900
 
-let dailyProfitQuotaLimit = 40;
+let dailyProfitQuotaLimit = 100;
 
-// let overallQuota = (betLevel[0] * 8);
+let overallQuota = (betLevel[0] * 32);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -155,20 +153,17 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%c-', 'color: black;');
-
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
 
             disconnect();
-
             return;
         }
-        // else if (grossProfit >= overallQuota) {
-        //     console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
-        //
-        //     disconnect();
-        //
-        //     return;
-        // }
+        else if (grossProfit >= overallQuota) {
+            console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
+
+            disconnect();
+            return;
+        }
 
         if (fightEvent === 'App\\Events\\FightUpdate') {
             const fightData = data[2].data;
@@ -458,13 +453,12 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    let minMinutes = 39;
+    let minMinutes = 20;
     const maxMinutes = 64;
     let pickList = [];
 
     while (minMinutes <= maxMinutes) {
         pickList.push(minMinutes)
-
         minMinutes += 1;
     }
 
