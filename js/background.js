@@ -19,7 +19,7 @@ betLevel = [
 
 let dailyProfitQuotaLimit = 100;
 
-let overallQuota = (betLevel[0] * 32);
+let overallQuota = (betLevel[0] * 25);
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
