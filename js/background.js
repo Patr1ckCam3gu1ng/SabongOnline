@@ -433,7 +433,7 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    if (fightNumber % 3 === 1 || finalBetside === '') {
+    if (fightNumber % 2 === 1 || finalBetside === '') {
         finalBetside = shuffleBetSide([...shuffleValues]);
     }
 }
