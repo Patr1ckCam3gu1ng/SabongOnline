@@ -59,6 +59,7 @@ let matchLogs = [{
     isExtendedBet: false
 }];
 let fightNumber = 1;
+let fightNumberAddon = 0;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala];
 let remainingCurrentPoints = 0;
@@ -433,8 +434,8 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    if (fightNumber % 2 === 1 || finalBetside === '') {
-        finalBetside = shuffleBetSide([...shuffleValues]);
+    if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
+        finalBetside = shuffleBetSide([...shufflalues]);
     }
 }
 
