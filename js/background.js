@@ -435,7 +435,7 @@ function stopTimer() {
 
 function setFinalBet() {
     if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
-        finalBetside = shuffleBetSide([...shufflalues]);
+        finalBetside = shuffleBetSide([...shuffleValues]);
     }
 }
 
