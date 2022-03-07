@@ -39,9 +39,6 @@ let isQuotaReachedPrinted = false;
 let isExtendedBet = false;
 let totalLossCountByFar = 0;
 let matchIndex = 1;
-let winCount = 0;
-let lossCount = 0;
-let drawCount = 0;
 let winStreak = 0;
 let highestLossStreak = 0;
 let betAmountPlaced = 0;
@@ -198,27 +195,18 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 isLastMatchDraw = winner === 'draw';
 
-                if (isBetSubmitted === true) {
-                    if (isLastMatchDraw) {
-                        paymentSafe(isLastMatchDraw);
-                        isBetSubmitted = false;
-
-                        drawCount += 1;
-                        return;
-                    } else {
-                        if (isWinner) {
-                            winCount += 1;
-                        } else {
-                            lossCount += 1;
-                            console.log(`%cYou lose! ${(presentLevel + 1) > 6 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: red');
-                        }
-                    }
-                }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
                     return;
                 }
                 if (isBetSubmitted === true) {
+                    if (isLastMatchDraw) {
+                        paymentSafe(isLastMatchDraw);
+                        isBetSubmitted = false;
+
+                        return;
+                    }
+
                     const odds = (finalBetside === wala ? walaOdds : meronOdds);
                     const winningSum = (betAmountPlaced * odds) - betAmountPlaced;
 
@@ -242,6 +230,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         presentLevel += 1;
 
                         totalLossCountByFar += 1;
+
+                        console.log(`%cYou lose! ${presentLevel > 6 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
 
                     betAmountPlaced = 0;
@@ -317,7 +307,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             if ([0, 1].includes(matchIndex / 8 % 2)) {
                 printLine();
-                resetIndexCounter();
             } else {
                 printLine();
             }
@@ -423,21 +412,15 @@ function startTimer() {
     }, 1000);
 }
 
-function resetIndexCounter() {
-    lossCount = 0;
-    winCount = 0;
-    drawCount = 0;
-}
-
 function stopTimer() {
     clearTimeout(timer);
     timerIndex = 0;
 }
 
 function setFinalBet() {
-    if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
+    // if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
         finalBetside = shuffleBetSide([...shuffleValues]);
-    }
+    // }
 }
 
 function paymentSafe(isDraw) {
@@ -513,8 +496,6 @@ function flushPreviousVariance() {
     matchLogs = [];
     matchLogs.push({ fightNumber: 1, isWin: true, sum, betAmountPlaced: 0 });
 
-    resetIndexCounter();
-
     remainingCurrentPoints = 0;
     betAmountPlaced = 0;
     highestLossStreak = 0;
@@ -547,7 +528,7 @@ function shuffleBetSide(value) {
     let shuffledBuckets = [];
     let index = 0;
 
-    while (index < randomPowerLawDistribution(20, 100)) {
+    while (index < randomPowerLawDistribution(1, 50)) {
         shuffledValues = shuffleArrays(shuffledValues);
         shuffledBuckets.push(...shuffledValues);
         index += 1;
@@ -557,7 +538,7 @@ function shuffleBetSide(value) {
     let indexPickedHistory = [];
     index = 0;
 
-    while (index <= randomPowerLawDistribution(20, 100)) {
+    while (index <= randomPowerLawDistribution(1, 50)) {
         const picked = randomPowerLawDistribution(1, shuffledBuckets.length);
         if (indexPickedHistory.filter(c => c === picked).length === 0) {
             indexPicked = picked;
