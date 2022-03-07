@@ -547,7 +547,7 @@ function shuffleBetSide(value) {
     index = 0;
 
     while (index <= randomPowerLawDistribution(1, 50)) {
-        const picked = randomPowerLawDistribution(1, shuffledBuckets.length);
+        const picked = randomPowerLawDistribution(1, shuffledBuckets.length - 1);
         if (indexPickedHistory.filter(c => c === picked).length === 0) {
             indexPicked = picked;
             indexPickedHistory.push(picked);
