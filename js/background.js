@@ -141,8 +141,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
         const { grossProfit } = calculateProfit();
 
         if (isDailyQuotaReached() === true) {
-            console.log(`%c\\( ﾟヮﾟ)/   Job Well Done! Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()}   ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
-            console.log('%c-', 'color: black;');
+            // console.log(`%c\\( ﾟヮﾟ)/   Job Well Done! Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()}   ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
+            // console.log('%c-', 'color: black;');
 
             isQuotaReachedPrinted = true;
             isBetSubmitted = false;
