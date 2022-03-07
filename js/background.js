@@ -418,8 +418,16 @@ function stopTimer() {
 }
 
 function setFinalBet() {
+    let index = 0;
+    while (index < 100) {
+        const pickedSide = shuffleBetSide([...shuffleValues]);
+        if (typeof pickedSide !== 'undefined') {
+            finalBetside = pickedSide;
+            break;
+        }
+        index += 1;
+    }
     // if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
-        finalBetside = shuffleBetSide([...shuffleValues]);
     // }
 }
 
