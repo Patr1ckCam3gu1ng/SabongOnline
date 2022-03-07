@@ -210,7 +210,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                             winCount += 1;
                         } else {
                             lossCount += 1;
-                            console.log(`%cYou lose! ${(presentLevel + 1) > 5 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: red');
+                            console.log(`%cYou lose! ${(presentLevel + 1) > 6 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: red');
                         }
                     }
                 }
@@ -435,9 +435,9 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    // if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
-    finalBetside = shuffleBetSide([...shuffleValues]);
-    // }
+    if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
+        finalBetside = shuffleBetSide([...shuffleValues]);
+    }
 }
 
 function paymentSafe(isDraw) {
