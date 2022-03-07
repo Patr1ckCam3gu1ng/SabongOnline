@@ -7,19 +7,20 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    200,
-    200,
-    500,
-    1150,
-    2600,
-    5850,
-    12400,
-    27000
-]; // 49,900
+    99,
+    99,
+    230,
+    520,
+    1170,
+    2630,
+    5570,
+    12120,
+    26400
+]; // 48,840
 
-let dailyProfitQuotaLimit = 100;
+let dailyProfitQuotaLimit = 70;
 
-let overallQuota = (betLevel[0] * 25);
+let overallQuota = 11000;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -454,16 +455,11 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    let minMinutes = 20;
-    const maxMinutes = 64;
-    let pickList = [];
+    return randomPowerLawDistribution(20, 64);
+}
 
-    while (minMinutes <= maxMinutes) {
-        pickList.push(minMinutes)
-        minMinutes += 1;
-    }
-
-    return shuffleBetSide([...pickList]);
+function randomPowerLawDistribution(min, max) {
+    return Math.ceil(Math.exp(Math.random() * (Math.log(max) - Math.log(min))) * min)
 }
 
 function printLine() {
@@ -538,7 +534,7 @@ function shuffleBetSide(value) {
     const shuffleArrays = (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
-            let rand = Math.floor(Math.random() * (i + 1));
+            let rand = randomPowerLawDistribution(1, i);
             oldElement = array[i];
             array[i] = array[rand];
             array[rand] = oldElement;
@@ -548,28 +544,27 @@ function shuffleBetSide(value) {
     }
 
     let shuffledValues = [...value];
-    const maxLoop = 3;
     let shuffledBuckets = [];
     let index = 0;
 
-    while (index < (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
+    while (index < randomPowerLawDistribution(20, 100)) {
         shuffledValues = shuffleArrays(shuffledValues);
         shuffledBuckets.push(...shuffledValues);
-        index++;
+        index += 1;
     }
 
     let indexPicked = 0;
     let indexPickedHistory = [];
     index = 0;
 
-    while (index <= (Math.floor(parseInt(((Math.random() * maxLoop) + 1).toFixed(0))))) {
-        const picked = Math.floor(Math.random() * shuffledBuckets.length);
+    while (index <= randomPowerLawDistribution(20, 100)) {
+        const picked = randomPowerLawDistribution(1, shuffledBuckets.length);
         if (indexPickedHistory.filter(c => c === picked).length === 0) {
             indexPicked = picked;
             indexPickedHistory.push(picked);
         }
 
-        index++;
+        index += 1;
     }
 
     return shuffledBuckets[indexPicked];
@@ -664,7 +659,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
         if (crfTokenValue !== '') {
-            getInitialPoints();
+            getInitialPoints().then(r => r);
         }
     }
 });
@@ -677,7 +672,7 @@ chrome.extension.onConnect.addListener(function (port) {
                     chrome.tabs.sendMessage(tab.id, { text: "ancestorOrigins" },
                         function (wssUrl) {
                             createWebSocketConnection(crfToken, wssUrl);
-                            getInitialPoints();
+                            getInitialPoints().then(r => r);
                         }
                     );
                 }
