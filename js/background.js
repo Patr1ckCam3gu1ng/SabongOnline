@@ -435,9 +435,9 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
-        finalBetside = shuffleBetSide([...shuffleValues]);
-    }
+    // if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
+    finalBetside = shuffleBetSide([...shuffleValues]);
+    // }
 }
 
 function paymentSafe(isDraw) {
