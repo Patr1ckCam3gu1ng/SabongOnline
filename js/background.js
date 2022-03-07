@@ -210,7 +210,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                             winCount += 1;
                         } else {
                             lossCount += 1;
-                            console.log('%cYou lose!', 'font-weight: bold; color: red');
+                            console.log(`%cYou lose! ${lossCount > 5 ? `(${lossCount})` : ''}`, 'font-weight: bold; color: red');
                         }
                     }
                 }
