@@ -59,7 +59,7 @@ let matchLogs = [{
 let fightNumber = 1;
 let fightNumberAddon = 0;
 let forceDisconnect = false;
-const shuffleValues = [meron, wala];
+const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
 let remainingCurrentPoints = 0;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
@@ -523,7 +523,7 @@ function shuffleBetSide(value) {
     const shuffleArrays = (array) => {
         let oldElement;
         for (let i = array.length - 1; i > 0; i--) {
-            let rand = randomPowerLawDistribution(1, i);
+            let rand = Math.floor(Math.random() * (i + 1));
             oldElement = array[i];
             array[i] = array[rand];
             array[rand] = oldElement;
@@ -536,25 +536,16 @@ function shuffleBetSide(value) {
     let shuffledBuckets = [];
     let index = 0;
 
-    while (index < randomPowerLawDistribution(1, 50)) {
-        shuffledValues = shuffleArrays(shuffledValues);
-        shuffledBuckets.push(...shuffledValues);
-        index += 1;
-    }
-
-    let indexPicked = 0;
-    let indexPickedHistory = [];
-    index = 0;
-
-    while (index <= randomPowerLawDistribution(1, 50)) {
-        const picked = randomPowerLawDistribution(1, shuffledBuckets.length - 1);
-        if (indexPickedHistory.filter(c => c === picked).length === 0) {
-            indexPicked = picked;
-            indexPickedHistory.push(picked);
+    while (index < randomPowerLawDistribution(20, 100)) {
+        const shuffledArrays = shuffleArrays(shuffledValues);
+        for (const shuffledArr of shuffledArrays) {
+            shuffledBuckets.push(shuffledArr);
         }
 
         index += 1;
     }
+
+    const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length + 1));
 
     return shuffledBuckets[indexPicked];
 }
