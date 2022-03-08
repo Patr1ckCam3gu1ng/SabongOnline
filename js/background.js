@@ -57,7 +57,6 @@ let matchLogs = [{
     isExtendedBet: false
 }];
 let fightNumber = 1;
-let fightNumberAddon = 0;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
 let remainingCurrentPoints = 0;
@@ -418,17 +417,17 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    let index = 0;
-    while (index < 100) {
-        const pickedSide = shuffleBetSide([...shuffleValues]);
-        if (typeof pickedSide !== 'undefined') {
-            finalBetside = pickedSide;
-            break;
+    if (fightNumber % 2 === 1 || finalBetside === '') {
+        let index = 0;
+        while (index < 100) {
+            const pickedSide = shuffleBetSide([...shuffleValues]);
+            if (typeof pickedSide !== 'undefined') {
+                finalBetside = pickedSide;
+                break;
+            }
+            index += 1;
         }
-        index += 1;
     }
-    // if ((fightNumber + fightNumberAddon) % 2 === 1 || finalBetside === '') {
-    // }
 }
 
 function paymentSafe(isDraw) {
@@ -545,7 +544,7 @@ function shuffleBetSide(value) {
         index += 1;
     }
 
-    const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length + 1));
+    const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length - 1));
 
     return shuffledBuckets[indexPicked];
 }
