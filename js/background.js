@@ -417,16 +417,18 @@ function stopTimer() {
 }
 
 function setFinalBet() {
-    if (fightNumber % 2 === 1 || finalBetside === '') {
-        let index = 0;
-        while (index < 100) {
+    let mainIndex = 0;
+    while (mainIndex < randomPowerLawDistribution(20, 100)) {
+        let subIndex = 0;
+        while (subIndex < 100) {
             const pickedSide = shuffleBetSide([...shuffleValues]);
             if (typeof pickedSide !== 'undefined') {
                 finalBetside = pickedSide;
                 break;
             }
-            index += 1;
+            subIndex += 1;
         }
+        mainIndex += 1;
     }
 }
 
