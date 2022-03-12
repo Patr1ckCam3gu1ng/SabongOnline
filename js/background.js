@@ -20,7 +20,7 @@ betLevel = [
 
 let dailyProfitQuotaLimit = 70;
 
-let overallQuota = 11000;
+let overallQuota = 2500;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -421,11 +421,14 @@ function setFinalBet() {
     while (mainIndex < randomPowerLawDistribution(20, 100)) {
         let subIndex = 0;
         while (subIndex < 100) {
-            const pickedSide = shuffleBetSide([...shuffleValues]);
+            const shuffledArrays = shuffleArrays([...shuffleValues]);
+            const pickedSide = shuffleBetSide(shuffledArrays);
+
             if (typeof pickedSide !== 'undefined') {
                 finalBetside = pickedSide;
                 break;
             }
+
             subIndex += 1;
         }
         mainIndex += 1;
@@ -520,19 +523,19 @@ async function chromeSendMessage(chromeTabs) {
     chromeTabs.sendMessage(tab.id, { text: 'placeBet', betSide: finalBetside });
 }
 
-function shuffleBetSide(value) {
-    const shuffleArrays = (array) => {
-        let oldElement;
-        for (let i = array.length - 1; i > 0; i--) {
-            let rand = Math.floor(Math.random() * (i + 1));
-            oldElement = array[i];
-            array[i] = array[rand];
-            array[rand] = oldElement;
-        }
-
-        return array;
+function shuffleArrays(array) {
+    let oldElement;
+    for (let i = array.length - 1; i > 0; i--) {
+        let rand = Math.floor(Math.random() * (i + 1));
+        oldElement = array[i];
+        array[i] = array[rand];
+        array[rand] = oldElement;
     }
 
+    return [...array];
+}
+
+function shuffleBetSide(value) {
     let shuffledValues = [...value];
     let shuffledBuckets = [];
     let index = 0;
