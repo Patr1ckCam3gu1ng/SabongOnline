@@ -104,6 +104,20 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         document.getElementsByClassName('float-left img-fluid')[0].insertAdjacentHTML("afterend",
             `<div id="${elementName}" style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <input id="${btnInputMinus}" type="button" onclick="${addFunction(btnInputMinus)}" value="-10"> </td> <td> <h5 id="printRemainingTime" style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #ff00eb;text-shadow: 0px 1px whitesmoke;">${msg.timerIndex.toString().padStart(2, '0')} of ${msg.maxWaitTimes} seconds</h5> </td> <td> <input type="button" id="${btnInputAdd}" onclick="${addFunction(btnInputAdd)}" value="+10"> </td> </tr> </tbody></table> </div>`);
     }
+    if (msg.text === "printRemainingSkipMatches") {
+        const id = 'skipMatch';
+        const $img = document.getElementsByClassName('float-left img-fluid');
+        const $skipMatch = document.getElementById(id);
+
+        if ($skipMatch != null) {
+            $skipMatch.remove();
+        }
+        if ($img.length > 0) {
+            $img[0].insertAdjacentHTML("afterend",
+                `<div id='${id}' style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <h5 style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #fdda11;text-shadow: 0px 1px #0b4591;">Skipping Matches: ${msg.indexSkip} of ${msg.maxSkip}</h5> </td>  </tr> </tbody></table> </div>`);
+        }
+    }
+
     if (msg.text === "deletePrintRemainingTime") {
         removePrintRemainingTime();
     }

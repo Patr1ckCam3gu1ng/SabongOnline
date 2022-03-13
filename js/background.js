@@ -37,10 +37,7 @@ let isMatchWin = false;
 let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
 let isExtendedBet = false;
-let totalLossCountByFar = 0;
 let matchIndex = 1;
-let winStreak = 0;
-let highestLossStreak = 0;
 let betAmountPlaced = 0;
 let isWinner = false;
 let isLastMatchDraw = false;
@@ -56,6 +53,8 @@ let matchLogs = [{
     presentLevel: 0,
     isExtendedBet: false
 }];
+let skipMatchesCount = -1;
+const maxSkipMatches = 4;
 let fightNumber = 1;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
@@ -194,6 +193,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 isLastMatchDraw = winner === 'draw';
 
+                if (skipMatchesCount >= 0) {
+                    skipMatchesCount -= 1;
+                    if (skipMatchesCount === 0) {
+                        skipMatchesCount = -1;
+                        chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                    }
+                }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
                     return;
@@ -212,23 +218,22 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     isMatchWin = false;
 
                     if (isWinner === true) {
-                        if (presentLevel === 0) {
-                            winStreak += 1;
-                        }
-
                         setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
 
                         isMatchWin = isWinner;
-                        presentLevel = 0;
-                        console.log('%cCongratulations!', 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
-                    } else {
-                        winStreak = 0;
 
+                        console.log(`%cCongratulations! ${presentLevel > 6 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
+
+                        presentLevel = 0;
+                    } else {
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
                         presentLevel += 1;
 
-                        totalLossCountByFar += 1;
+                        if (presentLevel === 4 && skipMatchesCount === -1) {
+                            skipMatchesCount = maxSkipMatches;
+                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        }
 
                         console.log(`%cYou lose! ${presentLevel > 6 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
@@ -264,7 +269,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 stopTimer();
                 return;
             }
-            if (timerIndex === 0) {
+            if (timerIndex === 0 && skipMatchesCount === -1) {
                 startTimer();
             }
 
@@ -280,8 +285,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 );
             }
 
-            // continuous refresh
-            shuffleBetSide([...shuffleValues]);
+            if (skipMatchesCount >= 0) {
+                printRemainingSkipMatches();
+            }
 
             if ((timerIndex + 4) <= maxWaitTimes) {
                 if (betAmountPlaced > 0 && timerIndex > 5) {
@@ -411,6 +417,12 @@ function startTimer() {
     }, 1000);
 }
 
+function printRemainingSkipMatches() {
+    if (skipMatchesCount >= 0) {
+        chrome.tabs.sendMessage(tab.id, { text: "printRemainingSkipMatches", indexSkip: skipMatchesCount, maxSkip: maxSkipMatches });
+    }
+}
+
 function stopTimer() {
     clearTimeout(timer);
     timerIndex = 0;
@@ -510,10 +522,9 @@ function flushPreviousVariance() {
 
     remainingCurrentPoints = 0;
     betAmountPlaced = 0;
-    highestLossStreak = 0;
-    winStreak = 0;
     matchIndex = 1;
     isPendingPrintProfit = false;
+    skipMatchesCount = -1;
 
     finalBetside = '';
 }
@@ -579,6 +590,8 @@ function printCurrentPoints() {
 }
 
 async function getInitialPoints() {
+    printRemainingSkipMatches();
+
     if (isDemoOnly === true) {
         printCurrentPoints();
         printDummyBet();
