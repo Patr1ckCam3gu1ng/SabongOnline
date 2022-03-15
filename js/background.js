@@ -14,9 +14,8 @@ betLevel = [
     1170,
     2630,
     5570,
-    12120,
-    26400
-]; // 48,840
+    12120
+]; // 22,440
 
 let dailyProfitQuotaLimit = 70;
 
@@ -222,7 +221,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         isMatchWin = isWinner;
 
-                        console.log(`%cCongratulations! ${ presentLevel > 5 ? `(${ presentLevel + 1 })` : '' }`, 'font-weight: bold; color: green', `+${ winningSum.toFixed(0).toLocaleString() } => ${ ((odds * 100) - 100).toFixed(0) }%`);
+                        console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
 
                         presentLevel = 0;
                     } else {
@@ -230,12 +229,12 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === 4 && skipMatchesCount === -1) {
+                        if (presentLevel === 3 && skipMatchesCount === -1) {
                             skipMatchesCount = maxSkipMatches;
                             chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         }
 
-                        console.log(`%cYou lose! ${presentLevel > 6 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
+                        console.log(`%cYou lose! ${presentLevel > 4 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
 
                     betAmountPlaced = 0;
