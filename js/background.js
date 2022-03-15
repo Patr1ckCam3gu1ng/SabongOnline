@@ -229,7 +229,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === 3 && skipMatchesCount === -1) {
+                        if (presentLevel === 4 && skipMatchesCount === -1) {
                             skipMatchesCount = maxSkipMatches;
                             chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         }
