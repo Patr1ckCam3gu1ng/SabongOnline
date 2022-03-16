@@ -58,6 +58,7 @@ let fightNumber = 1;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
 let remainingCurrentPoints = 0;
+let isExtraProfitUsed = false;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -224,6 +225,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
 
                         presentLevel = 0;
+                        isExtraProfitUsed = false;
                     } else {
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
@@ -254,7 +256,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 if (calculateProfit().grossProfit >= betLevel[0] && betLevel[2] !== betLevel[0]) {
                     betLevel.splice(2, 0, betLevel[0]);
                 } else {
-                    if (betLevel[2] === betLevel[0]) {
+                    if (betLevel[2] === betLevel[0] && isExtraProfitUsed === false) {
                         betLevel.splice(2, 1);
                     }
                 }
@@ -326,6 +328,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             setFinalBet();
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
+            isExtraProfitUsed = presentLevel === 2 && betLevel[2] === betLevel[0];
 
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
