@@ -229,7 +229,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        // if (presentLevel === 4 && skipMatchesCount === -1) {
+                        // if (presentLevel === hasExtraProfit ? 6 : 5 && skipMatchesCount === -1) {
                         //     skipMatchesCount = maxSkipMatches;
                         //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         // }
@@ -249,6 +249,14 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                }
+
+                if (calculateProfit().grossProfit >= betLevel[0] && betLevel[2] !== betLevel[0]) {
+                    betLevel.splice(2, 0, betLevel[0]);
+                } else {
+                    if (betLevel[2] === betLevel[0]) {
+                        betLevel.splice(2, 1);
+                    }
                 }
 
                 maxWaitTimes = generateRandomWaitTime();
