@@ -229,12 +229,12 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === 4 && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches;
-                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        }
+                        // if (presentLevel === 4 && skipMatchesCount === -1) {
+                        //     skipMatchesCount = maxSkipMatches;
+                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        // }
 
-                        console.log(`%cYou lose! ${presentLevel > 4 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
+                        console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
 
                     betAmountPlaced = 0;
