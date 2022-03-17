@@ -322,7 +322,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             manageExtraProfit();
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
-            isExtraProfitUsed = presentLevel === 2 && betLevel[2] === betLevel[0];
+            isExtraProfitUsed = presentLevel === 2 && betLevel[2] === betLevel[0] && isExtraProfitUsed === false;
 
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
