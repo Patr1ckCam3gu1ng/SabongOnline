@@ -35,7 +35,6 @@ let finalBetside = '';
 let isMatchWin = false;
 let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
-let isExtendedBet = false;
 let matchIndex = 1;
 let betAmountPlaced = 0;
 let isWinner = false;
@@ -49,11 +48,10 @@ let matchLogs = [{
     isWin: true,
     odds: 1,
     sum: 0,
-    presentLevel: 0,
-    isExtendedBet: false
+    presentLevel: 0
 }];
 let skipMatchesCount = -1;
-const maxSkipMatches = 4;
+const maxSkipMatches = 3;
 let fightNumber = 1;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
@@ -231,10 +229,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        // if (presentLevel === hasExtraProfit ? 6 : 5 && skipMatchesCount === -1) {
-                        //     skipMatchesCount = maxSkipMatches;
-                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        // }
+                        if (presentLevel === (betLevel[2] === betLevel[0] ? 6 : 5) && skipMatchesCount === -1) {
+                            skipMatchesCount = maxSkipMatches;
+                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        }
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
@@ -247,7 +245,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 isBetSubmitted = false;
                 betAmountPlaced = 0;
-                isExtendedBet = false;
 
                 if (fightNumber % 6 === 1) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
@@ -393,7 +390,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 }
 
 function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
-    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced, odds, isExtendedBet });
+    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced, odds });
 }
 
 function startTimer() {
