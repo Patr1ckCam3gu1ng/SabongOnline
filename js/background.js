@@ -253,14 +253,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
 
-                if (calculateProfit().grossProfit >= betLevel[0] && betLevel[2] !== betLevel[0]) {
-                    betLevel.splice(2, 0, betLevel[0]);
-                } else {
-                    if (betLevel[2] === betLevel[0] && isExtraProfitUsed === false) {
-                        betLevel.splice(2, 1);
-                    }
-                }
-
                 maxWaitTimes = generateRandomWaitTime();
 
                 return;
@@ -325,7 +317,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 printLine();
             }
 
-            setFinalBet();
+            setFinalBetside();
+
+            manageExtraProfit();
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
             isExtraProfitUsed = presentLevel === 2 && betLevel[2] === betLevel[0];
@@ -438,7 +432,7 @@ function stopTimer() {
     timerIndex = 0;
 }
 
-function setFinalBet() {
+function setFinalBetside() {
     let mainIndex = 0;
     while (mainIndex < randomPowerLawDistribution(20, 100)) {
         let subIndex = 0;
@@ -659,6 +653,17 @@ async function printPossibleWinningsIfClosed() {
                 }
             }
         );
+    }
+}
+
+function manageExtraProfit() {
+    const hasExtraProfit = calculateProfit().grossProfit >= betLevel[0];
+
+    if (hasExtraProfit === true && betLevel[2] !== betLevel[0]) {
+        betLevel.splice(2, 0, betLevel[0]);
+    }
+    if (hasExtraProfit === false && betLevel[2] === betLevel[0] && isExtraProfitUsed === false) {
+        betLevel.splice(2, 1);
     }
 }
 
