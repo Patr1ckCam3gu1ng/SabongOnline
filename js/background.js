@@ -58,7 +58,7 @@ let fightNumber = 1;
 let forceDisconnect = false;
 const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
 let remainingCurrentPoints = 0;
-let isExtraProfitUsed = [false, false];
+let isExtraProfitUsed = false;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -225,8 +225,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
 
                         presentLevel = 0;
-                        isExtraProfitUsed[0] = false;
-                        isExtraProfitUsed[1] = false;
+                        isExtraProfitUsed = false;
                     } else {
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
@@ -320,10 +319,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             setFinalBetside();
 
-            manageExtraProfit(0);
-            manageExtraProfit(1);
+            manageExtraProfit();
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
+
+            if (isExtraProfitUsed === false) {
+                isExtraProfitUsed = presentLevel === 2 && betLevel[2] === betLevel[0];
+            }
 
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
@@ -657,19 +659,14 @@ async function printPossibleWinningsIfClosed() {
     }
 }
 
-function manageExtraProfit(addOn) {
-    const hasExtraProfit = calculateProfit().grossProfit >= (betLevel[0] * (1 + addOn));
-    const indexAddon = 2 + addOn;
+function manageExtraProfit() {
+    const hasExtraProfit = calculateProfit().grossProfit >= betLevel[0];
 
-    if (hasExtraProfit === true && betLevel[indexAddon] !== betLevel[0]) {
+    if (hasExtraProfit === true && betLevel[2] !== betLevel[0]) {
         betLevel.splice(2, 0, betLevel[0]);
     }
-    if (hasExtraProfit === false && betLevel[indexAddon] === betLevel[0] && isExtraProfitUsed[addOn] === false) {
+    if (hasExtraProfit === false && betLevel[2] === betLevel[0] && isExtraProfitUsed === false) {
         betLevel.splice(2, 1);
-    }
-
-    if (isExtraProfitUsed[addOn] === false) {
-        isExtraProfitUsed[addOn] = presentLevel === indexAddon && betLevel[indexAddon] === betLevel[0];
     }
 }
 
