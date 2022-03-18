@@ -19,7 +19,7 @@ betLevel = [
 
 let dailyProfitQuotaLimit = 70;
 
-let overallQuota = 2500;
+let overallQuota = 5000;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -466,7 +466,7 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    return randomPowerLawDistribution(40, 74);
+    return randomPowerLawDistribution(50, 74);
 }
 
 function randomPowerLawDistribution(min, max) {
