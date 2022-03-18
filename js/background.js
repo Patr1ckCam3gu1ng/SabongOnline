@@ -51,10 +51,10 @@ let matchLogs = [{
     presentLevel: 0
 }];
 let skipMatchesCount = -1;
-const maxSkipMatches = 3;
+const maxSkipMatches = 8;
 let fightNumber = 1;
 let forceDisconnect = false;
-const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
+const shuffleValues = [meron, wala];
 let remainingCurrentPoints = 0;
 let isExtraProfitUsed = false;
 
@@ -466,11 +466,30 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    return randomPowerLawDistribution(50, 74);
+    return randomPowerLawDistribution(50, 84);
 }
 
 function randomPowerLawDistribution(min, max) {
-    return Math.ceil(Math.exp(Math.random() * (Math.log(max) - Math.log(min))) * min)
+    const range = max - min;
+    const requestBytes = Math.ceil(Math.log2(range) / 8);
+    if (!requestBytes) { // No randomness required
+        return min;
+    }
+    const maxNum = Math.pow(256, requestBytes);
+    const ar = new Uint8Array(requestBytes);
+
+    while (true) {
+        window.crypto.getRandomValues(ar);
+
+        let val = 0;
+        for (let i = 0; i < requestBytes; i++) {
+            val = (val << 8) + ar[i];
+        }
+
+        if (val < maxNum - maxNum % range) {
+            return min + (val % range);
+        }
+    }
 }
 
 function printLine() {
