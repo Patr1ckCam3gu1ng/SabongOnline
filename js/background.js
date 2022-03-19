@@ -7,17 +7,16 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    99,
-    99,
-    230,
-    520,
-    1170,
-    2630,
-    5570,
-    12120
-]; // 22,440
+    200,
+    100,
+    500,
+    1150,
+    2600,
+    5850,
+    12400
+]; // 23,000
 
-let dailyProfitQuotaLimit = 70;
+let dailyProfitQuotaLimit = 120;
 
 let overallQuota = 5000;
 
@@ -666,12 +665,13 @@ async function printPossibleWinningsIfClosed() {
 function manageExtraProfit(addOn) {
     const hasExtraProfit = calculateProfit().grossProfit >= (betLevel[0] * (1 + addOn));
     const indexAddon = 2 + addOn;
+    const addonBet = betLevel[0] / 2;
 
-    if (hasExtraProfit === true && betLevel[indexAddon] !== betLevel[0]) {
-        betLevel.splice(2, 0, betLevel[0]);
+    if (hasExtraProfit === true && betLevel[indexAddon] !== addonBet) {
+        betLevel.splice(2, 0, addonBet);
     }
-    if (hasExtraProfit === false && betLevel[indexAddon] === betLevel[0] && isExtraProfitUsed[addOn] === false) {
-        if (addOn === 1 && isExtraProfitUsed[0] === true && betLevel[indexAddon] === betLevel[0]) {
+    if (hasExtraProfit === false && betLevel[indexAddon] === addonBet && isExtraProfitUsed[addOn] === false) {
+        if (addOn === 1 && isExtraProfitUsed[0] === true && betLevel[indexAddon] === addonBet) {
 
         } else {
             betLevel.splice(2, 1);
@@ -679,7 +679,7 @@ function manageExtraProfit(addOn) {
     }
 
     if (isExtraProfitUsed[addOn] === false) {
-        isExtraProfitUsed[addOn] = presentLevel === indexAddon && betLevel[indexAddon] === betLevel[0];
+        isExtraProfitUsed[addOn] = presentLevel === indexAddon && betLevel[indexAddon] === addonBet;
     }
 }
 
