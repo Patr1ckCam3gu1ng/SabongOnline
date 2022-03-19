@@ -33,7 +33,6 @@ let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = '';
 let isMatchWin = false;
-let isPendingPrintProfit = false;
 let isQuotaReachedPrinted = false;
 let matchIndex = 1;
 let betAmountPlaced = 0;
@@ -51,10 +50,10 @@ let matchLogs = [{
     presentLevel: 0
 }];
 let skipMatchesCount = -1;
-const maxSkipMatches = 8;
+const maxSkipMatches = 4;
 let fightNumber = 1;
 let forceDisconnect = false;
-const shuffleValues = [meron, wala];
+const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
 let remainingCurrentPoints = 0;
 let isExtraProfitUsed = false;
 
@@ -299,15 +298,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             stopTimer();
 
-            if ([0, 1].includes((matchIndex / 10) % 2)) {
-                isPendingPrintProfit = true;
-            }
-            if (isMatchWin === true && isPendingPrintProfit === true) {
-                isPendingPrintProfit = false;
-
-                // printProfit();
-            }
-
             if ([0, 1].includes(matchIndex / 8 % 2)) {
                 printLine();
             } else {
@@ -466,7 +456,7 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    return randomPowerLawDistribution(50, 84);
+    return randomPowerLawDistribution(22, 84);
 }
 
 function randomPowerLawDistribution(min, max) {
@@ -546,7 +536,6 @@ function flushPreviousVariance() {
     remainingCurrentPoints = 0;
     betAmountPlaced = 0;
     matchIndex = 1;
-    isPendingPrintProfit = false;
     skipMatchesCount = -1;
 
     finalBetside = '';
@@ -574,7 +563,7 @@ function shuffleBetSide(value) {
     let shuffledBuckets = [];
     let index = 0;
 
-    while (index < randomPowerLawDistribution(20, 100)) {
+    while (index < randomPowerLawDistribution(1, 100)) {
         const shuffledArrays = shuffleArrays(shuffledValues);
         for (const shuffledArr of shuffledArrays) {
             shuffledBuckets.push(shuffledArr);
@@ -583,7 +572,8 @@ function shuffleBetSide(value) {
         index += 1;
     }
 
-    const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length - 1));
+    // const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length - 1));
+    const indexPicked = randomPowerLawDistribution(1, shuffledBuckets.length - 1)
 
     return shuffledBuckets[indexPicked];
 }
