@@ -229,10 +229,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === (betLevel[2] === betLevel[0] ? 5 : 4) && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches;
-                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        }
+                        // if (presentLevel === (betLevel[2] === betLevel[0] ? 5 : 4) && skipMatchesCount === -1) {
+                        //     skipMatchesCount = maxSkipMatches;
+                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        // }
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
@@ -671,7 +671,7 @@ function manageExtraProfit(addOn) {
         betLevel.splice(2, 0, betLevel[0]);
     }
     if (hasExtraProfit === false && betLevel[indexAddon] === betLevel[0] && isExtraProfitUsed[addOn] === false) {
-        if (addOn === 1 && isExtraProfitUsed[0] === true) {
+        if (addOn === 1 && isExtraProfitUsed[0] === true && betLevel[indexAddon] === betLevel[0]) {
 
         } else {
             betLevel.splice(2, 1);
