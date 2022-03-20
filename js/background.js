@@ -17,7 +17,7 @@ betLevel = [
     12120
 ]; // 22440
 
-let dailyProfitQuotaLimit = 120;
+let dailyProfitQuotaLimit = 60;
 
 let overallQuota = 10000;
 
