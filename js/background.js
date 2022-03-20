@@ -607,6 +607,9 @@ function printCurrentPoints() {
 async function getInitialPoints() {
     printRemainingSkipMatches();
 
+    if (shuffleValues.length === 0) {
+        shuffleValues = [...originalShuffleValues];
+    }
     if (isDemoOnly === true) {
         printCurrentPoints();
         printDummyBet();
@@ -694,7 +697,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
         tabsOnUpdated.setTabId(tabId);
         if (crfTokenValue !== '') {
             getInitialPoints().then(r => r);
-            shuffleValues = [...originalShuffleValues];
         }
     }
 });
@@ -708,7 +710,6 @@ chrome.extension.onConnect.addListener(function (port) {
                         function (wssUrl) {
                             createWebSocketConnection(crfToken, wssUrl);
                             getInitialPoints().then(r => r);
-                            shuffleValues = [...originalShuffleValues];
                         }
                     );
                 }
