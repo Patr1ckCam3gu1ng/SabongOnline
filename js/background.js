@@ -7,9 +7,9 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    200,
+    400,
     100,
-    // 99,
+    99,
     500,
     1150,
     2600,
@@ -53,7 +53,8 @@ let skipMatchesCount = -1;
 const maxSkipMatches = 4;
 let fightNumber = 1;
 let forceDisconnect = false;
-const shuffleValues = [meron, wala, meron, wala, meron, wala, meron, wala];
+const originalShuffleValues = [meron, wala, meron, wala, meron, wala];
+let shuffleValues = [];
 let remainingCurrentPoints = 0;
 let isExtraProfitUsed = [false, false];
 
@@ -224,15 +225,18 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         presentLevel = 0;
                         isExtraProfitUsed[0] = false;
                         isExtraProfitUsed[1] = false;
+                        shuffleValues = [...originalShuffleValues];
                     } else {
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
                         presentLevel += 1;
 
-                        // if (presentLevel === (betLevel[2] === betLevel[0] ? 5 : 4) && skipMatchesCount === -1) {
-                        //     skipMatchesCount = maxSkipMatches;
-                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        // }
+                        if (presentLevel === 5 && skipMatchesCount === -1) {
+                            skipMatchesCount = maxSkipMatches;
+                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        }
+
+                        shuffleValues.push(finalBetside === meron ? wala : meron);
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
@@ -690,6 +694,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
         tabsOnUpdated.setTabId(tabId);
         if (crfTokenValue !== '') {
             getInitialPoints().then(r => r);
+            shuffleValues = [...originalShuffleValues];
         }
     }
 });
