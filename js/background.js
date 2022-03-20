@@ -19,7 +19,7 @@ betLevel = [
 
 let dailyProfitQuotaLimit = 120;
 
-let overallQuota = 5000;
+let overallQuota = 10000;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -708,6 +708,7 @@ chrome.extension.onConnect.addListener(function (port) {
                         function (wssUrl) {
                             createWebSocketConnection(crfToken, wssUrl);
                             getInitialPoints().then(r => r);
+                            shuffleValues = [...originalShuffleValues];
                         }
                     );
                 }
