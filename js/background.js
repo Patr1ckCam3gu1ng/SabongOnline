@@ -53,8 +53,8 @@ let skipMatchesCount = -1;
 const maxSkipMatches = 4;
 let fightNumber = 1;
 let forceDisconnect = false;
-const originalShuffleValues = [meron, wala, meron, wala];
-let shuffleValues = [];
+const originalBetsideValues = [meron, wala, meron, wala];
+let betsideValues = [];
 let remainingCurrentPoints = 0;
 let isExtraProfitUsed = [false, false];
 
@@ -225,7 +225,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         presentLevel = 0;
                         isExtraProfitUsed[0] = false;
                         isExtraProfitUsed[1] = false;
-                        shuffleValues = [...originalShuffleValues];
+                        betsideValues = [...originalBetsideValues];
                     } else {
                         setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
 
@@ -236,7 +236,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                             chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         }
 
-                        shuffleValues.push(finalBetside === meron ? wala : meron);
+                        insertAdditionalBetsideValues();
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
@@ -429,7 +429,7 @@ function setFinalBetside() {
     while (mainIndex < randomPowerLawDistribution(20, 100)) {
         let subIndex = 0;
         while (subIndex < 100) {
-            const shuffledArrays = shuffleArrays([...shuffleValues]);
+            const shuffledArrays = shuffleArrays([...betsideValues]);
             const pickedSide = shuffleBetSide(shuffledArrays);
 
             if (typeof pickedSide !== 'undefined') {
@@ -607,8 +607,8 @@ function printCurrentPoints() {
 async function getInitialPoints() {
     printRemainingSkipMatches();
 
-    if (shuffleValues.length === 0) {
-        shuffleValues = [...originalShuffleValues];
+    if (betsideValues.length === 0) {
+        betsideValues = [...originalBetsideValues];
     }
     if (isDemoOnly === true) {
         printCurrentPoints();
@@ -689,6 +689,14 @@ function manageExtraProfit(addOn) {
 
     if (isExtraProfitUsed[addOn] === false) {
         isExtraProfitUsed[addOn] = presentLevel === indexAddon && betLevel[indexAddon] === addonBet;
+    }
+}
+
+function insertAdditionalBetsideValues() {
+    let index = 0;
+    while (index < 4) {
+        betsideValues.push(finalBetside === meron ? wala : meron);
+        index += 1;
     }
 }
 
