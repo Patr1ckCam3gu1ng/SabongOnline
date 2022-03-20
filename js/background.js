@@ -8,7 +8,7 @@ let retryPinger;
 
 betLevel = [
     400,
-    100,
+    // 100,
     99,
     500,
     1150,
