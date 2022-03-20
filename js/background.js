@@ -17,8 +17,6 @@ betLevel = [
     12120
 ]; // 22440
 
-let dailyProfitQuotaLimit = 60;
-
 let overallQuota = 10000;
 
 //should remain 'let' so we can change it in the console:
@@ -33,7 +31,6 @@ let presentLevel = 0;
 let isBetSubmitted = false;
 let finalBetside = '';
 let isMatchWin = false;
-let isQuotaReachedPrinted = false;
 let matchIndex = 1;
 let betAmountPlaced = 0;
 let isWinner = false;
@@ -41,22 +38,17 @@ let isLastMatchDraw = false;
 let timer;
 let timerIndex = 0;
 let isDemoOnly = true;
-let matchLogs = [{
-    betAmountPlaced: 0,
-    fightNumber: 1,
-    isWin: true,
-    odds: 1,
-    sum: 0,
-    presentLevel: 0
-}];
 let skipMatchesCount = -1;
 const maxSkipMatches = 4;
 let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
 let betsideValues = [];
-let remainingCurrentPoints = 0;
 let isExtraProfitUsed = [false, false];
+let potWinnings = {
+    win: 0,
+    loss: 0
+};
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -131,20 +123,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
         const fightEvent = data[0];
         const isBetting = data[1] === 'betting';
-        const { grossProfit } = calculateProfit();
-
-        if (isDailyQuotaReached() === true) {
-            // console.log(`%c\\( ﾟヮﾟ)/   Job Well Done! Php ${calculateTodaysProfit().totalNetProfit.toLocaleString()}   ✯⸜(*❛‿❛)⸝✯`, 'font-weight: bold; color: #FF00FF;');
-            // console.log('%c-', 'color: black;');
-
-            isQuotaReachedPrinted = true;
-            isBetSubmitted = false;
-
-            flushPreviousVariance();
-            stopTimer();
-
-            return;
-        }
 
         if (presentLevel > betLevel.length - 1) {
             console.log('%c-', 'color: black;');
@@ -153,7 +131,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             disconnect();
             return;
         }
-        else if (grossProfit >= overallQuota) {
+        else if (calculateProfit() >= overallQuota) {
             console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
             disconnect();
@@ -216,7 +194,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     isMatchWin = false;
 
                     if (isWinner === true) {
-                        setMatchLogs(fightNumber, isWinner, winningSum, betAmountPlaced, odds);
+                        setPotWinnings(isWinner, winningSum);
 
                         isMatchWin = isWinner;
 
@@ -227,7 +205,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         isExtraProfitUsed[1] = false;
                         betsideValues = [...originalBetsideValues];
                     } else {
-                        setMatchLogs(fightNumber, isWinner, -betAmountPlaced, betAmountPlaced);
+                        setPotWinnings(isWinner, betAmountPlaced);
 
                         presentLevel += 1;
 
@@ -357,7 +335,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
         clearInterval(pinger);
         // console.log(`%c- Interrupted -`, 'font-weight: bold; color: #00ff00; font-size: 12px;');
 
-        if (!(presentLevel > betLevel.length - 1) && isDailyQuotaReached() === false && forceDisconnect === false) {
+        if (!(presentLevel > betLevel.length - 1) && forceDisconnect === false) {
             retryPinger = setInterval(function () {
                 if (reconnectRetries >= 3) {
                     const localTime = new Date().toLocaleTimeString();
@@ -381,8 +359,12 @@ const websocketConnect = (crfToken, webserviceUrl) => {
     };
 }
 
-function setMatchLogs(fightNumber, isWin, sum, betAmountPlaced, odds) {
-    matchLogs.push({ fightNumber, isWin, sum, betAmountPlaced, odds });
+function setPotWinnings(isWin, sum) {
+    if (isWin === true) {
+        potWinnings.win += sum;
+    } else {
+        potWinnings.loss += sum;
+    }
 }
 
 function startTimer() {
@@ -452,9 +434,7 @@ function paymentSafe(isDraw) {
 }
 
 function printProfit() {
-    const { grossProfit } = calculateProfit();
-
-    return grossProfit.toLocaleString();
+    return calculateProfit().toLocaleString();
 }
 
 function generateRandomWaitTime() {
@@ -489,54 +469,12 @@ function printLine() {
 }
 
 function calculateProfit() {
-    const wonMatches = matchLogs.filter(c => c.isWin === true);
-    const lossMatches = matchLogs.filter(c => c.isWin === false);
-
-    const grossProfit = parseInt(matchLogs.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
-    const {
-        totalNetProfit: todaysTotalNetProfit
-    } = calculateTodaysProfit();
-
-    return {
-        wonMatches: wonMatches.length,
-        lossMatches: lossMatches.length,
-        //
-        grossProfit: grossProfit,
-        //
-        todaysTotalNetProfit
-    }
-}
-
-function calculateTodaysProfit() {
-    const wonMatches = [...matchLogs].slice(1).filter(c => c.isWin === true);
-    const lossMatches = [...matchLogs].slice(1).filter(c => c.isWin === false);
-
-    const wonMatchesTotalGrossProfit = parseInt(wonMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
-    const lossMatchesTotalGrossProfit = parseInt(lossMatches.map(({ sum }) => sum).reduce((a, b) => a + b, 0));
-
-    return {
-        totalNetProfit: wonMatchesTotalGrossProfit + lossMatchesTotalGrossProfit
-    }
-}
-
-function isDailyQuotaReached() {
-    return true;
-    // const { totalNetProfit } = calculateTodaysProfit();
-    //
-    // return totalNetProfit >= dailyProfitQuotaLimit;
+    return potWinnings.win - potWinnings.loss;
 }
 
 function flushPreviousVariance() {
-    const { totalNetProfit } = calculateTodaysProfit();
-
-    const sum = matchLogs[0].sum + totalNetProfit;
-
     chrome.storage.local.clear();
 
-    matchLogs = [];
-    matchLogs.push({ fightNumber: 1, isWin: true, sum, betAmountPlaced: 0 });
-
-    remainingCurrentPoints = 0;
     betAmountPlaced = 0;
     matchIndex = 1;
     skipMatchesCount = -1;
@@ -596,44 +534,28 @@ function disconnect() {
 }
 
 function printCurrentPoints() {
-    const { grossProfit } = calculateProfit();
+    const profit = calculateProfit();
 
     if (isBetSubmitted === true) {
-        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: grossProfit - betAmountPlaced });
+        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: profit - betAmountPlaced });
     } else {
-        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: grossProfit });
+        chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: profit });
     }
 }
 
 async function getInitialPoints() {
     printRemainingSkipMatches();
+    printCurrentPoints();
+    printDummyBet();
+
+    maxWaitTimes = generateRandomWaitTime();
 
     if (betsideValues.length === 0) {
         betsideValues = [...originalBetsideValues];
     }
     if (isDemoOnly === true) {
-        printCurrentPoints();
-        printDummyBet();
-
-        maxWaitTimes = generateRandomWaitTime();
-
         printPossibleWinningsIfClosed().then(r => r);
-
-        return;
     }
-    chrome.tabs.sendMessage(tab.id, { text: "remainingPoints", withReplace: true },
-        async function (value) {
-            remainingCurrentPoints = value;
-
-            if (isMatchWin === true && presentLevel === 0 && matchLogs.length === 1) {
-                matchLogs[0].sum = parseInt(value) - parseInt(betLevel.map(sum => sum).reduce((a, b) => a + b, 0));
-            }
-
-            printCurrentPoints();
-            printDummyBet();
-            maxWaitTimes = generateRandomWaitTime();
-        }
-    );
 }
 
 function printDummyBet() {
@@ -672,7 +594,7 @@ async function printPossibleWinningsIfClosed() {
 }
 
 function manageExtraProfit(addOn) {
-    const hasExtraProfit = calculateProfit().grossProfit >= (betLevel[0] * (1 + addOn));
+    const hasExtraProfit = calculateProfit() >= (betLevel[0] * (1 + addOn));
     const indexAddon = 2 + addOn;
     // const addonBet = betLevel[0] / 2;
     const addonBet = 99;
