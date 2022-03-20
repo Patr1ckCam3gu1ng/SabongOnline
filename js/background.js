@@ -520,9 +520,10 @@ function calculateTodaysProfit() {
 }
 
 function isDailyQuotaReached() {
-    const { totalNetProfit } = calculateTodaysProfit();
-
-    return totalNetProfit >= dailyProfitQuotaLimit;
+    return true;
+    // const { totalNetProfit } = calculateTodaysProfit();
+    //
+    // return totalNetProfit >= dailyProfitQuotaLimit;
 }
 
 function flushPreviousVariance() {
