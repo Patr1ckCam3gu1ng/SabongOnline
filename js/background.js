@@ -9,6 +9,7 @@ let retryPinger;
 betLevel = [
     200,
     100,
+    // 99,
     500,
     1150,
     2600,
@@ -665,7 +666,8 @@ async function printPossibleWinningsIfClosed() {
 function manageExtraProfit(addOn) {
     const hasExtraProfit = calculateProfit().grossProfit >= (betLevel[0] * (1 + addOn));
     const indexAddon = 2 + addOn;
-    const addonBet = betLevel[0] / 2;
+    // const addonBet = betLevel[0] / 2;
+    const addonBet = 99;
 
     if (hasExtraProfit === true && betLevel[indexAddon] !== addonBet) {
         betLevel.splice(2, 0, addonBet);
