@@ -7,15 +7,15 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    400,
-    // 100,
     99,
-    500,
-    1150,
-    2600,
-    5850,
-    12400
-]; // 23,000
+    99,
+    230,
+    520,
+    1170,
+    2630,
+    5570,
+    12120
+]; // 22440
 
 let dailyProfitQuotaLimit = 120;
 
@@ -312,7 +312,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             setFinalBetside();
 
             manageExtraProfit(0);
-            manageExtraProfit(1);
+            // manageExtraProfit(1);
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
 
