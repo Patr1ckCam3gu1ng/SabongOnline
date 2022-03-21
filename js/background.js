@@ -17,7 +17,7 @@ betLevel = [
     12120
 ]; // 22440
 
-let overallQuota = 10000;
+let overallQuota = 2500;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -171,9 +171,12 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 if (skipMatchesCount >= 0) {
                     skipMatchesCount -= 1;
+
                     if (skipMatchesCount === 0) {
                         skipMatchesCount = -1;
+
                         chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        betsideValues = [...originalBetsideValues];
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
@@ -617,7 +620,7 @@ function manageExtraProfit(addOn) {
 
 function insertAdditionalBetsideValues() {
     let index = 0;
-    while (index < 4) {
+    while (index < 2) {
         betsideValues.push(finalBetside === meron ? wala : meron);
         index += 1;
     }
