@@ -600,7 +600,7 @@ function manageExtraProfit(addOn) {
     const hasExtraProfit = calculateProfit() >= (betLevel[0] * (1 + addOn));
     const indexAddon = 2 + addOn;
     // const addonBet = betLevel[0] / 2;
-    const addonBet = 99;
+    const addonBet = isDemoOnly === true ? 99 : betLevel[0];
 
     if (hasExtraProfit === true && betLevel[indexAddon] !== addonBet) {
         betLevel.splice(2, 0, addonBet);
