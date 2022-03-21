@@ -7,8 +7,8 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    99,
-    99,
+    100,
+    100,
     230,
     520,
     1170,
@@ -17,7 +17,7 @@ betLevel = [
     12120
 ]; // 22440
 
-let overallQuota = 1500;
+let overallQuota = 1000;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
