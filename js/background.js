@@ -17,7 +17,7 @@ betLevel = [
     12120
 ]; // 22440
 
-let overallQuota = 2500;
+let overallQuota = 1500;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -441,7 +441,7 @@ function printProfit() {
 }
 
 function generateRandomWaitTime() {
-    return randomPowerLawDistribution(22, 84);
+    return randomPowerLawDistribution(22, 72);
 }
 
 function randomPowerLawDistribution(min, max) {
