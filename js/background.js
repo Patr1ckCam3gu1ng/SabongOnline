@@ -202,7 +202,11 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         isMatchWin = isWinner;
 
-                        console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        if (presentLevel < 3) {
+
+                        } else {
+                            console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
+                        }
 
                         presentLevel = 0;
                         isExtraProfitUsed = false;
@@ -219,7 +223,11 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         insertAdditionalBetsideValues();
 
-                        console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
+                        if (presentLevel < 3) {
+
+                        } else {
+                            console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
+                        }
                     }
 
                     betAmountPlaced = 0;
@@ -363,6 +371,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 }
 
 function setPotWinnings(isWin, sum) {
+    if (presentLevel < 3) {
+        return;
+    }
+
     if (isWin === true) {
         potWinnings.win += sum;
     } else {
