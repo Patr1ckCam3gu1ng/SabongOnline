@@ -605,11 +605,7 @@ function manageExtraProfit(addOn) {
         betLevel.splice(2, 0, addonBet);
     }
     if (hasExtraProfit === false && betLevel[indexAddon] === addonBet && isExtraProfitUsed === false) {
-        if (isExtraProfitUsed === true && betLevel[indexAddon] === addonBet) {
-
-        } else {
-            betLevel.splice(2, 1);
-        }
+        betLevel.splice(2, 1);
     }
 
     if (isExtraProfitUsed === false) {
