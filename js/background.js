@@ -44,7 +44,7 @@ let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
 let betsideValues = [];
-let isExtraProfitUsed = [false, false];
+let isExtraProfitUsed = false;
 let potWinnings = {
     win: 0,
     loss: 0
@@ -204,8 +204,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
 
                         presentLevel = 0;
-                        isExtraProfitUsed[0] = false;
-                        isExtraProfitUsed[1] = false;
+                        isExtraProfitUsed = false;
                         betsideValues = [...originalBetsideValues];
                     } else {
                         setPotWinnings(isWinner, betAmountPlaced);
@@ -605,16 +604,16 @@ function manageExtraProfit(addOn) {
     if (hasExtraProfit === true && betLevel[indexAddon] !== addonBet) {
         betLevel.splice(2, 0, addonBet);
     }
-    if (hasExtraProfit === false && betLevel[indexAddon] === addonBet && isExtraProfitUsed[addOn] === false) {
-        if (addOn === 1 && isExtraProfitUsed[0] === true && betLevel[indexAddon] === addonBet) {
+    if (hasExtraProfit === false && betLevel[indexAddon] === addonBet && isExtraProfitUsed === false) {
+        if (isExtraProfitUsed === true && betLevel[indexAddon] === addonBet) {
 
         } else {
             betLevel.splice(2, 1);
         }
     }
 
-    if (isExtraProfitUsed[addOn] === false) {
-        isExtraProfitUsed[addOn] = presentLevel === indexAddon && betLevel[indexAddon] === addonBet;
+    if (isExtraProfitUsed === false) {
+        isExtraProfitUsed = presentLevel === indexAddon && betLevel[indexAddon] === addonBet;
     }
 }
 
