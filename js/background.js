@@ -223,7 +223,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         insertAdditionalBetsideValues();
 
-                        if (presentLevel < 4) {
+                        if (presentLevel < 3) {
 
                         } else {
                             console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
