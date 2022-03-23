@@ -39,7 +39,7 @@ let timer;
 let timerIndex = 0;
 let isDemoOnly = true;
 let skipMatchesCount = -1;
-const maxSkipMatches = 4;
+const maxSkipMatches = 7;
 let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
