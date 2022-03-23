@@ -13,11 +13,10 @@ betLevel = [
     520,
     1170,
     2630,
-    5570,
-    12120
-]; // 22440
+    5570
+]; // 10500
 
-let overallQuota = 1000;
+let overallQuota = 700;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -37,7 +36,7 @@ let isWinner = false;
 let isLastMatchDraw = false;
 let timer;
 let timerIndex = 0;
-let isDemoOnly = true;
+let isDemoOnly = false;
 let skipMatchesCount = -1;
 const maxSkipMatches = 7;
 let fightNumber = 1;
