@@ -222,10 +222,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === 5 && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches;
-                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        }
+                        // if (presentLevel === 5 && skipMatchesCount === -1) {
+                        //     skipMatchesCount = maxSkipMatches;
+                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        // }
 
                         insertAdditionalBetsideValues();
 
