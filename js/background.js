@@ -16,7 +16,7 @@ betLevel = [
     1170
 ]; // 4,750
 
-let overallQuota = 700;
+let overallQuota = 500;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -211,6 +211,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                             betLevel.pop();
                             isLastBetUsed = true;
+
+                            potWinnings.win = 0;
+                            potWinnings.loss = 0;
                         }
 
                         presentLevel = 0;
