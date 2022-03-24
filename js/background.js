@@ -9,6 +9,7 @@ let retryPinger;
 betLevel = [
     100,
     100,
+    100,
     230,
     520,
     1170,
@@ -289,7 +290,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             setFinalBetside();
 
-            manageExtraProfit(0);
+            // manageExtraProfit(0);
             // manageExtraProfit(1);
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
