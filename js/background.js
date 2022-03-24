@@ -13,7 +13,7 @@ betLevel = [
     230,
     520,
     1170,
-    2630
+    1170
 ]; // 4,750
 
 let overallQuota = 700;
@@ -43,6 +43,7 @@ let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
 let betsideValues = [];
+let isLastBetUsed = false;
 let isExtraProfitUsed = false;
 let potWinnings = {
     win: 0,
@@ -202,9 +203,17 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         console.log(`%cCongratulations! ${presentLevel > 4 ? `(${presentLevel + 1})` : ''}`, 'font-weight: bold; color: green', `+${winningSum.toFixed(0).toLocaleString()} => ${((odds * 100) - 100).toFixed(0)}%`);
 
-                        presentLevel = 0;
                         isExtraProfitUsed = false;
                         betsideValues = [...originalBetsideValues];
+
+                        if (presentLevel === betLevel.length - 1 && isLastBetUsed === false) {
+                            console.log(`%Sorry! Bet level reduced`, 'font-weight: bold; color: #fdda11;');
+
+                            betLevel.pop();
+                            isLastBetUsed = true;
+                        }
+
+                        presentLevel = 0;
                     } else {
                         setPotWinnings(isWinner, betAmountPlaced);
 
