@@ -12,9 +12,8 @@ betLevel = [
     100,
     230,
     520,
-    1170,
     1170
-]; // 4,750
+]; // 2,120
 
 let overallQuota = 200;
 
@@ -206,15 +205,15 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         isExtraProfitUsed = false;
                         betsideValues = [...originalBetsideValues];
 
-                        if (presentLevel === betLevel.length - 1 && isLastBetUsed === false) {
-                            console.log(`%Sorry! Bet level reduced`, 'font-weight: bold; color: #fdda11;');
-
-                            betLevel.pop();
-                            isLastBetUsed = true;
-
-                            potWinnings.win = 0;
-                            potWinnings.loss = 0;
-                        }
+                        // if (presentLevel === betLevel.length - 1 && isLastBetUsed === false) {
+                        //     console.log(`%Sorry! Bet level reduced`, 'font-weight: bold; color: #fdda11;');
+                        //
+                        //     betLevel.pop();
+                        //     isLastBetUsed = true;
+                        //
+                        //     potWinnings.win = 0;
+                        //     potWinnings.loss = 0;
+                        // }
 
                         presentLevel = 0;
                     } else {
