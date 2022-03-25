@@ -16,7 +16,7 @@ betLevel = [
     1170
 ]; // 4,750
 
-let overallQuota = 400;
+let overallQuota = 200;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
