@@ -241,7 +241,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 isBetSubmitted = false;
                 betAmountPlaced = 0;
 
-                if (fightNumber % 6 === 1) {
+                if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
 
