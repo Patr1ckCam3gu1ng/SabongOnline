@@ -259,6 +259,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 }
 
                 maxWaitTimes = generateRandomWaitTime();
+                printBetLevelTable();
 
                 return;
             }
@@ -568,11 +569,15 @@ function printCurrentPoints() {
         chrome.tabs.sendMessage(tab.id, { text: "setRemainingDummyPoints", remainingPoints: profit });
     }
 }
+function printBetLevelTable() {
+    chrome.tabs.sendMessage(tab.id, { text: "printBetLevelTable", betLevel, presentLevel });
+}
 
-async function getInitialPoints() {
+async function initialize() {
     printRemainingSkipMatches();
     printCurrentPoints();
     printDummyBet();
+    printBetLevelTable();
 
     maxWaitTimes = generateRandomWaitTime();
 
@@ -664,7 +669,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
     if (info.status === "complete") {
         tabsOnUpdated.setTabId(tabId);
         if (crfTokenValue !== '') {
-            getInitialPoints().then(r => r);
+            initialize().then(r => r);
         }
     }
 });
@@ -677,7 +682,7 @@ chrome.extension.onConnect.addListener(function (port) {
                     chrome.tabs.sendMessage(tab.id, { text: "ancestorOrigins" },
                         function (wssUrl) {
                             createWebSocketConnection(crfToken, wssUrl);
-                            getInitialPoints().then(r => r);
+                            initialize().then(r => r);
                         }
                     );
                 }

@@ -123,6 +123,37 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.text === "isLoginPage") {
         sendResponse(document.getElementById('password') !== null);
     }
+    if (msg.text === "printBetLevelTable") {
+        const printBetLevelTableID = 'betLevelTable';
+        const elem = document.getElementById(printBetLevelTableID);
+        if (elem !== null) {
+            elem.parentNode.removeChild(elem);
+        }
+
+        const $card = document.getElementsByClassName("card mb-1");
+        if ($card.length > 0 && msg.betLevel.length > 0) {
+            let betTd = '';
+
+            msg.betLevel.forEach(function (bet, index) {
+                betTd += `<td style="border: 3px solid yellow;width:20%;background-color: ${msg.presentLevel - 1 === index ? '#f34141' : 'none'}">` +
+                    `       <h3 style="text-align: center;padding-top: 20px;${msg.presentLevel === index ? 'color:#1e81f1;text-decoration:underline' : `color:${msg.presentLevel - 1 === index ? '#ff8686' : 'white'}`}">` +
+                    `           ${bet}` +
+                    '       </h3>' +
+                    '</td>'
+            });
+
+            $card[0].insertAdjacentHTML("afterend",
+                `<div id="${printBetLevelTableID}">` +
+                '   <table style="border: 3px solid yellow;width:100%">' +
+                '       <tbody>' +
+                '           <tr>' +
+                '               ' + betTd +
+                '           </tr>' +
+                '       </tbody>' +
+                '   </table>' +
+                '</div>');
+        }
+    }
     if (msg.text === "printGameOver") {
         if (document.getElementById('password') !== null) {
             const $img = document.getElementsByClassName('header-mobile__logo-img');
