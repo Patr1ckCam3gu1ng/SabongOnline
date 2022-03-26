@@ -242,6 +242,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                     printCurrentPoints();
                     printDummyBet();
+
+                    if (isFundsDepleted() === true) {
+                        console.log('%Objection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
+                        disconnect();
+
+                        return;
+                    }
                 }
 
                 isBetSubmitted = false;
@@ -610,6 +617,12 @@ async function printPossibleWinningsIfClosed() {
             }
         );
     }
+}
+
+function isFundsDepleted() {
+    const profit = calculateProfit();
+
+    return -Math.abs(betLevel.reduce((partialSum, a) => partialSum + a, 0)) > profit;
 }
 
 function manageExtraProfit(addOn) {
