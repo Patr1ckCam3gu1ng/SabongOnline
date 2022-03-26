@@ -51,6 +51,7 @@ const originalBetsideValues = [meron, wala, meron, wala];
 let betsideValues = [];
 let isLastBetUsed = false;
 let isExtraProfitUsed = false;
+let isSubmissionOpen = true;
 let potWinnings = {
     win: 0,
     loss: 0
@@ -252,6 +253,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 }
 
                 isBetSubmitted = false;
+                isSubmissionOpen = true;
                 betAmountPlaced = 0;
 
                 if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
@@ -344,11 +346,18 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             if (isDemoOnly === true) {
                 isBetSubmitted = true;
             } else {
+                if (isSubmissionOpen === false) {
+                    return;
+                }
+
+                isSubmissionOpen = false;
+
                 await new Promise(resolve => setTimeout(resolve, 2500));
 
                 chrome.tabs.sendMessage(tab.id, { text: "submittedBetValue", betSide: finalBetside },
                     async function (submittedBetValue) {
                         isBetSubmitted = submittedBetValue > 0;
+                        isSubmissionOpen = true;
                     }
                 );
             }
