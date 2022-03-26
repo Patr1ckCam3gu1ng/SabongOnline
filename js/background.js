@@ -6,15 +6,23 @@ let wssUrl = '';
 let reconnectRetries = 0;
 let retryPinger;
 
-betLevel = [
-    250,
-    250,
-    250,
-    250,
-    1000
-]; // 2,000
+// betLevel = [
+//     250,
+//     250,
+//     250,
+//     250,
+//     1000
+// ]; // 2,000
 
-let overallQuota = 500;
+betLevel = [
+    100,
+    100,
+    100,
+    100,
+    600
+]; // 1,000
+
+let overallQuota = 200;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
