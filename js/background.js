@@ -17,12 +17,13 @@ let retryPinger;
 betLevel = [
     100,
     100,
+    100,
     200,
     450,
     1000
 ]; // 1,850
 
-let overallQuota = 200;
+let overallQuota = 160;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -234,7 +235,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         // }
 
-                        insertAdditionalBetsideValues();
+                        // insertAdditionalBetsideValues();
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
                     }
