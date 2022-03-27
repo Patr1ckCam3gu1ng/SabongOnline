@@ -595,12 +595,15 @@ async function initialize() {
     }
     if (isDemoOnly === true) {
         printPossibleWinningsIfClosed().then(r => r);
-    }
-    else {
+    } else {
         chrome.tabs.sendMessage(tab.id, { text: "isLoginPage" },
             async function (isLoginPage) {
-                if (isFundsDepleted() === true || presentLevel > betLevel.length - 1) {
-                    chrome.tabs.sendMessage(tab.id, { text: "printGameOver" });
+                if (isLoginPage === true) {
+                    if (isFundsDepleted() === true || presentLevel > betLevel.length - 1) {
+                        chrome.tabs.sendMessage(tab.id, { text: "printGameOver" });
+                    } else if (calculateProfit() >= overallQuota) {
+                        chrome.tabs.sendMessage(tab.id, { text: "printQuoteReached" });
+                    }
                 }
             }
         );

@@ -162,6 +162,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             }
         }
     }
+    if (msg.text === "printQuoteReached") {
+        if (document.getElementById('password') !== null) {
+            const $img = document.getElementsByClassName('header-mobile__logo-img');
+            if ($img.length > 0) {
+                $img[0].insertAdjacentHTML("afterend", "<label style='font-size:100px;color:#04ff00;font-weight:bold;padding-top:60px'>&#x26CA;&#x26CA;&#x26CA;&#x26CA;&#x26CA;</label>");
+            }
+        }
+    }
     function inputBet() {
         if (document.getElementsByClassName("betAmount").length > 0) {
             document.getElementsByClassName("betAmount")[0].focus();
