@@ -15,9 +15,9 @@ let retryPinger;
 // ]; // 2,000
 
 betLevel = [
-    100,
-    100,
-    100,
+    99,
+    99,
+    99,
     200,
     450,
     1000
@@ -732,7 +732,7 @@ function recalculateFinalBetLevelAmount() {
         const netBetLevelAmount = (betLevelTotal + calculateProfit()) - betLevelTotal;
 
         if (netBetLevelAmount < 0) {
-            betLevel[betLevel.length - 1] = originalFinalBetLevelAmount + netBetLevelAmount;
+            betLevel[betLevel.length - 1] = Number((originalFinalBetLevelAmount + netBetLevelAmount).toFixed(0));
         }
     }
 }
