@@ -15,9 +15,9 @@ let retryPinger;
 // ]; // 2,000
 
 betLevel = [
-    99,
-    99,
-    99,
+    100,
+    100,
+    100,
     200,
     450,
     1000
@@ -264,7 +264,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
-                recalculateFinalBetLevelAmount();
+                // recalculateFinalBetLevelAmount();
 
                 return;
             }
