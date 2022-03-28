@@ -445,22 +445,34 @@ function stopTimer() {
     timerIndex = 0;
 }
 
+// function setFinalBetside() {
+//     let mainIndex = 0;
+//     while (mainIndex < randomPowerLawDistribution(20, 100)) {
+//         let subIndex = 0;
+//         while (subIndex < 100) {
+//             const shuffledArrays = shuffleArrays([...betsideValues]);
+//             const pickedSide = shuffleBetSide(shuffledArrays);
+//
+//             if (typeof pickedSide !== 'undefined') {
+//                 finalBetside = pickedSide;
+//                 break;
+//             }
+//
+//             subIndex += 1;
+//         }
+//         mainIndex += 1;
+//     }
+// }
 function setFinalBetside() {
-    let mainIndex = 0;
-    while (mainIndex < randomPowerLawDistribution(20, 100)) {
-        let subIndex = 0;
-        while (subIndex < 100) {
-            const shuffledArrays = shuffleArrays([...betsideValues]);
-            const pickedSide = shuffleBetSide(shuffledArrays);
-
-            if (typeof pickedSide !== 'undefined') {
-                finalBetside = pickedSide;
-                break;
-            }
-
-            subIndex += 1;
+    let index = 0;
+    while (index < 100) {
+        const pickedSide = shuffleBetSide([...generateRandomBetArray()]);
+        if (typeof pickedSide !== 'undefined') {
+            finalBetside = pickedSide;
+            break;
         }
-        mainIndex += 1;
+
+        index += 1;
     }
 }
 
@@ -538,21 +550,27 @@ function shuffleArrays(array) {
     return [...array];
 }
 
-function shuffleBetSide(value) {
-    let shuffledValues = [...value];
-    let shuffledBuckets = [];
-    let index = 0;
-
-    while (index < randomPowerLawDistribution(1, 100)) {
-        const shuffledArrays = shuffleArrays(shuffledValues);
-        for (const shuffledArr of shuffledArrays) {
-            shuffledBuckets.push(shuffledArr);
-        }
-
-        index += 1;
-    }
-
-    // const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length - 1));
+// function shuffleBetSide(value) {
+//     let shuffledValues = [...value];
+//     let shuffledBuckets = [];
+//     let index = 0;
+//
+//     while (index < randomPowerLawDistribution(1, 100)) {
+//         const shuffledArrays = shuffleArrays(shuffledValues);
+//         for (const shuffledArr of shuffledArrays) {
+//             shuffledBuckets.push(shuffledArr);
+//         }
+//
+//         index += 1;
+//     }
+//
+//     // const indexPicked = Math.floor(Math.random() * (shuffledBuckets.length - 1));
+//     const indexPicked = randomPowerLawDistribution(1, shuffledBuckets.length - 1)
+//
+//     return shuffledBuckets[indexPicked];
+// }
+function shuffleBetSide(generateRandomBetArray) {
+    let shuffledBuckets = [...generateRandomBetArray];
     const indexPicked = randomPowerLawDistribution(1, shuffledBuckets.length - 1)
 
     return shuffledBuckets[indexPicked];
@@ -678,6 +696,31 @@ function insertAdditionalBetsideValues() {
         betsideValues.push(finalBetside === meron ? wala : meron);
         index += 1;
     }
+}
+
+function generateRandomBetArray() {
+    const alphanumerics = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    const uids = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+
+    let betArray = [];
+
+    for (const uid of uids) {
+        if (uid === '-') {
+            continue;
+        }
+        [...alphanumerics].forEach((alphanumeric, alphanumericIndex) => {
+            if (alphanumeric.toString() === uid.toString()) {
+                betArray.push(((alphanumericIndex % 2 === 0) ? meron : wala).toString());
+            }
+        });
+    }
+
+    return betArray;
 }
 
 function recalculateFinalBetLevelAmount() {
