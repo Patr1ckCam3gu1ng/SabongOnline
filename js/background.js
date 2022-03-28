@@ -326,7 +326,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
 
-            if (presentLevel === betLevel.length - 1) {
+            if (presentLevel === betLevel.length - 1 && currentPoints < betLevel[presentLevel]) {
                 betAmountPlaced = currentPoints;
             }
 
