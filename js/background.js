@@ -45,7 +45,7 @@ let timer;
 let timerIndex = 0;
 let isDemoOnly = false;
 let skipMatchesCount = -1;
-const maxSkipMatches = 7;
+const maxSkipMatches = 3;
 let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
@@ -57,7 +57,7 @@ let potWinnings = {
     win: 0,
     loss: 0
 };
-let originalFinalBetLevelAmount = 0;
+let currentPoints = 0;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -231,10 +231,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        // if (presentLevel === 5 && skipMatchesCount === -1) {
-                        //     skipMatchesCount = maxSkipMatches;
-                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        // }
+                        if (presentLevel === 4 && skipMatchesCount === -1) {
+                            skipMatchesCount = maxSkipMatches;
+                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        }
 
                         // insertAdditionalBetsideValues();
 
@@ -264,7 +264,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
-                // recalculateFinalBetLevelAmount();
+                setCurrentPoints();
 
                 return;
             }
@@ -325,6 +325,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             // manageExtraProfit(1);
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
+
+            if (presentLevel === betLevel.length - 1) {
+                betAmountPlaced = currentPoints;
+            }
 
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
@@ -608,9 +612,9 @@ async function initialize() {
     printCurrentPoints();
     printDummyBet();
     printBetLevelTable();
+    setCurrentPoints();
 
     maxWaitTimes = generateRandomWaitTime();
-    originalFinalBetLevelAmount = betLevel[betLevel.length - 1];
 
     if (betsideValues.length === 0) {
         betsideValues = [...originalBetsideValues];
@@ -723,18 +727,17 @@ function generateRandomBetArray() {
     return betArray;
 }
 
-function recalculateFinalBetLevelAmount() {
-    const profit = calculateProfit();
-    const betLevelTotal = betLevel.reduce((partialSum, a) => partialSum + a, 0);
-
-    if (profit < 0) {
-        // (betLevel.reduce((partialSum, a) => partialSum + a, 0) + calculateProfit()) - betLevel.reduce((partialSum, a) => partialSum + a, 0)
-        const netBetLevelAmount = (betLevelTotal + calculateProfit()) - betLevelTotal;
-
-        if (netBetLevelAmount < 0) {
-            betLevel[betLevel.length - 1] = Number((originalFinalBetLevelAmount + netBetLevelAmount).toFixed(0));
+function setCurrentPoints()
+{
+    chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
+        async function (url) {
+            const xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", url, false ); // false for synchronous request
+            xmlHttp.send( null );
+            const response = JSON.parse(xmlHttp.responseText);
+            currentPoints = parseInt(response.currentPoints);
         }
-    }
+    );
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {

@@ -170,6 +170,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             }
         }
     }
+    if (msg.text === "getLocationOrigin") {
+        sendResponse(`${ window.location.origin }/arenainfo/6`);
+    }
     function inputBet() {
         if (document.getElementsByClassName("betAmount").length > 0) {
             document.getElementsByClassName("betAmount")[0].focus();
