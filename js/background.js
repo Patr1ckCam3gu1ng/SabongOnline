@@ -23,7 +23,7 @@ betLevel = [
     1000
 ]; // 1,850
 
-let overallQuota = 160;
+let overallQuota = 120;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -57,6 +57,7 @@ let potWinnings = {
     win: 0,
     loss: 0
 };
+let originalFinalBetLevelAmount = 0;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -263,6 +264,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
+                recalculateFinalBetLevelAmount();
 
                 return;
             }
@@ -590,6 +592,7 @@ async function initialize() {
     printBetLevelTable();
 
     maxWaitTimes = generateRandomWaitTime();
+    originalFinalBetLevelAmount = betLevel[betLevel.length - 1];
 
     if (betsideValues.length === 0) {
         betsideValues = [...originalBetsideValues];
@@ -669,12 +672,25 @@ function manageExtraProfit(addOn) {
         isExtraProfitUsed = presentLevel === indexAddon && betLevel[indexAddon] === addonBet;
     }
 }
-
 function insertAdditionalBetsideValues() {
     let index = 0;
     while (index < 2) {
         betsideValues.push(finalBetside === meron ? wala : meron);
         index += 1;
+    }
+}
+
+function recalculateFinalBetLevelAmount() {
+    const profit = calculateProfit();
+    const betLevelTotal = betLevel.reduce((partialSum, a) => partialSum + a, 0);
+
+    if (profit < 0) {
+        // (betLevel.reduce((partialSum, a) => partialSum + a, 0) + calculateProfit()) - betLevel.reduce((partialSum, a) => partialSum + a, 0)
+        const netBetLevelAmount = (betLevelTotal + calculateProfit()) - betLevelTotal;
+
+        if (netBetLevelAmount < 0) {
+            betLevel[betLevel.length - 1] = originalFinalBetLevelAmount + netBetLevelAmount;
+        }
     }
 }
 

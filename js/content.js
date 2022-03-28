@@ -135,7 +135,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             let betTd = '';
 
             msg.betLevel.forEach(function (bet, index) {
-                betTd += `<td style="border: 3px solid yellow;width:16.66%;background-color: ${index <= msg.presentLevel - 1 ? '#f34141' : 'none'}">` +
+                betTd += `<td style="border: 3px solid yellow;width:${100 / msg.betLevel.length}%;background-color: ${index <= msg.presentLevel - 1 ? '#f34141' : 'none'}">` +
                     `       <h3 style="text-align: center;padding-top: 20px;${msg.presentLevel === index ? 'color:#1e81f1;text-decoration:underline' : `color:${index <= msg.presentLevel - 1 ? '#ff8686' : 'white'}`}">` +
                     `           ${bet}` +
                     '       </h3>' +
