@@ -732,10 +732,10 @@ function setCurrentPoints()
     chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
         async function (url) {
             const xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", url, false ); // false for synchronous request
-            xmlHttp.send( null );
+            xmlHttp.open("GET", url, false); // false for synchronous request
+            xmlHttp.send(null);
             const response = JSON.parse(xmlHttp.responseText);
-            currentPoints = parseInt(response.currentPoints);
+            currentPoints = parseInt(response.currentPoints.replace(',', ''));
         }
     );
 }
