@@ -638,14 +638,17 @@ async function initialize() {
             }
         );
 
-        skipMatchOnFirstInit();
+        skipMatchOnFirstInit().then(r => r);
     }
 }
 
-function skipMatchOnFirstInit() {
+async function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
         skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
         initialSkipMatchesInitialized = true;
+
+        await new Promise(resolve => setTimeout(resolve, 700));
+        chrome.tabs.sendMessage(tab.id, { text: "reload" });
     }
 }
 
