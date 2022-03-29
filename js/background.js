@@ -45,7 +45,6 @@ let timer;
 let timerIndex = 0;
 let isDemoOnly = false;
 let skipMatchesCount = -1;
-const maxSkipMatches = 3;
 let fightNumber = 1;
 let forceDisconnect = false;
 const originalBetsideValues = [meron, wala, meron, wala];
@@ -59,6 +58,7 @@ let potWinnings = {
 };
 let currentPoints = 0;
 let ignoreInitialSkipMatches = false;
+let maxSkipMatches = 3;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -184,6 +184,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                     if (skipMatchesCount === 0) {
                         skipMatchesCount = -1;
+                        ignoreInitialSkipMatches = true;
 
                         chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         betsideValues = [...originalBetsideValues];
@@ -233,7 +234,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         presentLevel += 1;
 
                         if (presentLevel === 4 && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches;
+                            skipMatchesCount = maxSkipMatches = 3;
                             chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         }
 
@@ -534,6 +535,7 @@ function flushPreviousVariance() {
     betAmountPlaced = 0;
     matchIndex = 1;
     skipMatchesCount = -1;
+    ignoreInitialSkipMatches = false;
 
     finalBetside = '';
 }
@@ -641,7 +643,7 @@ async function initialize() {
 
 function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
-        skipMatchesCount = randomPowerLawDistribution(1, 6);
+        skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
     }
 }
 
