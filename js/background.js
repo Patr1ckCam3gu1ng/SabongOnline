@@ -58,6 +58,7 @@ let potWinnings = {
 };
 let currentPoints = 0;
 let ignoreInitialSkipMatches = false;
+let initialSkipMatchesInitialized = false;
 let maxSkipMatches = 3;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
@@ -642,8 +643,9 @@ async function initialize() {
 }
 
 function skipMatchOnFirstInit() {
-    if (ignoreInitialSkipMatches === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
+    if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
         skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
+        initialSkipMatchesInitialized = true;
     }
 }
 
