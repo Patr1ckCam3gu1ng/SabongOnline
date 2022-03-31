@@ -234,7 +234,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         presentLevel += 1;
 
                         if (presentLevel === 3 && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 4);
+                            skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 5);
                             chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         }
 
@@ -734,7 +734,7 @@ function generateRandomBetArray() {
         }
         [...alphanumerics].forEach((alphanumeric, alphanumericIndex) => {
             if (alphanumeric.toString() === uid.toString()) {
-                betArray.push(((alphanumericIndex % 2 === 0) ? meron : wala).toString());
+                betArray.push(((alphanumericIndex % 2 === (randomPowerLawDistribution(2, 4) - 2)) ? meron : wala).toString());
             }
         });
     }
