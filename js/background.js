@@ -248,7 +248,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printDummyBet();
 
                     skipMatchesCount = maxSkipMatches = 1;
-                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                    // chrome.tabs.sendMessage(tab.id, { text: "reload" });
 
                     if (isFundsDepleted() === true) {
                         console.log('%Objection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -649,7 +649,7 @@ async function skipMatchOnFirstInit() {
         initialSkipMatchesInitialized = true;
 
         await new Promise(resolve => setTimeout(resolve, 700));
-        chrome.tabs.sendMessage(tab.id, { text: "reload" });
+        // chrome.tabs.sendMessage(tab.id, { text: "reload" });
     }
 }
 
