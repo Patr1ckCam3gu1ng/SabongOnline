@@ -233,10 +233,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        if (presentLevel === 3 && skipMatchesCount === -1) {
-                            skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
-                            chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        }
+                        // if (presentLevel === 3 && skipMatchesCount === -1) {
+                        //     skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
+                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        // }
 
                         // insertAdditionalBetsideValues();
 
