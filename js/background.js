@@ -249,7 +249,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = 1;
+                    skipMatchesCount = maxSkipMatches = presentLevel + 1;
                     // chrome.tabs.sendMessage(tab.id, { text: "reload" });
 
                     if (isFundsDepleted() === true) {
