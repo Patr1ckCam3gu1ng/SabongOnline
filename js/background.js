@@ -744,15 +744,17 @@ function generateRandomBetArray() {
 
 function setCurrentPoints()
 {
-    chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
-        async function (url) {
-            const xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("GET", url, false); // false for synchronous request
-            xmlHttp.send(null);
-            const response = JSON.parse(xmlHttp.responseText);
-            currentPoints = parseInt(response.currentPoints.replace(',', ''));
-        }
-    );
+    if (presentLevel === betLevel.length - 1) {
+        chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
+            async function (url) {
+                const xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("GET", url, false); // false for synchronous request
+                xmlHttp.send(null);
+                const response = JSON.parse(xmlHttp.responseText);
+                currentPoints = parseInt(response.currentPoints.replace(',', ''));
+            }
+        );
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
