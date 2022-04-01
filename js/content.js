@@ -117,6 +117,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 `<div id='${id}' style="position: absolute;margin-left: 30%;margin-top: 3px;width: 300px;"> <table> <tbody><tr> <td> <h5 style="text-align: left;padding-top: 12px;padding-left: 7px;padding-right: 7px;color: #fdda11;text-shadow: 0px 1px #0b4591;">Skipping Matches: ${msg.indexSkip} of ${msg.maxSkip}</h5> </td>  </tr> </tbody></table> </div>`);
         }
     }
+    if (msg.text === "deletePrintRemainingSkipMatches") {
+        const elem = document.getElementById('skipMatch');
+        if (elem !== null) {
+            elem.parentNode.removeChild(elem);
+        }
+    }
     if (msg.text === "deletePrintRemainingTime") {
         removePrintRemainingTime();
     }

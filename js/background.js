@@ -185,8 +185,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         skipMatchesCount = -1;
                         ignoreInitialSkipMatches = true;
 
-                        chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                        // chrome.tabs.sendMessage(tab.id, { text: "reload" });
                         betsideValues = [...originalBetsideValues];
+
+                        chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingSkipMatches" });
                     }
                 }
                 if (finalBetside === '' || isBetSubmitted === false) {
@@ -262,13 +264,17 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 isSubmissionOpen = true;
                 betAmountPlaced = 0;
 
-                if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
-                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                }
+                // if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
+                //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                // }
 
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
                 setCurrentPoints();
+
+                if (maxSkipMatches > -1) {
+                    chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingTime" });
+                }
 
                 return;
             }
