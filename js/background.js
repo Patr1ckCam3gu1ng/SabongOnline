@@ -247,6 +247,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
+                    skipMatchesCount = maxSkipMatches = 1;
+                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+
                     if (isFundsDepleted() === true) {
                         console.log('%Objection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
                         disconnect();
@@ -727,13 +730,15 @@ function generateRandomBetArray() {
 
     let betArray = [];
 
+    const randomOddEvenBetside = (randomPowerLawDistribution(2, 4) - 2);
+
     for (const uid of uids) {
         if (uid === '-') {
             continue;
         }
         [...alphanumerics].forEach((alphanumeric, alphanumericIndex) => {
             if (alphanumeric.toString() === uid.toString()) {
-                betArray.push(((alphanumericIndex % 2 === (randomPowerLawDistribution(2, 4) - 2)) ? meron : wala).toString());
+                betArray.push(((alphanumericIndex % 2 === randomOddEvenBetside) ? meron : wala).toString());
             }
         });
     }
