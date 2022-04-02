@@ -17,8 +17,8 @@ let retryPinger;
 betLevel = [
     100,
     100,
-    200,
-    500
+    300,
+    // 500
 ]; // 900
 
 let overallQuota = 150;
