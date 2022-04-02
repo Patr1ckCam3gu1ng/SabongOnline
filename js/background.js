@@ -799,7 +799,7 @@ function withdrawProfit() {
                     profit = points;
                 }
 
-                console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11;');
+                console.log(`%cFunds withdrawn successfully: ${points}`, 'font-weight: bold; color: #ffdc11;');
 
                 if (profit < 1) {
                     flush();
