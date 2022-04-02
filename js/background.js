@@ -791,6 +791,8 @@ function withdrawProfit() {
                 const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
                 let profit = 0;
 
+                console.log('points', points)
+
                 if (calculateProfit() >= overallQuota) {
                     profit = points - totalBetLevel;
                 } else if (presentLevel > betLevel.length - 1) {
