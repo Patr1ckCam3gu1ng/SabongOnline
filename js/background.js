@@ -593,19 +593,8 @@ function shuffleBetSide(generateRandomBetArray) {
 }
 
 function disconnectThenWithdraw() {
-    flushPreviousVariance();
-    stopTimer();
-
-    chrome.tabs.sendMessage(tab.id, { text: 'logout' });
-
-    clearInterval(pinger);
-
     withdrawProfit();
 
-    websocket.close();
-
-    forceDisconnect = true;
-    reconnectRetries = 999;
 }
 
 function printCurrentPoints() {
@@ -626,7 +615,6 @@ async function initialize() {
     printCurrentPoints();
     printDummyBet();
     printBetLevelTable();
-    setCurrentPoints();
 
     maxWaitTimes = generateRandomWaitTime();
 
@@ -644,6 +632,9 @@ async function initialize() {
                     } else if (calculateProfit() >= overallQuota) {
                         chrome.tabs.sendMessage(tab.id, { text: "printQuoteReached" });
                     }
+                }
+                else {
+                    setCurrentPoints();
                 }
             }
         );
@@ -757,42 +748,63 @@ function generateRandomBetArray() {
     return betArray;
 }
 
-function setCurrentPoints()
-{
-    if (presentLevel === betLevel.length - 1) {
+function setCurrentPoints() {
+    if (presentLevel === betLevel.length - 1 && isFundsDepleted() === false) {
         chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
             async function (url) {
-                currentPoints = sendHttpRequestCurrentPoints(url);
+                sendHttpRequestCurrentPoints(url, function (points) {
+                    currentPoints = points;
+                });
             }
         );
     }
 }
 
-function sendHttpRequestCurrentPoints(url) {
+function sendHttpRequestCurrentPoints(url, execFunc) {
     const xmlHttp = new XMLHttpRequest();
     xmlHttp.open("GET", url + '/arenainfo/6', false); // false for synchronous request
     xmlHttp.send(null);
-    const response = JSON.parse(xmlHttp.responseText);
-    return parseInt(response.currentPoints.replace(',', ''));
+    xmlHttp.onload = function () {
+        const response = JSON.parse(xmlHttp.responseText);
+        execFunc(parseInt(response.currentPoints.replace(',', '')));
+    }()
 }
 
 function withdrawProfit() {
+    const flush = () => {
+        flushPreviousVariance();
+        stopTimer();
+
+        chrome.tabs.sendMessage(tab.id, { text: 'logout' });
+
+        clearInterval(pinger);
+
+        websocket.close();
+
+        reconnectRetries = 999;
+        forceDisconnect = true;
+    };
+
     hasWithdrawnAlready === false && crfTokenValue !== '' && chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
         async function (url) {
-            const points = sendHttpRequestCurrentPoints(url);
-            const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
-            const profit = points - totalBetLevel;
+            sendHttpRequestCurrentPoints(url, function (points) {
+                const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
+                const profit = points - totalBetLevel;
 
-            if (profit < 1) {
-                return;
-            }
+                if (profit < 1) {
+                    flush();
+                    return;
+                }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", `${url}/cashrequest`, true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            xhr.send(`_token=${crfTokenValue}&type=withdrawal&amount=${profit}&details=${generateGuid()}`);
-
-            hasWithdrawnAlready = true;
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `${url}/cashrequest`, true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                xhr.send(`_token=${crfTokenValue}&type=withdrawal&amount=${profit}&details=${generateGuid()}`);
+                xhr.onload = function () {
+                    flush();
+                    hasWithdrawnAlready = true;
+                }();
+            });
         }
     );
 }
