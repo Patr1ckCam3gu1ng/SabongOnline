@@ -58,6 +58,7 @@ let currentPoints = 0;
 let ignoreInitialSkipMatches = false;
 let initialSkipMatchesInitialized = false;
 let maxSkipMatches = 3;
+let hasWithdrawnAlready = false;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
     if (crfTokenValue === '') {
@@ -137,13 +138,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             console.log('%c-', 'color: black;');
             console.log('%cGame Over! No more funds', 'font-weight: bold; color: #f00; font-size: 19px;');
 
-            disconnect();
+            disconnectThenWithdraw();
             return;
         }
         else if (calculateProfit() >= overallQuota) {
             console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11; font-size: 15px;');
 
-            disconnect();
+            disconnectThenWithdraw();
             return;
         }
 
@@ -253,8 +254,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     // chrome.tabs.sendMessage(tab.id, { text: "reload" });
 
                     if (isFundsDepleted() === true) {
-                        console.log('%Objection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
-                        disconnect();
+                        console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
+                        disconnectThenWithdraw();
 
                         return;
                     }
@@ -591,13 +592,15 @@ function shuffleBetSide(generateRandomBetArray) {
     return shuffledBuckets[indexPicked];
 }
 
-function disconnect() {
+function disconnectThenWithdraw() {
     flushPreviousVariance();
     stopTimer();
 
     chrome.tabs.sendMessage(tab.id, { text: 'logout' });
 
     clearInterval(pinger);
+
+    withdrawProfit();
 
     websocket.close();
 
@@ -725,20 +728,22 @@ function insertAdditionalBetsideValues() {
     }
 }
 
+function generateGuid() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
 function generateRandomBetArray() {
     const alphanumerics = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    const uids = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-
     let betArray = [];
 
     const randomOddEvenBetside = (randomPowerLawDistribution(2, 4) - 2);
 
-    for (const uid of uids) {
+    for (const uid of generateGuid()) {
         if (uid === '-') {
             continue;
         }
@@ -757,14 +762,39 @@ function setCurrentPoints()
     if (presentLevel === betLevel.length - 1) {
         chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
             async function (url) {
-                const xmlHttp = new XMLHttpRequest();
-                xmlHttp.open("GET", url, false); // false for synchronous request
-                xmlHttp.send(null);
-                const response = JSON.parse(xmlHttp.responseText);
-                currentPoints = parseInt(response.currentPoints.replace(',', ''));
+                currentPoints = sendHttpRequestCurrentPoints(url);
             }
         );
     }
+}
+
+function sendHttpRequestCurrentPoints(url) {
+    const xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", url + '/arenainfo/6', false); // false for synchronous request
+    xmlHttp.send(null);
+    const response = JSON.parse(xmlHttp.responseText);
+    return parseInt(response.currentPoints.replace(',', ''));
+}
+
+function withdrawProfit() {
+    hasWithdrawnAlready === false && crfTokenValue !== '' && chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
+        async function (url) {
+            const points = sendHttpRequestCurrentPoints(url);
+            const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
+            const profit = points - totalBetLevel;
+
+            if (profit < 1) {
+                return;
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", `${url}/cashrequest`, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            xhr.send(`_token=${crfTokenValue}&type=withdrawal&amount=${profit}&details=${generateGuid()}`);
+
+            hasWithdrawnAlready = true;
+        }
+    );
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {

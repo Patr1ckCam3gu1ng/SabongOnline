@@ -177,7 +177,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         }
     }
     if (msg.text === "getLocationOrigin") {
-        sendResponse(`${ window.location.origin }/arenainfo/6`);
+        sendResponse(`${ window.location.origin }`);
     }
     function inputBet() {
         if (document.getElementsByClassName("betAmount").length > 0) {
