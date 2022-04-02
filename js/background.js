@@ -789,7 +789,15 @@ function withdrawProfit() {
         async function (url) {
             sendHttpRequestCurrentPoints(url, function (points) {
                 const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
-                const profit = points - totalBetLevel;
+                let profit = 0;
+
+                if (calculateProfit() >= overallQuota) {
+                    profit = points - totalBetLevel;
+                } else if (presentLevel > betLevel.length - 1) {
+                    profit = points;
+                }
+
+                console.log(`%cCongratulations! Net Profit: ${printProfit()}`, 'font-weight: bold; color: #ffdc11;');
 
                 if (profit < 1) {
                     flush();
