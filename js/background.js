@@ -251,7 +251,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printDummyBet();
 
                     skipMatchesCount = maxSkipMatches = presentLevel + 1;
-                    // chrome.tabs.sendMessage(tab.id, { text: "reload" });
+
+                    if (presentLevel > 1) {
+                        skipMatchesCount = maxSkipMatches = presentLevel + (randomPowerLawDistribution(1, 4) - 2);
+                    }
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -790,13 +793,14 @@ function withdrawProfit() {
             sendHttpRequestCurrentPoints(url, function (points) {
                 const totalBetLevel = betLevel.reduce((partialSum, a) => partialSum + a, 0);
                 let profit = 0;
-
-                console.log('points', points)
+                let details = '';
 
                 if (calculateProfit() >= overallQuota) {
                     profit = (points + 100) - totalBetLevel;
+                    details = generateGuid();
                 } else if (presentLevel > betLevel.length - 1) {
                     profit = points;
+                    details = 'Game Over!'
                 }
 
                 console.log(`%cFunds withdrawn successfully: ${points}`, 'font-weight: bold; color: #ffdc11;');
@@ -809,7 +813,7 @@ function withdrawProfit() {
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", `${url}/cashrequest`, true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-                xhr.send(`_token=${crfTokenValue}&type=withdrawal&amount=${profit}&details=${generateGuid()}`);
+                xhr.send(`_token=${crfTokenValue}&type=withdrawal&amount=${profit}&details=${details}`);
                 xhr.onload = function () {
                     flush();
                     hasWithdrawnAlready = true;
