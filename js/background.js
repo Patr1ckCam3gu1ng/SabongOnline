@@ -241,7 +241,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 12);
+                    // skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 12);
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
