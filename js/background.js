@@ -6,22 +6,13 @@ let wssUrl = '';
 let reconnectRetries = 0;
 let retryPinger;
 
-// betLevel = [
-//     250,
-//     250,
-//     250,
-//     250,
-//     1000
-// ]; // 2,000
-
 betLevel = [
     100,
     100,
-    300,
-    // 500
-]; // 900
+    300
+]; // 500
 
-let overallQuota = 150;
+let overallQuota = 120;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -250,11 +241,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = presentLevel + 1;
-
-                    if (presentLevel > 1) {
-                        skipMatchesCount = maxSkipMatches = presentLevel + (randomPowerLawDistribution(1, 4) - 2);
-                    }
+                    skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 6);
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
