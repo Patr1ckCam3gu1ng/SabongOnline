@@ -12,7 +12,7 @@ betLevel = [
     300
 ]; // 500
 
-let overallQuota = 240;
+let overallQuota = 50;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -241,7 +241,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = presentLevel + 1;
+                    skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 4)
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
