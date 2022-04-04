@@ -1,7 +1,7 @@
 {
   "name": "Autobot Sabong",
   "description": "Automated sabong betting: Alternate odds",
-  "version": "4.40",
+  "version": "4.41",
   "permissions": [
     "activeTab",
     "storage",
@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://wpc2022.live/*", "*://wpc2028.live/*", "*://wpc2029.live/*"
+        "*://wpc2022.live/*", "*://wpc2028.live/*"
       ],
       "js": [
         "js/content.js"
