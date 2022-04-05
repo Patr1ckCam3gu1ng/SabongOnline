@@ -782,7 +782,7 @@ function withdrawProfit() {
 
                 if (calculateProfit() >= overallQuota) {
                     // profit = (points - 100) - totalBetLevel;
-                    profit = (points - 50) - totalBetLevel;
+                    profit = (points - 20) - totalBetLevel;
                     details = generateGuid();
                 } else if (presentLevel > betLevel.length - 1) {
                     profit = points;
