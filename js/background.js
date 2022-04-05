@@ -172,7 +172,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 if (skipMatchesCount >= 0) {
                     skipMatchesCount -= 1;
 
-                    if (skipMatchesCount === 0) {
+                    if (skipMatchesCount <= 0) {
                         skipMatchesCount = -1;
                         ignoreInitialSkipMatches = true;
 
