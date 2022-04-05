@@ -225,11 +225,6 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                         presentLevel += 1;
 
-                        // if (presentLevel === 3 && skipMatchesCount === -1) {
-                        //     skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
-                        //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        // }
-
                         // insertAdditionalBetsideValues();
 
                         console.log(`%cYou lose! ${presentLevel > 5 ? `(${presentLevel})` : ''}`, 'font-weight: bold; color: red');
@@ -633,7 +628,7 @@ async function initialize() {
 
 async function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
-        skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 10);
+        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
         initialSkipMatchesInitialized = true;
 
         await new Promise(resolve => setTimeout(resolve, 700));
