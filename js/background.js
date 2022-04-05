@@ -8,7 +8,7 @@ let retryPinger;
 
 betLevel = [
     100,
-    150
+    130
 ]; // 250
 
 let overallQuota = 70;
@@ -240,7 +240,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = randomPowerLawDistribution(1, 4)
+                    skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -711,6 +711,20 @@ function generateGuid() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
+}
+
+function generateRandomIntFromGuid() {
+    let numberOnlyUid = [];
+    for (const uid of generateGuid()) {
+        if (uid === '-') {
+            continue;
+        }
+        if (isNaN(uid) === false) {
+            numberOnlyUid.push(uid)
+        }
+    }
+    const indexPicked = randomPowerLawDistribution(1, numberOnlyUid.length - 1)
+    return parseInt(numberOnlyUid[indexPicked]);
 }
 
 function generateRandomBetArray() {
