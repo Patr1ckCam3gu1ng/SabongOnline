@@ -715,11 +715,13 @@ function generateRandomIntFromGuid() {
             continue;
         }
         if (isNaN(uid) === false) {
-            numberOnlyUid.push(uid)
+            if (uid === '0') {
+                numberOnlyUid.push(-1);
+            }
+            numberOnlyUid.push(parseInt(uid));
         }
     }
-    const indexPicked = randomPowerLawDistribution(1, numberOnlyUid.length - 1)
-    return parseInt(numberOnlyUid[indexPicked]);
+    return parseInt(numberOnlyUid[randomPowerLawDistribution(1, numberOnlyUid.length - 1)]);
 }
 
 function generateRandomBetArray() {
