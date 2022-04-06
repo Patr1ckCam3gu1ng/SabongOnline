@@ -7,7 +7,7 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    100,
+    200,
     100
 ]; // 200
 
