@@ -8,10 +8,10 @@ let retryPinger;
 
 betLevel = [
     100,
-    130
-]; // 250
+    100
+]; // 200
 
-let overallQuota = 70;
+let overallQuota = 50;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
