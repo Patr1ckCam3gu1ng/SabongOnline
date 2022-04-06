@@ -235,7 +235,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
+                    skipMatchesCount = maxSkipMatches = presentLevel + generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -628,7 +628,7 @@ async function initialize() {
 
 async function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
-        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
+        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
         initialSkipMatchesInitialized = true;
 
         await new Promise(resolve => setTimeout(resolve, 700));
