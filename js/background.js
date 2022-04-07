@@ -319,7 +319,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             if (currentPoints < betLevel[presentLevel]) {
                 betAmountPlaced = currentPoints;
             }
-            
+
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
 
