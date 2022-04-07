@@ -1,7 +1,7 @@
 {
   "name": "Autobot Sabong",
   "description": "Automated sabong betting: Alternate odds",
-  "version": "4.70",
+  "version": "4.72",
   "permissions": [
     "activeTab",
     "storage",

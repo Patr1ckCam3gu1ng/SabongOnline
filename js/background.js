@@ -44,7 +44,7 @@ let potWinnings = {
     win: 0,
     loss: 0
 };
-let currentPoints = 0;
+let currentPoints = betLevel[0];
 let ignoreInitialSkipMatches = false;
 let initialSkipMatchesInitialized = false;
 let maxSkipMatches = 3;
