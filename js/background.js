@@ -209,15 +209,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                         isExtraProfitUsed = false;
                         betsideValues = [...originalBetsideValues];
 
-                        // if (presentLevel === betLevel.length - 1 && isLastBetUsed === false) {
-                        //     console.log(`%Sorry! Bet level reduced`, 'font-weight: bold; color: #fdda11;');
-                        //
-                        //     betLevel.pop();
-                        //     isLastBetUsed = true;
-                        //
-                        //     potWinnings.win = 0;
-                        //     potWinnings.loss = 0;
-                        // }
+                        setCurrentPoints();
 
                         presentLevel = 0;
                     } else {
@@ -321,10 +313,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             betAmountPlaced = parseInt(betLevel[presentLevel]);
 
-            if (presentLevel === betLevel.length - 1 && currentPoints < betLevel[presentLevel]) {
+            // if (presentLevel === betLevel.length - 1 && currentPoints < betLevel[presentLevel]) {
+            //     betAmountPlaced = currentPoints;
+            // }
+            if (currentPoints < betLevel[presentLevel]) {
                 betAmountPlaced = currentPoints;
             }
-
+            
             chrome.tabs.sendMessage(tab.id, { text: "inputBet", betAmountPlaced });
             await chromeSendMessage(chrome.tabs);
 
