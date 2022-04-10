@@ -7,8 +7,10 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
+    100,
+    100,
     200,
-    100
+    550
 ]; // 200
 
 let overallQuota = 50;
