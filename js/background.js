@@ -50,6 +50,7 @@ let currentPoints = betLevel[0];
 let ignoreInitialSkipMatches = false;
 let initialSkipMatchesInitialized = false;
 let maxSkipMatches = 3;
+let skipMatchIndex = 0;
 let hasWithdrawnAlready = false;
 
 function createWebSocketConnection(crfToken, webserviceUrl) {
@@ -173,9 +174,11 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 if (skipMatchesCount >= 0) {
                     skipMatchesCount -= 1;
+                    skipMatchIndex += 1;
 
                     if (skipMatchesCount <= 0) {
                         skipMatchesCount = -1;
+                        skipMatchIndex = 0;
                         ignoreInitialSkipMatches = true;
 
                         // chrome.tabs.sendMessage(tab.id, { text: "reload" });
@@ -247,6 +250,10 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 // }
 
+                if (skipMatchIndex % 3 === 1) {
+                    chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                }
+
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
                 setCurrentPoints();
@@ -308,7 +315,9 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 printLine();
             }
 
-            setFinalBetside();
+            // setFinalBetside();
+
+            await iterateFinalBetside();
 
             // manageExtraProfit(0);
             // manageExtraProfit(1);
@@ -815,6 +824,26 @@ function withdrawProfit() {
             });
         }
     );
+}
+
+async function iterateFinalBetside() {
+    let finalBetIndex = 0;
+    let finalBetArray = [];
+    while (finalBetIndex < 5) {
+        setFinalBetside();
+        finalBetArray.push(finalBetside);
+        finalBetIndex += 1;
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    finalBetside = '';
+
+    if (finalBetArray.filter(p => p === meron).length > finalBetArray.filter(p => p === wala).length) {
+        finalBetside = meron;
+    } else {
+        finalBetside = wala;
+    }
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
