@@ -317,6 +317,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
             // setFinalBetside();
 
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
             await iterateFinalBetside();
 
             // manageExtraProfit(0);
