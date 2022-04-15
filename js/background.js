@@ -7,13 +7,17 @@ let reconnectRetries = 0;
 let retryPinger;
 
 betLevel = [
-    100,
-    100,
-    200,
-    550
+    99,
+    99,
+    230,
+    520,
+    1170,
+    2600,
+    6000,
+    13500
 ]; // 200
 
-let overallQuota = 50;
+let overallQuota = 9999;
 
 //should remain 'let' so we can change it in the console:
 let maxWaitTimes = 62;
@@ -232,7 +236,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printCurrentPoints();
                     printDummyBet();
 
-                    skipMatchesCount = maxSkipMatches = presentLevel + generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
+                    // skipMatchesCount = maxSkipMatches = presentLevel + generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
+                    skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -636,7 +641,8 @@ async function initialize() {
 
 async function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
-        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
+        // skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
+        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
         initialSkipMatchesInitialized = true;
 
         await new Promise(resolve => setTimeout(resolve, 700));
