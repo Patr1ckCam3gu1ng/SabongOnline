@@ -242,13 +242,13 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                 isSubmissionOpen = true;
                 betAmountPlaced = 0;
 
-                // if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
-                //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                // }
-
-                if (skipMatchIndex % 3 === 1) {
+                if (fightNumber % 6 === 1 && calculateProfit() < overallQuota) {
                     chrome.tabs.sendMessage(tab.id, { text: "reload" });
                 }
+
+                // if (skipMatchIndex % 3 === 1) {
+                //     chrome.tabs.sendMessage(tab.id, { text: "reload" });
+                // }
 
                 maxWaitTimes = generateRandomWaitTime();
                 printBetLevelTable();
@@ -325,7 +325,7 @@ const websocketConnect = (crfToken, webserviceUrl) => {
             // if (presentLevel === betLevel.length - 1 && currentPoints < betLevel[presentLevel]) {
             //     betAmountPlaced = currentPoints;
             // }
-            if (currentPoints < betLevel[presentLevel]) {
+            if (currentPoints < betLevel[presentLevel] && isDemoOnly === false) {
                 betAmountPlaced = currentPoints;
             }
 
@@ -753,7 +753,7 @@ function generateRandomBetArray() {
 }
 
 function setCurrentPoints() {
-    if (presentLevel === betLevel.length - 1 && isFundsDepleted() === false) {
+    if (presentLevel === betLevel.length - 1 && isFundsDepleted() === false && isDemoOnly === false) {
         chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
             async function (url) {
                 sendHttpRequestCurrentPoints(url, function (points) {
@@ -788,6 +788,11 @@ function withdrawProfit() {
         reconnectRetries = 999;
         forceDisconnect = true;
     };
+
+    if (isDemoOnly === true) {
+        flush();
+        return;
+    }
 
     hasWithdrawnAlready === false && crfTokenValue !== '' && chrome.tabs.sendMessage(tab.id, { text: "getLocationOrigin" },
         async function (url) {
