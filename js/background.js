@@ -176,21 +176,8 @@ const websocketConnect = (crfToken, webserviceUrl) => {
 
                 isLastMatchDraw = winner === 'draw';
 
-                if (skipMatchesCount >= 0) {
-                    skipMatchesCount -= 1;
-                    skipMatchIndex += 1;
+                manageSkipMatch();
 
-                    if (skipMatchesCount <= 0) {
-                        skipMatchesCount = -1;
-                        skipMatchIndex = 0;
-                        ignoreInitialSkipMatches = true;
-
-                        // chrome.tabs.sendMessage(tab.id, { text: "reload" });
-                        betsideValues = [...originalBetsideValues];
-
-                        chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingSkipMatches" });
-                    }
-                }
                 if (finalBetside === '' || isBetSubmitted === false) {
                     isBetSubmitted = false;
                     return;
@@ -237,7 +224,11 @@ const websocketConnect = (crfToken, webserviceUrl) => {
                     printDummyBet();
 
                     // skipMatchesCount = maxSkipMatches = presentLevel + generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
-                    skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
+                    // skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
+
+                    // if (skipMatchesCount === 0) {
+                    //     manageSkipMatch();
+                    // }
 
                     if (isFundsDepleted() === true) {
                         console.log('%cObjection Failed! Budget overrun', 'font-weight: bold; color: #f00; font-size: 19px;');
@@ -642,7 +633,7 @@ async function initialize() {
 async function skipMatchOnFirstInit() {
     if (ignoreInitialSkipMatches === false && initialSkipMatchesInitialized === false && potWinnings.win === 0 && potWinnings.loss === 0 && presentLevel === 0) {
         // skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid() + randomPowerLawDistribution(1, 4);
-        skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
+        // skipMatchesCount = maxSkipMatches = generateRandomIntFromGuid();
         initialSkipMatchesInitialized = true;
 
         await new Promise(resolve => setTimeout(resolve, 700));
@@ -845,12 +836,32 @@ async function iterateFinalBetside() {
         await new Promise(resolve => setTimeout(resolve, 500));
     }
 
+    console.log('finalBetArray', finalBetArray);
+
     finalBetside = '';
 
     if (finalBetArray.filter(p => p === meron).length > finalBetArray.filter(p => p === wala).length) {
         finalBetside = meron;
     } else {
         finalBetside = wala;
+    }
+}
+
+function manageSkipMatch() {
+    if (skipMatchesCount >= 0) {
+        skipMatchesCount -= 1;
+        skipMatchIndex += 1;
+
+        if (skipMatchesCount <= 0) {
+            skipMatchesCount = -1;
+            skipMatchIndex = 0;
+            ignoreInitialSkipMatches = true;
+
+            // chrome.tabs.sendMessage(tab.id, { text: "reload" });
+            betsideValues = [...originalBetsideValues];
+
+            chrome.tabs.sendMessage(tab.id, { text: "deletePrintRemainingSkipMatches" });
+        }
     }
 }
 
