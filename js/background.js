@@ -37,7 +37,7 @@ let isWinner = false;
 let isLastMatchDraw = false;
 let timer;
 let timerIndex = 0;
-let isDemoOnly = false;
+let isDemoOnly = true;
 let skipMatchesCount = -1;
 let fightNumber = 1;
 let forceDisconnect = false;
@@ -835,8 +835,6 @@ async function iterateFinalBetside() {
 
         await new Promise(resolve => setTimeout(resolve, 500));
     }
-
-    console.log('finalBetArray', finalBetArray);
 
     finalBetside = '';
 
